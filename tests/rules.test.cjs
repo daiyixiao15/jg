@@ -1,0 +1,38 @@
+const fs = require('node:fs');
+const vm = require('node:vm');
+const assert = require('node:assert/strict');
+const path = require('node:path');
+const sandbox = {}; vm.createContext(sandbox);
+for (const file of ['data.js','rules.js']) vm.runInContext(fs.readFileSync(path.join(__dirname,'../src',file),'utf8'),sandbox);
+const R=sandbox.GameRules,D=sandbox.GameData;
+const make=(ids,dialogueCount=0,risk=0)=>({...R.createState(),phase:'brew',collected:ids,pot:ids,dialogueCount,risk});
+const base=['apple','grape','cabbage','ice_cream','dumpling','frost','plants','cat_food'];
+assert.equal(R.resolveEnding(make(base)),'two');
+assert.equal(R.resolveEnding(make(['apple','grape','dumpling','frost','plants','cat_food','salt','vinegar'])),'one');
+assert.equal(R.resolveEnding(make(['apple','grape','cabbage','ice_cream','dumpling','frost','plants','cat_fur'])),'three');
+assert.equal(R.resolveEnding(make(['apple','grape','cabbage','ice_cream','dumpling','frost','shampoo','body_wash'])),'three');
+assert.equal(R.resolveEnding(make(['apple','grape','cabbage','ice_cream','dumpling','shampoo','body_wash','detergent'])),'four');
+assert.equal(R.resolveEnding(make(['apple','grape','cabbage','ice_cream','dumpling','frost','plants','skincare'])),'five');
+assert.equal(R.resolveEnding(make(['apple','grape','cabbage','ice_cream','shampoo','body_wash','detergent','bleach'])),'five');
+assert.equal(R.resolveEnding(make(['apple','grape','cabbage','ice_cream','shampoo','body_wash','detergent','bleach'],3)),'six');
+assert.equal(R.resolveEnding(make(base,3,6)),'caught');
+assert.throws(()=>R.resolveEnding(make(base.slice(0,7))));
+assert.throws(()=>R.resolveEnding(make([...base.slice(0,7),'apple'])));
+const s=R.createState();s.phase='explore';
+assert.equal(R.collect(s,'apple').ok,true);assert.equal(R.collect(s,'apple').ok,false);assert.equal(s.collected.length,1);
+assert.equal(R.collect(s,'salt').ok,false);assert.equal(s.risk,0);
+s.scene='sky';assert.equal(R.collect(s,'salt').ok,true);assert.equal(s.risk,1);R.collect(s,'salt');assert.equal(s.risk,1);
+s.scene='bath';assert.equal(R.collect(s,'bleach').ok,false);s.bleachStage=1;assert.equal(R.collect(s,'bleach').ok,false);s.bleachStage=2;assert.equal(R.collect(s,'bleach').ok,true);assert.equal(s.risk,1);
+const danger=R.createState();danger.phase='explore';danger.scene='sky';
+for(const id of ['soy_sauce','vinegar','salt','sugar','cooking_wine'])assert.equal(R.collect(danger,id).ok,true);
+assert.equal(danger.risk,5);assert.equal(danger.phase,'explore');danger.scene='palace';R.collect(danger,'lipstick');assert.equal(danger.risk,6);assert.equal(danger.ending,'caught');assert.equal(R.collect(danger,'skincare').ok,false);
+const full=make(base);full.phase='explore';full.pot=[];full.scene='sky';assert.equal(R.collect(full,'salt').ok,false);assert.equal(full.risk,0);full.phase='brew';
+assert.equal(R.putInPot(full,'salt'),false);assert.equal(R.canBrew(full),false);
+for(const id of base)assert.equal(R.putInPot(full,id),true);
+assert.equal(R.putInPot(full,'apple'),false);assert.equal(R.canBrew(full),true);full.phase='mixing';assert.equal(R.putInPot(full,'apple'),false);
+assert.equal(D.materials.length,23);assert.equal(new Set(D.materials.map(m=>m.id)).size,23);
+// Enumerate every legal eight-material combination: no unresolved ending, all six reachable.
+const found=new Set();let count=0;
+function visit(start,ids){if(ids.length===8){const rows=ids.map(id=>D.materials.find(m=>m.id===id));const risk=rows.filter(m=>['palace','sky'].includes(m.scene)).length;if(risk<=5){found.add(R.resolveEnding(make(ids,0,risk)));count++;}return;}for(let i=start;i<=D.materials.length-(8-ids.length);i++)visit(i+1,[...ids,D.materials[i].id]);}
+visit(0,[]);for(const id of ['one','two','three','four','five'])assert.ok(found.has(id),id+' must be reachable');found.add(R.resolveEnding(make(base,3)));assert.ok(found.has('six'));
+console.log('PASS: collection, risk boundaries, 84 gate, brewing gates, ending priorities; '+count+' legal combinations checked; all six endings reachable.');
