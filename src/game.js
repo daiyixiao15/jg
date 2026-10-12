@@ -1,7 +1,7 @@
 (function(){
   'use strict';
   const D=GameData,R=GameRules,S=GameStory,app=document.getElementById('app');
-  const KEY='little-magic-library-v2',OLD_KEY='little-magic-save-v1';
+  const KEY='little-magic-library-v2',OLD_KEY='little-magic-save-v1',NAME_KEY='little-magic-last-name';
   const names={lab:'制药所',hub:'中央公园',bath:'泡泡王国',sky:'天空之城',ice:'冰雪塔楼',forest:'梦幻森林',palace:'宫殿长廊',dragon:'恶龙盘踞之地'};
   const backgrounds={lab:'lab.jpg',bath:'bath.jpg',sky:'sky.jpg',ice:'ice.jpg',dragon:'dragon-resting.png'};
   const itemImages={ice_cream:'sweet-snow.png',dumpling:'dumplings.png',frost:'frost.png'};
@@ -28,6 +28,15 @@
     }catch{return {version:2,autosave:null,slots:[null,null,null],completed:[]};}
   }
   let library=readLibrary();
+  function readLastName(){
+    try{const name=localStorage.getItem(NAME_KEY);if(typeof name==='string'&&name.trim()&&name.trim().length<=24)return name.trim();}catch{}
+    return library.autosave?.playerName||library.slots.find(Boolean)?.state.playerName||'';
+  }
+  let lastName=readLastName();
+  function rememberName(name){
+    lastName=name;
+    try{localStorage.setItem(NAME_KEY,name);}catch{notice='浏览器无法保存名字，请允许本地存储。';}
+  }
   function persist(){try{localStorage.setItem(KEY,JSON.stringify(library));return true;}catch{notice='浏览器无法保存进度，请允许本地存储。';return false;}}
   function autosave(resume=false){if(resume)autosavePaused=false;if(!autosavePaused&&valid(state)){library.autosave=clone(state);persist();}}
   function markEnding(){if(!library.completed.includes(state.adventureId))library.completed.push(state.adventureId);autosave();}
@@ -71,6 +80,7 @@
     if(!modal)return '';
     let body='';
     if(modal.type==='name')body=`<form id="name-form"><h2>小精灵，你叫什么名字？</h2><input id="player-name" maxlength="24" required autocomplete="off" aria-label="玩家名字" placeholder="输入你的名字"><div class="choices">${button('取消','close')}<button type="submit">开始冒险</button></div></form>`;
+    else if(modal.type==='reuse-name')body=`<h2>继续使用上次的名字吗？</h2><p>上次使用的名字是「${esc(lastName)}」。</p><div class="choices">${button('继续使用','reuse-name')}${button('换一个名字','change-name')}</div>`;
     else if(modal.type==='settings')body=`<h2>设置</h2><div class="setting-buttons">${button('存档','save-list')}${button('读档','load-list')}${button('返回启动界面','menu')}</div><p class="storage-note">存档保存在当前浏览器，共三个手动存档位置。</p>`;
     else if(modal.type==='saves')body=saveList();
     else if(modal.type==='material'){
@@ -133,7 +143,7 @@
   function restore(id){
     const saved=id==='auto'?library.autosave:library.slots[Number(id)]?.state;
     if(!valid(saved)){modal={type:'text',text:'没有可读取的有效存档。'};render();return;}
-    clearTimeout(mixingTimer);cancelDrag();autosavePaused=false;state=clone(saved);state.round=Number.isInteger(state.round)&&state.round>0?state.round:1;state.adventureId=state.adventureId||'legacy';state.visited=state.visited||[];modal=null;bag=false;notice='进度已读取。';
+    clearTimeout(mixingTimer);cancelDrag();autosavePaused=false;state=clone(saved);state.round=Number.isInteger(state.round)&&state.round>0?state.round:1;state.adventureId=state.adventureId||'legacy';state.visited=state.visited||[];modal=null;bag=false;notice='进度已读取。';rememberName(state.playerName);
     if(state.phase==='mixing'){state.phase='ready';modal={type:'travel'};}
     else if(state.phase==='ready'&&!state.narrative)modal={type:state.scene==='dragon'?'drink':'travel'};
     autosave();render();
@@ -153,12 +163,17 @@
     state.phase='mixing';bag=false;cancelDrag();autosave(true);render();
     mixingTimer=setTimeout(()=>{if(state.phase!=='mixing')return;state.phase='ready';modal={type:'travel'};autosave();render();},3200);
   }
-  app.addEventListener('submit',event=>{
-    if(event.target.id!=='name-form')return;event.preventDefault();
-    const name=document.getElementById('player-name').value.trim();if(!name)return;
+  function startAdventure(name){
+    name=name.trim();if(!name||name.length>24)return;
     clearTimeout(mixingTimer);cancelDrag();notice='';autosavePaused=false;
+    rememberName(name);
     state={...R.createState(),phase:'prologue',scene:'lab',playerName:name,section:'lower',round:library.completed.length+1,adventureId:Date.now().toString(36)+'-'+Math.random().toString(36).slice(2),visited:[],narrative:null};
     say(S.opening,'lab');
+  }
+  app.addEventListener('submit',event=>{
+    if(event.target.id!=='name-form')return;event.preventDefault();
+    if(modal?.type!=='name')return;
+    startAdventure(document.getElementById('player-name').value);
   });
   app.addEventListener('click',event=>{
     if(drag?.active)return;
@@ -168,10 +183,12 @@
     if(!el||el.disabled)return;
     const action=el.dataset.action,id=el.dataset.id;
     // A popup blocks all underlying world controls, including keyboard activation.
-    const popupActions=['close','save-list','load-list','menu','restore','save-slot','delete-save','collect','discard','potion-travel','drink'];
+    const popupActions=['close','reuse-name','change-name','save-list','load-list','menu','restore','save-slot','delete-save','collect','discard','potion-travel','drink'];
     if(modal&&!popupActions.includes(action))return;
     notice='';
-    if(action==='start')modal={type:'name'};
+    if(action==='start')modal={type:lastName?'reuse-name':'name'};
+    else if(action==='reuse-name'&&modal?.type==='reuse-name'){startAdventure(lastName);return;}
+    else if(action==='change-name'&&modal?.type==='reuse-name')modal={type:'name'};
     else if(action==='continue'||action==='load-list')modal={type:'saves',mode:'load'};
     else if(action==='settings')modal={type:'settings'};
     else if(action==='save-list')modal={type:'saves',mode:'save'};
