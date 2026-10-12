@@ -1,142 +1,73 @@
-(function() {
-  'use strict';
-  const D=GameData,R=GameRules,app=document.getElementById('app');
-  let state=R.createState(),selected=null,notice='',modal=null,drag=null,suppressClick=false,mixingTimer=null,touchClickUntil=0;
-  const tagNames={edible:'能吃',tasty:'好吃',inedible:'不能吃',nonToxic:'无毒',toxic:'有毒',foaming:'出泡'};
-  const material=id=>D.materials.find(m=>m.id===id);
-  const button=(text,action,extra='',cls='')=>`<button class="${cls}" data-action="${action}" ${extra}>${text}</button>`;
-  function inventory() {
-    return `<footer class="inventory"><div class="inventory-heading"><div><strong>我的八份宝物</strong><span>${state.collected.length} / 8 已收集${['brew','mixing','ready'].includes(state.phase)?` · ${state.pot.length} / 8 已入锅`:''}</span></div><p>${state.phase==='brew'?'点击选中瓶子，再拖入大锅':'每种宝物只能收集一次'}</p></div><div class="bottles">${Array.from({length:8},(_,i)=>{const id=state.collected[i],m=material(id),used=state.pot.includes(id);return m?`<button class="bottle ${selected===id?'selected':''} ${used?'used':''}" data-action="bottle" data-id="${id}" ${used?'disabled':''} aria-label="${m.name}${used?'，已入锅':''}" ${state.phase==='brew'?'data-draggable="true"':''}><span class="bottle-art" aria-hidden="true">${used?'✓':'✦'}</span><span>${m.name}</span><small>${used?'已入锅':state.phase==='brew'?'拖入大锅':'已收集'}</small></button>`:`<div class="bottle empty"><span class="bottle-art">${i+1}</span><span>等待宝物</span></div>`;}).join('')}</div></footer>`;
+(function(){
+ 'use strict';
+ const D=GameData,R=GameRules,app=document.getElementById('app'),KEY='little-magic-save-v1';
+ let state=R.createState(),bag=false,modal=null,dialog=null,timer=null,mixTimer=null,selected=null,notice='';
+ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const btn=(label,action,attrs='')=>`<button data-action="${action}" ${attrs}>${label}</button>`;
+ const mat=id=>D.materials.find(m=>m.id===id);
+ const names={hub:'中央公园',lab:'制药所',ice:'冰雪塔楼',bath:'泡泡王国',sky:'天空之城',forest:'梦幻森林',palace:'宫殿长廊',dragon:'巨龙盘踞之地'};
+ const backgrounds={lab:'lab',ice:'ice',bath:'bath',sky:'sky'};
+ const spots={shampoo:[10,29,14,22],body_wash:[22,32,10,23],detergent:[68,37,14,23],toothpaste:[86,37,10,28],bleach:[79,1,15,19],soy_sauce:[88,46,10,25],vinegar:[30,4,10,21],salt:[64,33,9,15],sugar:[13,53,10,17],cooking_wine:[17,14,10,12],ice_cream:[54,55,19,22],dumpling:[60,72,36,15],frost:[30,79,15,20],apple:[12,55,18,22],grape:[2,74,14,22],cabbage:[78,52,17,21]};
+ const tags={edible:'能吃',tasty:'好吃',inedible:'不能吃',nonToxic:'无毒',toxic:'有毒',foaming:'出泡'};
+ function readSave(){try{const s=JSON.parse(localStorage.getItem(KEY));if(!s||s.version!==1)return null;const v=s.state;if(!v||!['explore','brew','mixing','ready','ending'].includes(v.phase)||!names[v.scene]||typeof v.playerName!=='string'||!v.playerName.trim()||!Array.isArray(v.collected)||v.collected.length>8||new Set(v.collected).size!==v.collected.length||v.collected.some(id=>!mat(id))||!Array.isArray(v.pot)||new Set(v.pot).size!==v.pot.length||v.pot.some(id=>!v.collected.includes(id))||!Number.isInteger(v.risk)||v.risk<0||!Number.isInteger(v.dialogueCount)||v.dialogueCount<0||![0,1,2].includes(v.bleachStage)||!['upper','lower'].includes(v.section)||v.phase==='ending'&&!D.endings[v.ending]||['mixing','ready'].includes(v.phase)&&v.pot.length!==8)return null;return v;}catch{return null;}}
+ function save(){if(['intro','exit'].includes(state.phase))return;try{localStorage.setItem(KEY,JSON.stringify({version:1,state}));}catch{notice='浏览器无法保存进度，请允许本地存储。';}}
+ function hot(label,action,id,rect){return `<button class="hotspot" data-action="${action}" data-id="${id}" style="left:${rect[0]}%;top:${rect[1]}%;width:${rect[2]}%;height:${rect[3]}%" aria-label="${esc(label)}"><span>${esc(label)}</span></button>`;}
+ function scene(){
+  if(state.scene==='hub')return `<div class="hub"><h2>中央公园</h2><p>沿着小路，去寻找你的魔法。</p>${['lab','bath','sky','forest','palace'].map(id=>btn(names[id],'scene',`data-id="${id}"`)).join('')}</div>${hot('门边的巨龙','scene','dragon',[3,55,18,22])}`;
+  if(state.scene==='lab')return hot('离开制药所','scene','hub',[34,20,18,36])+hot('大锅与搅拌木棍','brew','',[34,51,64,46]);
+  if(state.scene==='dragon')return `<div class="placeholder"><div class="dragon">⌁</div><h2>巨龙静静守在门边</h2>${btn('与巨龙交谈','talk')}</div>`;
+  const rows=D.materials.filter(m=>m.scene===state.scene&&(!m.section||m.section===state.section));
+  let content=rows.map((m,i)=>hot(m.name+(state.collected.includes(m.id)?' · 已收集':''),'inspect',m.id,spots[m.id]||[15+i%2*40,25+Math.floor(i/2)*25,28,18])).join('');
+  if(!backgrounds[state.scene])content=`<div class="placeholder"><h2>${names[state.scene]}</h2><p>试运行场景 · 点击宝物探索</p></div>`+content;
+  if(state.scene==='sky')content+=hot('通往冰雪塔楼的云梯','scene','ice',[58,0,20,29]);
+  if(state.scene==='bath')content+=hot('小椅子','chair','',[40,73,13,16]);
+  if(state.scene==='ice')content+=hot('返回天空之城','scene','sky',[40,4,15,23]);
+  if(state.scene==='ice')content+=`<div class="section-tabs">${btn('上层冰塔','section','data-id="upper"')}${btn('下层冰窟','section','data-id="lower"')}</div>`;
+  if(state.scene==='ice'&&state.section==='lower')content+=hot('冰窟里的大冰石头','stone','',[4,54,12,18]);
+  return content;
+ }
+ function inventory(){return `<aside class="inventory" aria-label="背包"><h2>背包 · ${state.collected.length}/8</h2><div class="items">${state.collected.map(id=>`<button class="item ${state.pot.includes(id)?'used':''}" data-action="item" data-id="${id}"><span>✦</span>${mat(id).name}<small>${state.pot.includes(id)?'已入锅':state.phase==='brew'?'选择后点击大锅投入':'查看'}</small></button>`).join('')||'<p>背包还是空的，去找找宝物吧。</p>'}</div></aside>`;}
+ function popup(){if(!modal)return '';if(modal.type==='name')return `<div class="shade"><form class="modal" id="name-form"><h2>小精灵，你叫什么名字？</h2><input id="player-name" maxlength="24" required autocomplete="off" placeholder="输入你的名字" aria-label="玩家名字"><div class="choices">${btn('取消','close','type="button"')}<button type="submit">开始冒险</button></div></form></div>`;
+  const m=modal.id&&mat(modal.id);return `<div class="shade"><section class="modal" role="dialog" aria-modal="true" aria-label="${m?m.name:'提示'}">${btn('×','close','class="close" aria-label="关闭提示"')}${m?`<div class="item-art" style="${backgrounds[m.scene]?'background-image:url(assets/'+backgrounds[m.scene]+'.jpg);background-size:'+(10000/(spots[m.id]?.[2]||30))+'% '+(10000/(spots[m.id]?.[3]||30))+'%;background-position:'+((spots[m.id]?.[0]||0)/(100-(spots[m.id]?.[2]||30))*100)+'% '+((spots[m.id]?.[1]||0)/(100-(spots[m.id]?.[3]||30))*100)+'%':''}">✦</div><h2>${m.name}</h2><p>${m.description}</p><p>${m.tags.map(t=>tags[t]).join(' · ')}</p><div class="choices">${btn(state.collected.includes(m.id)?'已收集':'收集','collect',`data-id="${m.id}" ${state.collected.includes(m.id)?'disabled':''}`)}${btn('丢弃','close')}</div>`:`<h2>提示</h2><p>${esc(modal.text)}</p>`}</section></div>`;}
+ function render(){
+  clearInterval(timer);
+  if(state.phase==='intro'||state.phase==='exit'){app.innerHTML=`<div class="stage menu"><h1>一锅小小的魔法</h1><p>${state.phase==='exit'?'游戏已结束，进度已保存。':'小精灵的第一次冒险'}</p>${btn('开始','start')}${btn('继续','continue',readSave()?'':'disabled')}${btn('结束游戏','exit')}${popup()}</div>`;if(modal?.type==='name')document.getElementById('player-name').focus();return;}
+  const bg=backgrounds[state.scene];
+  app.innerHTML=`<div class="stage ${bg?'illustrated':''}" ${bg?`style="background-image:url(assets/${bg}.jpg)"`:''}><header>${btn('← 返回','back')}<span>${esc(names[state.scene])}</span><div>${btn('存档','save')}${btn('读档','load')}${btn('菜单','menu')}${btn('背包','bag','aria-expanded="'+bag+'"')}</div></header>${state.phase==='ending'?`<div class="ending"><h2>${D.endings[state.ending].title}</h2><p>${D.endings[state.ending].subtitle}</p>${btn('重返启动界面','menu')}</div>`:['brew','mixing','ready'].includes(state.phase)?`<div class="brew-panel ${state.phase==='mixing'?'mixing':''}"><h2>${state.phase==='mixing'?'魔法正在涌现…':state.phase==='ready'?'魔法药做好了':'把八种宝物逐一放入大锅'}</h2><p>${state.pot.length}/8 已入锅</p>${btn(selected?'投入「'+mat(selected).name+'」':'大锅','deposit','id="pot"')}${state.phase==='brew'?btn('开始制药','mix',R.canBrew(state)?'':'disabled'):state.phase==='ready'?btn(state.dialogueCount>=3?'放下药，去找巨龙':'喝下魔法药','finish'):''}</div>`:scene()}${bag?inventory():''}${notice?`<div class="notice" role="status">${esc(notice)}</div>`:''}${dialog?`<div class="dialogue" role="button" tabindex="0" aria-label="点击推进对话"><div class="portrait"><img src="assets/player.png" alt="玩家立绘"></div>${dialog.lines[dialog.index].speaker?`<div class="speaker">${esc(dialog.lines[dialog.index].speaker)}</div>`:''}<p id="dialog-text"></p><small>点击画面继续</small></div>`:''}${popup()}</div>`;
+  if(dialog){const line=dialog.lines[dialog.index].text,node=document.getElementById('dialog-text');node.textContent=line.slice(0,dialog.shown);timer=setInterval(()=>{if(!dialog){clearInterval(timer);return;}dialog.shown=Math.min(line.length,dialog.shown+1);node.textContent=line.slice(0,dialog.shown);if(dialog.shown===line.length)clearInterval(timer);},55);}
+ }
+ function say(lines,done){bag=false;dialog={lines,index:0,shown:0,done};render();}
+ function advance(){const line=dialog.lines[dialog.index];if(dialog.shown<line.text.length){dialog.shown=line.text.length;render();return;}if(dialog.index<dialog.lines.length-1){dialog.index++;dialog.shown=0;render();return;}const done=dialog.done;dialog=null;clearInterval(timer);if(done)done();save();render();}
+ function go(id){clearTimeout(mixTimer);state.phase='explore';state.scene=id;selected=null;bag=false;save();}
+ function restore(){const s=readSave();if(!s){notice='没有可读取的有效存档。';return;}clearTimeout(mixTimer);state=s;if(state.phase==='mixing')state.phase='ready';modal=null;dialog=null;bag=false;selected=null;notice='进度已读取。';}
+ app.addEventListener('submit',e=>{if(e.target.id!=='name-form')return;e.preventDefault();const name=document.getElementById('player-name').value.trim();if(!name)return;state={...R.createState(),playerName:name,phase:'explore',scene:'lab'};modal=null;save();say([{text:'你是这片大陆唯一的精灵。巨龙守在光明世界的交界处。'},{speaker:name,text:'我要寻找八种宝物，调制属于我的魔法药！'}]);});
+ app.addEventListener('click',e=>{
+  if(dialog&&!modal){advance();return;}const el=e.target.closest('[data-action]');if(!el||el.disabled)return;const a=el.dataset.action,id=el.dataset.id;notice='';
+  if(a==='start')modal={type:'name'};
+  if(a==='continue'||a==='load')restore();
+  if(a==='exit'||a==='menu'){save();clearTimeout(mixTimer);state.phase=a==='exit'?'exit':'intro';modal=null;bag=false;}
+  if(a==='close')modal=null;
+  if(a==='bag')bag=!bag;
+  if(a==='save'){save();notice=notice||'进度已保存。';}
+  if(a==='scene')go(id);
+  if(a==='back')go(state.scene==='hub'?'lab':state.scene==='ice'?'sky':['brew','mixing','ready'].includes(state.phase)?'lab':'hub');
+  if(a==='section')state.section=id;
+  if(a==='stone'){say([{speaker:state.playerName,text:'这块大冰石头纹丝不动，今天带不走啦。'}]);return;}
+  if(a==='inspect'){
+   if(id==='bleach'&&state.bleachStage<2){state.bleachStage=1;say([{speaker:state.playerName,text:'呜呜呜太高了够不着，有什么办法可以拿到它呢'}]);save();return;}
+   modal={id};
   }
-  function header() {
-    return `<header class="topbar"><div><span class="eyebrow">小精灵的第一次冒险</span><h1>一锅小小的魔法</h1></div><div class="top-actions"><span class="risk ${state.risk>=5?'danger':''}" aria-label="风险 ${state.risk}，超过5被抓">风险 ${state.risk} / 5</span>${button('玩法','help','','quiet')}${button('重新开始','restart','','quiet')}</div></header>`;
-  }
-  function explore() {
-    const s=D.scenes.find(x=>x.id===state.scene);
-    let objects='';
-    if(s.id==='dragon') {
-      objects=`<div class="dragon-figure" aria-hidden="true"><span>⌁</span><i></i><i></i></div><div class="dragon-caption"><h3>${state.dialogueCount>=3?'它的眼睛里有暖暖的光':'巨龙静静地守着门'}</h3><p>已经交谈 ${state.dialogueCount} 次${state.dialogueCount>=3?' · 你开始理解它了':''}</p>${button(state.dialogueCount?'再和它说说话':'与巨龙对话','talk','','primary')}</div>`;
-    } else {
-      const rows=D.materials.filter(m=>m.scene===s.id && (!m.section || m.section===state.section));
-      objects=`<div class="objects">${rows.map((m,i)=>`<button class="object ${state.collected.includes(m.id)?'collected':''}" data-action="inspect" data-id="${m.id}" style="--object-color:${['#e1b1a6','#beb9df','#a9c8a6','#e5c286'][i%4]}"><span class="object-shape" aria-hidden="true">${state.collected.includes(m.id)?'✓':'✦'}</span><strong>${m.name}</strong><small>${state.collected.includes(m.id)?'已收集':'点击查看'}</small></button>`).join('')}${s.id==='ice' && state.section==='lower'?`<button class="object stone" data-action="meat"><span class="object-shape">◇</span><strong>冰窟里的大冰石头</strong><small>点击查看</small></button>`:''}${s.id==='bath'?`<button class="object chair" data-action="chair"><span class="object-shape">▤</span><strong>小椅子</strong><small>${state.bleachStage>=2?'已经搬好了':'点击互动'}</small></button>`:''}</div>`;
-    }
-    return `<main class="explore-layout"><nav class="scene-nav" aria-label="场景导航"><span class="eyebrow">去哪里找魔法？</span>${D.scenes.map(x=>`<button class="scene-link ${s.id===x.id?'active':''}" data-action="scene" data-id="${x.id}" ${s.id===x.id?'aria-current="page"':''}><span>${x.icon}</span>${x.name}${x.risky?'<small>收集 +1 风险</small>':''}</button>`).join('')}<button class="go-brew ${state.collected.length===8?'complete':''}" data-action="go-brew" ${state.collected.length!==8?'disabled':''}>去大锅那里 <span>${state.collected.length}/8</span></button></nav><section class="scene" style="--scene-color:${s.color}"><div class="scene-heading"><div><span class="eyebrow">场景 ${D.scenes.indexOf(s)+1} / 6</span><h2>${s.name}</h2></div><span class="scene-icon" aria-hidden="true">${s.icon}</span></div><p class="scene-intro">${s.intro}</p>${s.risky?'<p class="risk-hint">每收集一件宝物，风险 +1。超过 5 会被巨龙发现。</p>':''}${s.id==='ice'?`<div class="section-tabs">${button('上层冰塔','section','data-id="upper"',state.section==='upper'?'active':'')}${button('下层冰窟','section','data-id="lower"',state.section==='lower'?'active':'')}</div>`:''}${objects}</section></main>`;
-  }
-  function brewing() {
-    const busy=state.phase==='mixing',ready=state.phase==='ready';
-    return `<main class="brew-page"><div class="brew-heading"><span class="eyebrow">八份宝物，一锅魔法</span><h2>${busy?'魔法正在涌现':ready?'你的魔法药做好了':'把宝物放进大锅'}</h2><p>${busy?'光在锅里转圈，气泡一颗颗升起来。':ready?'最后的选择，就在你手里。':'先点击底部的瓶子，再按住它拖到锅里。八种都放进去才能制药。'}</p></div><div class="cauldron-wrap ${busy?'mixing':''} ${ready?'ready':''}"><div class="steam" aria-hidden="true">${Array.from({length:8},(_,i)=>`<i style="--i:${i}"></i>`).join('')}</div><div id="pot" class="cauldron" aria-label="大锅，拖放材料到这里"><div class="liquid" style="--level:${20+state.pot.length*6}%"><span>✦</span><span>✧</span><span>✦</span></div><div class="pot-label">${ready?'✦':`${state.pot.length} / 8`}<small>${ready?'魔法药':busy?'搅拌中':'拖到这里'}</small></div></div><div class="pot-feet" aria-hidden="true"></div></div><div class="brew-controls">${state.phase==='brew'?(R.canBrew(state)?button('开始制药 · 搅拌','mix','','primary'): `<p>${selected?`已选中「${material(selected).name}」，把瓶子拖到锅里。`:'还需要放入 '+(8-state.pot.length)+' 种宝物'}</p>`)+button('回去看看巨龙','back','','quiet'):''}${ready?button(state.dialogueCount>=3?'放下药，去找巨龙':'喝下魔法药','finish','','primary'):''}${busy?'<p role="status">正在搅拌……</p>':''}</div><div class="pot-list">${state.pot.map(id=>`<span>${material(id).name}</span>`).join('')}</div></main>`;
-  }
-  function ending() {
-    const e=D.endings[state.ending];
-    return `<main class="ending-page"><span class="eyebrow">${e.trueEnding?'真结局':'冒险的一个结局'}</span><div class="ending-symbol" aria-hidden="true">${({one:'☁',two:'✦',three:'〰',four:'○',five:'◇',six:'☀',caught:'！'})[state.ending]}</div><h2>${e.title}</h2><p class="ending-subtitle">${e.subtitle}</p><div class="ending-story">${e.text.map(t=>`<p>${t}</p>`).join('')}</div><p class="ending-note">${e.trueEnding?'谢谢你走到了故事的这一面。':'这还不是真结局。再试一次，也许能发现巨龙的另一面。'}</p>${button('再来一次冒险','restart','','primary')}</main>`;
-  }
-  function modalView() {
-    if(!modal)return '';
-    let body='';
-    if(modal.type==='material') {
-      const m=material(modal.id),owned=state.collected.includes(m.id),full=state.collected.length>=8,locked=m.id==='bleach' && state.bleachStage<2;
-      body=`<span class="eyebrow">发现一份宝物</span><h2 id="modal-title">${m.name}</h2><p>${m.description}</p><div class="tags">${m.tags.map(t=>`<span>${tagNames[t]}</span>`).join('')}</div>${locked?'<p>借助小椅子才能够到它。先关上这个窗口，再点击椅子。</p>':''}${button(owned?'已经收集':full?'收集栏已满':locked?'现在够不着':'收集这份宝物','collect',`data-id="${m.id}" ${owned||full||locked?'disabled':''}`,'primary')}`;
-    } else if(modal.type==='talk') {
-      const d=D.dialogues[Math.min(state.dialogueCount,D.dialogues.length-1)];
-      body=`<span class="eyebrow">与巨龙的第 ${state.dialogueCount+1} 次对话</span><h2 id="modal-title">巨龙的声音</h2><blockquote>“${d.dragon}”</blockquote><p>${d.thought}</p>${button(d.reply,'advance-talk','','primary')}`;
-    } else if(modal.type==='help') {
-      body='<h2 id="modal-title">怎样调制魔法药</h2><p>点击场景里的宝物，查看后收集。每种只能拿一次，一共需要八种。</p><p>宫殿长廊和天空之城每拿一件，风险增加1；超过5，就会提前被抓。</p><p>到大锅那里，点击收集栏里的瓶子，再逐个拖入锅里。全部放入后，点击开始制药。</p><p>也可以去和巨龙说说话。每次交谈，都会多了解它一点。</p><p class="prototype-note">这是虚构的幻想游戏。材料标签只属于游戏设定，请勿模仿调配或食用现实物品。</p>';
-    } else {
-      body=`<h2 id="modal-title">${modal.title}</h2><p>${modal.text}</p>`;
-    }
-    return `<div class="modal-backdrop"><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">${button('关闭','close','aria-label="关闭窗口"','close')}${body}</section></div>`;
-  }
-  function render() {
-    if(state.phase==='intro') {
-      app.innerHTML=`<main class="intro-page"><span class="eyebrow">点击探索 · 单机小冒险</span><div class="intro-art" aria-hidden="true"><span>✦</span><i>☁</i><b>◇</b></div><h1>一锅小小的魔法</h1><p>你是这片大陆唯一的精灵。</p><p>一位巨龙守在光明世界的交界处。你觉得它是邪恶的象征，可你现在还没有力量战胜它。</p><p>去不同的地方寻找八种宝物，调制增强药水。<br>也许，冒险会给你一个意想不到的答案。</p>${button('出发，寻找魔法','start','','primary')}<small>建议使用浏览器打开 · 鼠标和触屏均可操作</small></main>`;
-    } else {
-      app.innerHTML=header()+(state.phase==='explore'?explore():state.phase==='ending'?ending():brewing())+(state.phase==='ending'?'':inventory())+`<div class="notice" role="status" aria-live="polite">${notice}</div>`+modalView();
-    }
-    if(modal) {const focus=app.querySelector('.modal button:not([disabled])');if(focus)focus.focus();}
-  }
-  function flash(text) {notice=text;render();}
-  app.addEventListener('click',event=>{
-    const el=event.target.closest('[data-action]'); if(!el || el.disabled)return;
-    if(event.isTrusted && event.detail>0 && Date.now()<touchClickUntil)return;
-    if(suppressClick && el.dataset.action==='bottle')return;
-    const a=el.dataset.action,id=el.dataset.id; notice='';
-    if(a==='start') state.phase='explore';
-    if(a==='scene' && state.phase==='explore') {state.scene=id;selected=null;}
-    if(a==='section') state.section=id;
-    if(a==='inspect') {if(id==='bleach' && state.bleachStage===0) state.bleachStage=1;modal={type:'material',id};}
-    if(a==='collect') {const result=R.collect(state,id);notice=result.message;modal=null;}
-    if(a==='chair') {
-      if(state.bleachStage===1) {state.bleachStage=2;notice='你把椅子搬到高处的瓶子下面。现在再点击女巫毒药，就能够到它了。';}
-      else notice=state.bleachStage>=2?'椅子已经放好了。再点击女巫毒药吧。':'一把小椅子。也许有什么宝物，是你踮脚也够不到的？';
-    }
-    if(a==='meat')modal={type:'text',title:'冰窟里的大冰石头',text:'你使劲撬了撬，它纹丝不动。这块大冰石头，今天是带不走啦。'};
-    if(a==='talk')modal={type:'talk'};
-    if(a==='advance-talk' && modal?.type==='talk') {state.dialogueCount++;modal=null;notice=state.dialogueCount===3?'巨龙的心意，你终于听懂了。':'你又多了解了巨龙一点。';}
-    if(a==='go-brew' && state.collected.length===8) {state.phase='brew';selected=null;}
-    if(a==='back') {state.phase='explore';state.scene='dragon';selected=null;}
-    if(a==='bottle') {if(state.phase==='brew'){selected=id;notice='已选中「'+material(id).name+'」，请按住瓶子拖入大锅。';}else modal={type:'material',id};}
-    if(a==='mix' && R.canBrew(state)) {
-      state.phase='mixing';selected=null;
-      mixingTimer=setTimeout(()=>{state.phase='ready';notice='魔法药做好了。';mixingTimer=null;render();},3200);
-    }
-    if(a==='finish' && state.phase==='ready') {state.ending=R.resolveEnding(state);state.phase='ending';}
-    if(a==='help')modal={type:'help'};
-    if(a==='close')modal=null;
-    if(a==='restart') {if(mixingTimer)clearTimeout(mixingTimer);mixingTimer=null;state=R.createState();selected=null;modal=null;notice='';}
-    render();
-  });
-  app.addEventListener('pointerup',event=>{
-    if(event.pointerType!=='touch' || drag?.active)return;
-    const el=event.target.closest('[data-action]');
-    if(!el || el.disabled)return;
-    event.preventDefault();touchClickUntil=Date.now()+500;el.click();
-  });
-  app.addEventListener('pointerdown',event=>{
-    const el=event.target.closest('[data-draggable]');
-    if(!el || el.disabled || state.phase!=='brew' || modal || event.button!==0)return;
-    drag={id:el.dataset.id,x:event.clientX,y:event.clientY,pointer:event.pointerId,active:false,ghost:null};
-    el.setPointerCapture(event.pointerId);
-  });
-  function scrollWhileDragging() {
-    if(!drag?.active)return;
-    if(drag.clientY<65)window.scrollBy(0,-12);
-    else if(drag.clientY>window.innerHeight-65)window.scrollBy(0,12);
-    const pot=document.getElementById('pot'),rect=pot?.getBoundingClientRect();
-    if(pot)pot.classList.toggle('over',!!rect && drag.clientX>=rect.left && drag.clientX<=rect.right && drag.clientY>=rect.top && drag.clientY<=rect.bottom);
-    requestAnimationFrame(scrollWhileDragging);
-  }
-  window.addEventListener('pointermove',event=>{
-    if(!drag || event.pointerId!==drag.pointer)return;
-    if(!drag.active && Math.hypot(event.clientX-drag.x,event.clientY-drag.y)>8) {
-      drag.active=true;selected=drag.id;requestAnimationFrame(scrollWhileDragging);
-      drag.ghost=document.createElement('div');drag.ghost.className='drag-ghost';drag.ghost.textContent='✦ '+material(drag.id).name;document.body.appendChild(drag.ghost);
-    }
-    if(drag.active) {
-      event.preventDefault();drag.clientX=event.clientX;drag.clientY=event.clientY;drag.ghost.style.left=event.clientX+'px';drag.ghost.style.top=event.clientY+'px';
-      const pot=document.getElementById('pot'),rect=pot?.getBoundingClientRect();
-      if(pot)pot.classList.toggle('over',!!rect && event.clientX>=rect.left && event.clientX<=rect.right && event.clientY>=rect.top && event.clientY<=rect.bottom);
-    }
-  },{passive:false});
-  function stopDrag(event,cancelled=false) {
-    if(!drag || event.pointerId!==drag.pointer)return;
-    const current=drag;drag=null;current.ghost?.remove();
-    if(!current.active)return;
-    suppressClick=true;setTimeout(()=>{suppressClick=false;},0);
-    const pot=document.getElementById('pot'),rect=pot?.getBoundingClientRect();
-    if(!cancelled && rect && event.clientX>=rect.left && event.clientX<=rect.right && event.clientY>=rect.top && event.clientY<=rect.bottom && R.putInPot(state,current.id)) {selected=null;notice='「'+material(current.id).name+'」放入大锅了。';}
-    else notice='还没放进锅里，再拖一次吧。';
-    requestAnimationFrame(render);
-  }
-  window.addEventListener('pointerup',event=>stopDrag(event));
-  window.addEventListener('pointercancel',event=>stopDrag(event,true));
-  document.addEventListener('keydown',event=>{
-    if(event.key==='Escape' && modal){modal=null;render();return;}
-    if(event.key==='Tab' && modal){const nodes=Array.from(app.querySelectorAll('.modal button:not([disabled])'));const first=nodes[0],last=nodes[nodes.length-1];if(event.shiftKey && document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey && document.activeElement===last){event.preventDefault();first.focus();}}
-    if(event.key==='Enter' && state.phase==='brew' && selected && !modal && event.target.closest('.bottle')){event.preventDefault();if(R.putInPot(state,selected)){selected=null;flash('宝物放进锅里了。');}}
-  },true);
-  render();
+  if(a==='chair'){if(state.bleachStage===1)state.bleachStage=2;say([{speaker:state.playerName,text:state.bleachStage===2?'把小椅子搬到瓶子下面，这下就够得着了！':'一把小椅子，也许能帮我够到高处的宝物。'}]);save();return;}
+  if(a==='collect'){const result=R.collect(state,id);notice=result.message;modal=null;if(state.phase==='ending'){showEnding();return;}}
+  if(a==='talk'){const d=D.dialogues[Math.min(state.dialogueCount,D.dialogues.length-1)];say([{speaker:'巨龙',text:d.dragon},{text:d.thought},{speaker:state.playerName,text:d.reply}],()=>state.dialogueCount++);return;}
+  if(a==='brew'){if(state.collected.length!==8)modal={text:'需要先收集八种不同的宝物，再来制药。'};else{state.phase='brew';bag=true;}}
+  if(a==='item'){if(state.phase==='brew'&&!state.pot.includes(id)){selected=id;notice='已选中「'+mat(id).name+'」，点击大锅投入。';}else modal={id};}
+  if(a==='deposit'&&selected&&R.putInPot(state,selected)){selected=null;notice='宝物放入大锅了。';}
+  if(a==='mix'&&R.canBrew(state)){state.phase='mixing';bag=false;mixTimer=setTimeout(()=>{if(state.phase!=='mixing')return;state.phase='ready';save();render();},3200);}
+  if(a==='finish'&&state.phase==='ready'){state.ending=R.resolveEnding(state);state.phase='ending';showEnding();return;}
+  save();render();
+ });
+ function showEnding(){save();say(D.endings[state.ending].text.map(text=>({text})));}
+ document.addEventListener('keydown',e=>{if(e.isComposing||e.target.tagName==='INPUT')return;if(dialog&&!modal&&['Enter',' '].includes(e.key)){e.preventDefault();advance();}else if(e.key==='Escape'){if(modal)modal=null;else bag=false;render();}});
+ render();
 })();
-
-
-
-

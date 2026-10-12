@@ -18,7 +18,7 @@
     row('frost','ice','冰窟里刮下来的冰霜','冷冻区冰霜',['edible'],'lower'),
     row('shampoo','bath','粉色药水','洗发水',['inedible','foaming']),
     row('body_wash','bath','黄色药水','沐浴露',['inedible','foaming']),
-    row('detergent','bath','白砂','洗衣粉',['inedible','foaming']),
+    row('detergent','bath','白砂砂','洗衣粉',['inedible','foaming']),
     row('toothpaste','bath','莓莓泡泡云','儿童草莓味牙膏',['edible','foaming']),
     row('bleach','bath','女巫毒药','84消毒液',['inedible','toxic']),
     row('plants','forest','魔法花与魔法草','花草',['edible']),
