@@ -31,6 +31,8 @@ assert.equal(R.putInPot(full,'salt'),false);assert.equal(R.canBrew(full),false);
 for(const id of base)assert.equal(R.putInPot(full,id),true);
 assert.equal(R.putInPot(full,'apple'),false);assert.equal(R.canBrew(full),true);full.phase='mixing';assert.equal(R.putInPot(full,'apple'),false);
 assert.equal(D.materials.length,23);assert.equal(new Set(D.materials.map(m=>m.id)).size,23);
+const dropped=make(base);dropped.risk=4;
+assert.equal(R.discard(dropped,'apple'),true);assert.equal(dropped.collected.length,7);assert.equal(dropped.pot.length,7);assert.equal(dropped.risk,4);assert.equal(dropped.phase,'explore');assert.equal(dropped.scene,'lab');assert.equal(R.canBrew(dropped),false);assert.equal(R.discard(dropped,'apple'),false);
 // Enumerate every legal eight-material combination: no unresolved ending, all six reachable.
 const found=new Set();let count=0;
 function visit(start,ids){if(ids.length===8){const rows=ids.map(id=>D.materials.find(m=>m.id===id));const risk=rows.filter(m=>['palace','sky'].includes(m.scene)).length;if(risk<=5){found.add(R.resolveEnding(make(ids,0,risk)));count++;}return;}for(let i=start;i<=D.materials.length-(8-ids.length);i++)visit(i+1,[...ids,D.materials[i].id]);}

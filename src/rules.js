@@ -7,7 +7,7 @@
     if(!m || m.scene!==state.scene || (m.section && m.section!==state.section)) return {ok:false,message:'请先前往材料所在的地方。'};
     if(state.collected.includes(id)) return {ok:false,message:'这份宝物已经在你的收集栏里了。'};
     if(state.collected.length>=8) return {ok:false,message:'已经收满八种宝物，去大锅那里吧。'};
-    if(id==='bleach' && state.bleachStage<2) return {ok:false,message:'女巫毒药太高了。先看看它，再借助椅子吧。'};
+    if(id==='bleach' && state.bleachStage<2) return {ok:false,message:'女巫毒药太高了，现在还够不到。'};
     state.collected.push(id);
     if(m.scene==='palace' || m.scene==='sky') state.risk++;
     if(state.risk>5) {state.phase='ending';state.ending='caught';}
@@ -30,5 +30,13 @@
     if(allEdible) return 'one';
     return 'three';
   }
-  root.GameRules={createState,collect,putInPot,canBrew,resolveEnding};
+  function discard(state,id) {
+    if(!['explore','brew','ready'].includes(state.phase) || !state.collected.includes(id)) return false;
+    state.collected=state.collected.filter(x=>x!==id);
+    state.pot=state.pot.filter(x=>x!==id);
+    if(state.phase!=='explore') {state.phase='explore';state.scene='lab';}
+    // Picking up risky objects has already drawn attention; dropping them cannot undo it.
+    return true;
+  }
+  root.GameRules={createState,collect,discard,putInPot,canBrew,resolveEnding};
 })(typeof globalThis !== 'undefined' ? globalThis : window);
