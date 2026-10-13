@@ -21,13 +21,13 @@
     row('detergent','bath','白砂砂','洗衣粉',['inedible','foaming']),
     row('toothpaste','bath','莓莓泡泡云','儿童草莓味牙膏',['edible','foaming']),
     row('bleach','bath','女巫毒药','84消毒液',['inedible','toxic']),
-    row('plants','forest','魔法花与魔法草','花草',['edible']),
-    row('fallen_leaves','forest','魔法树的落叶','枯枝落叶',['inedible','nonToxic']),
-    row('cat_fur','forest','毛绒绒怪的毛绒绒','猫毛',['inedible','nonToxic']),
-    row('cat_food','forest','毛绒绒怪的粮仓粮食','猫粮',['edible']),
-    row('lipstick','palace','装在鞘里的晚霞','口红',['inedible','nonToxic']),
-    row('skincare','palace','粘腻腻药水','护肤品',['inedible','toxic']),
-    row('perfume','palace','香香剂','香水',['inedible','toxic']),
+    row('plants','forest','奇幻花','花草',['edible']),
+    row('fallen_leaves','forest','落叶','枯枝落叶',['inedible','nonToxic']),
+    row('cat_fur','forest','地上的毛绒绒','猫毛',['inedible','nonToxic']),
+    row('cat_food','forest','毛绒绒怪的美食','猫粮',['edible']),
+    row('lipstick','palace','小公主收藏的晚霞','口红',['inedible','nonToxic']),
+    row('skincare','palace','黏黏剂','护肤品',['inedible','toxic']),
+    row('perfume','palace','香香水','香水',['inedible','toxic']),
     row('soy_sauce','sky','乌云墨水','酱油',['edible']),
     row('vinegar','sky','魔法酸雨','醋',['edible']),
     row('salt','sky','咸咸星光晶','盐',['edible']),
@@ -35,11 +35,11 @@
     row('cooking_wine','sky','闪电药水','料酒',['edible'])
   ];
   const descriptions = {
-    apple:'一颗圆滚滚的冰果，红得像刚睡醒的太阳。', grape:'小小的冰珠挤在一起，像一串紫色的秘密。', cabbage:'一层又一层的冰草草，包着一个安静的冬天。',
+    apple:'诶？这个掉下来砸开了诶，蓝蓝的皮下竟是如此漂亮的果肉吗！', grape:'小小的冰珠挤在一起，像一串紫色的秘密。', cabbage:'糖糖，糖糖……好像是一株成了精的冰草？',
     ice_cream:'雪也会甜吗？这块甜雪好像知道答案。', dumpling:'它们总是连在一起的，你费了好大劲儿才勉强掰下完整的一颗。', frost:'冰壁上薄薄的霜，像碎掉的银色月光。',
     shampoo:'粉色药水轻轻一晃，细细的泡泡便冒了出来。', body_wash:'黄色药水像一小瓶阳光，摇起来却满是泡泡。', detergent:'白砂细得像雪，遇见水就开始热闹。', toothpaste:'莓莓泡泡云缩在细长的管子里，挤出来就蓬松起来。', bleach:'女巫毒药站得太高。你踮起脚尖，还是差了一点点。',
     plants:'魔法花和魔法草依偎在一起，摇着小小的叶子。', fallen_leaves:'魔法树落下的叶子，脆脆的，像写满咒语的纸。', cat_fur:'毛绒绒怪留下一小撮毛。它软得像一朵睡着的云。', cat_food:'毛绒绒怪的粮仓里，装着一颗颗小小的粮食。',
-    lipstick:'小小的鞘里藏着晚霞。轻轻打开，天空的颜色就露出来了。', skincare:'粘腻腻药水慢吞吞地流动，好像还没有睡醒。', perfume:'香香剂只露出一点，整个长廊就闻到了它。',
+    lipstick:'梦幻又美丽。小公主爬上梯子踮着脚，从收藏里挑出一抹晚霞递给你。这个颜色，好像和她笑起来时嘴唇的颜色有一点像。', skincare:'软软滑滑，像一小团不会飘走的云。小公主钻进小房子里，出来时一边抹着脸蛋，一边把它递给你。', perfume:'好香好香，像把花园里的一阵风装进了瓶子。小公主说，只要一点点，就能让心情香上一整天。',
     soy_sauce:'浓浓的乌云，被收进一瓶深色的墨水里。', vinegar:'魔法酸雨还没有落下来，你的鼻尖就先皱了起来。', salt:'咸咸的星光晶，闪着细小的光。', sugar:'甜甜的月光晶，一粒一粒，像月亮掉下的碎屑。', cooking_wine:'闪电药水安安静静的，也许闪电都藏在里面。'
   };
   materials.forEach(m => {m.description=descriptions[m.id];});

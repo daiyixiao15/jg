@@ -14,10 +14,10 @@
     return {ok:true,message:'收好了：'+m.name};
   }
   function putInPot(state,id) {
-    if(state.phase!=='brew' || state.collected.length!==8 || !state.collected.includes(id) || state.pot.includes(id)) return false;
+    if(state.phase!=='brew' || state.collected.length!==8 || !root.GameData.materials.some(m=>m.id===id) || !state.collected.includes(id) || state.pot.includes(id)) return false;
     state.pot.push(id); return true;
   }
-  function canBrew(state) {return state.phase==='brew' && state.collected.length===8 && state.pot.length===8 && new Set(state.pot).size===8 && state.pot.every(id=>state.collected.includes(id));}
+  function canBrew(state) {return state.phase==='brew' && state.collected.length===8 && state.collected.every(id=>root.GameData.materials.some(m=>m.id===id)) && state.pot.length===8 && new Set(state.pot).size===8 && state.pot.every(id=>state.collected.includes(id));}
   function resolveEnding(state) {
     if(state.risk>5) return 'caught';
     const rows=state.pot.map(id=>root.GameData.materials.find(m=>m.id===id));
