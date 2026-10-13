@@ -76,13 +76,13 @@
     "width": 1840,
     "height": 2453,
     "bounds": [
-      36,
-      246,
-      1840,
-      2136
+      0,
+      140,
+      1613,
+      2381
     ],
-    "source": "image_1791896986034.png",
-    "sha256": "d29427c805313193d56e1f4087a8f3e60ea46273bb475647cab6ece7fb94dcd2"
+    "source": "codex-clipboard-3c1184ac-a5c2-4dec-87fd-fb64c5f54872.png",
+    "sha256": "ea0938811783ce757898490087389d5f00c271133295034dbbbb3ae30c348929"
   },
   "fluffy-sleep.png": {
     "width": 2800,
@@ -189,7 +189,7 @@
       1508,
       1828
     ],
-    "source": "image_1791896733384.png",
+    "source": "codex-clipboard-4ea1d602-bcaf-45e2-b335-204ca19abb60.png",
     "sha256": "e8efbd58a7114bf394a32ad9af546394c3b17daa29b1b8ffad2ac1d5c4d8767e"
   },
   "ice-fruit.png": {
@@ -201,20 +201,20 @@
       1788,
       1273
     ],
-    "source": "image_1791896734446.png",
+    "source": "codex-clipboard-74fd1efd-114b-4bd3-bc6a-6f303cb1219a.png",
     "sha256": "9ff9d5a61fb1003a043920824a9a857ea350db31b68c1aee38f876ef3f801bf8"
   },
   "grape.png": {
-    "width": 2048,
-    "height": 2048,
+    "width": 2800,
+    "height": 1840,
     "bounds": [
-      487,
-      360,
-      1540,
-      1804
+      788,
+      353,
+      1910,
+      1461
     ],
-    "source": "image_1791896737447.png",
-    "sha256": "64a13a816e533423a460ff9d8760386d4eeff92f4ae89427b50007e596904340"
+    "source": "codex-clipboard-5797b81c-caf7-4fb0-b488-8378edf9d8a9.png",
+    "sha256": "9b65d8ef46dca4cbc9e6117d42ef13f863af202bdda6e416daa404ca197edc80"
   },
   "snack-small.png": {
     "width": 2800,
@@ -299,6 +299,18 @@
     ],
     "source": "image_1791896715728.png",
     "sha256": "311c574ff2e8cc64c2e189d80ef1ec16e3fc36d0ef723cc11d8f25acd8616185"
+  },
+  "princess-dialogue.png": {
+    "width": 1840,
+    "height": 2453,
+    "bounds": [
+      36,
+      246,
+      1840,
+      2136
+    ],
+    "source": "previous-player.png (corrected princess portrait)",
+    "sha256": "d29427c805313193d56e1f4087a8f3e60ea46273bb475647cab6ece7fb94dcd2"
   }
 };
 })(globalThis);

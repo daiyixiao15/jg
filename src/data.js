@@ -15,7 +15,7 @@
     row('cabbage','ice','冰草草','大白菜',['edible','tasty'],'upper'),
     row('ice_cream','ice','甜雪','雪糕冰激凌',['edible','tasty'],'lower'),
     row('dumpling','ice','小冰石头','速冻饺子',['edible'],'lower'),
-    row('frost','ice','冰窟里刮下来的冰霜','冷冻区冰霜',['edible'],'lower'),
+    row('frost','ice','冰霜','冷冻区冰霜',['edible'],'lower'),
     row('shampoo','bath','粉色药水','洗发水',['inedible','foaming']),
     row('body_wash','bath','黄色药水','沐浴露',['inedible','foaming']),
     row('detergent','bath','白砂砂','洗衣粉',['inedible','foaming']),
@@ -35,7 +35,7 @@
     row('cooking_wine','sky','闪电药水','料酒',['edible'])
   ];
   const descriptions = {
-    apple:'诶？这个掉下来砸开了诶，蓝蓝的皮下竟是如此漂亮的果肉吗！', grape:'小小的冰珠挤在一起，像一串紫色的秘密。', cabbage:'糖糖，糖糖……好像是一株成了精的冰草？',
+    apple:'诶？这个掉下来砸开了诶，蓝蓝的皮下竟是如此漂亮的果肉吗！', grape:'小小的冰珠挤在一起，像一串紫色的秘密。', cabbage:'糖糖，糖糖……\n好像是一株成了精的冰草？',
     ice_cream:'雪也会甜吗？这块甜雪好像知道答案。', dumpling:'它们总是连在一起的，你费了好大劲儿才勉强掰下完整的一颗。', frost:'冰壁上薄薄的霜，像碎掉的银色月光。',
     shampoo:'粉色药水轻轻一晃，细细的泡泡便冒了出来。', body_wash:'黄色药水像一小瓶阳光，摇起来却满是泡泡。', detergent:'白砂细得像雪，遇见水就开始热闹。', toothpaste:'莓莓泡泡云缩在细长的管子里，挤出来就蓬松起来。', bleach:'女巫毒药站得太高。你踮起脚尖，还是差了一点点。',
     plants:'魔法花和魔法草依偎在一起，摇着小小的叶子。', fallen_leaves:'魔法树落下的叶子，脆脆的，像写满咒语的纸。', cat_fur:'毛绒绒怪留下一小撮毛。它软得像一朵睡着的云。', cat_food:'毛绒绒怪的粮仓里，装着一颗颗小小的粮食。',

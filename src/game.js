@@ -6,7 +6,7 @@
   const backgrounds={lab:'lab.jpg',bath:'bath.jpg',sky:'sky.jpg',ice:'ice.jpg',forest:'forest.png',palace:'palace.png',dragon:'dragon-resting.png'};
   const itemImages={ice_cream:'sweet-snow.png',dumpling:'dumplings.png',frost:'frost.png',apple:'ice-fruit.png',grape:'grape.png',cabbage:'ice-grass.png',plants:'flowers.png',fallen_leaves:'chicken-hat.png',cat_fur:'fur.png',skincare:'skincare.png',perfume:'perfume.png',lipstick:'sunset.png',snack_small:'snack-small.png',snack_large:'snack-large.png'};
   const spots={shampoo:[10,29,14,22],body_wash:[22,32,10,23],detergent:[68,37,14,23],toothpaste:[86,37,10,28],bleach:[79,1,15,19],soy_sauce:[88,46,10,25],vinegar:[30,4,10,21],salt:[64,33,9,15],sugar:[13,53,10,17],cooking_wine:[17,14,10,12],ice_cream:[54,53,39,22],dumpling:[60,73,38,15],frost:[0,30,12,22]};
-  Object.assign(spots,{apple:[28,76,24,24],grape:[67,41,32,50],cabbage:[71,0,19,30],plants:[68,0,20,30],cat_fur:[54,79,11,18],fallen_leaves:[0,49,25,50],skincare:[13,45,23,27],perfume:[34,29,17,28],lipstick:[55,37,33,45]});
+  Object.assign(spots,{apple:[28,76,24,24],grape:[58,0,25,30],cabbage:[67,41,32,50],plants:[68,0,20,30],cat_fur:[54,79,11,18],fallen_leaves:[0,49,25,50],skincare:[13,45,23,27],perfume:[34,29,17,28],lipstick:[55,37,33,45]});
   let state=Q.normalize(R.createState()),bag=false,modal=null,notice='',typingTimer=null,mixingTimer=null,drag=null,suppressClickUntil=0,autosavePaused=false;
   const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const material=id=>D.materials.concat(Q.questItems).find(m=>m.id===id);
@@ -135,7 +135,7 @@
     if(state.scene==='bath')view+=hot('泡泡','bath-bubbles','',[42,32,13,25]);
     if(state.scene==='sky')view+=arrow('前往冰雪塔楼下层','ice','lower');
     if(state.scene==='palace')view+=arrow('前往恶龙盘踞之地','dragon')+hot('小公主','princess-talk','',[65,76,9,17]);
-    if(state.scene==='ice'&&state.section==='lower')view+=hot('黄白色冰门 · 前往上层','scene','ice',[43,6,10,21],'data-section="upper"')+hot('大冰石头','stone','',[12,55,18,22])+spriteObject('ice-grass.png','冰草草彩蛋',[1,73,8,22],'cabbage-secret','');
+    if(state.scene==='ice'&&state.section==='lower')view+=hot('黄白色冰门 · 前往上层','scene','ice',[43,6,10,21],'data-section="upper"')+hot('大冰石头','stone','',[12,55,18,22])+hot('冰草草彩蛋','cabbage-secret','',[6,75,12,22]);
     return view;
   }
   function inventory(){
@@ -167,7 +167,7 @@
     else if(modal.type==='next-round')body=`<h2>是否开启下一周目？</h2><p>${state.ending==='five'?'再去和龙聊聊吧。':state.ending&&!D.endings[state.ending].trueEnding?'还不是最终结局哦～再去找恶龙试试看！':'风从远方吹来，下一次冒险也在等你。'}</p><div class="choices">${button('是','next-round')}${button('存档','next-save')}</div>`;
     else if(modal.type==='material'){
       const m=material(modal.id),owned=state.collected.includes(m.id);
-      body=`<div class="item-art">${art(m)}</div><h2>${esc(m.name)}</h2><p>${esc(m.description)}</p><div class="choices">${button(owned?'已收集':'收集','collect',`data-id="${m.id}" ${owned?'disabled':''}`)}${button('丢弃','discard',`data-id="${m.id}"`)}</div>`;
+      body=`<div class="item-art">${art(m)}</div><h2>${esc(m.name)}</h2><p>${esc(m.description)}</p><div class="choices">${button(owned?'已收集':'收集','collect',`data-id="${m.id}" ${owned?'disabled':''}`)}${button('丢弃','discard',`data-id="${m.id}" ${owned?'':'disabled'}`)}</div>`;
     }else if(modal.type==='travel')body=`<h2>魔法药做好了</h2><p>是否前往恶龙盘踞之地？</p><div class="choices">${button('确认','potion-travel')}${button('稍后再去','close')}</div>`;
     else if(modal.type==='drink')body=`<h2>恶龙就在眼前</h2><p>你握着已经调制好的魔法药。</p><div class="choices">${button('喝下药水','drink')}${button('暂时收好','close')}</div>`;
     else body=`<h2>提示</h2><p>${esc(modal.text)}</p>`;
@@ -176,7 +176,7 @@
   function narrativeView(){
     const n=state.narrative;if(!n)return '';
     const line=n.lines[n.index],speaker=line.speaker==='player'?state.playerName:({dragon:'恶龙',cat:'毛绒绒怪',chicken:'傻不拉鸡',princess:'小公主',unknown:'未知的声音'})[line.speaker]||'';
-    const npcFile=line.speaker==='dragon'?(line.expression==='smile'?'dragon-smile.png':'dragon.png'):line.speaker==='cat'?(['accepted','rewarded'].includes(state.quests.cat)?'fluffy-reward.png':'fluffy-wait.png'):line.speaker==='chicken'?(state.quests.hatTaken?'chicken.png':'chicken-hat.png'):line.speaker==='princess'?'princess.png':null;
+    const npcFile=line.speaker==='dragon'?(line.expression==='smile'?'dragon-smile.png':'dragon.png'):line.speaker==='cat'?(['accepted','rewarded'].includes(state.quests.cat)?'fluffy-reward.png':'fluffy-wait.png'):line.speaker==='chicken'?(state.quests.hatTaken?'chicken.png':'chicken-hat.png'):line.speaker==='princess'?'princess-dialogue.png':null;
     const playerFile=line.form==='pig'?'ending-pig.png':line.form==='ugly'?'ending-ugly.png':'player.png';
     return `<div class="reading-layer"><button type="button" class="reading-surface" data-action="advance" aria-label="点击画面推进文字"></button>${npcFile?(line.speaker==='dragon'?`<img class="npc-portrait" src="assets/${npcFile}" alt="恶龙立绘">`:`<div class="npc-portrait other-npc" data-npc="${line.speaker}">${sprite(npcFile,speaker+'立绘')}</div>`):''}${speaker&&line.speaker!=='unknown'&&!state.endingReality?`<img class="player-portrait" src="assets/${playerFile}" alt="玩家立绘">`:''}<div class="dialogue ${speaker?'':'narration'}" role="button" tabindex="0" data-action="advance" aria-label="点击推进对话">${speaker?`<div class="speaker">${esc(speaker)}</div>`:''}<p id="dialog-text">${esc(line.text.replaceAll('{name}',state.playerName).slice(0,n.shown))}</p><small>${state.phase==='prologue'?'点击画面翻页':'点击画面继续'}</small></div></div>`;
   }
@@ -317,7 +317,7 @@
       if(state.collected.length>=8&&!state.collected.includes(id)){modal={type:'text',text:'背包已满，不可继续收集。请先丢弃物品，腾出空格。'};render();return;}
       const result=collectItem(id);if(state.phase==='ending')return;modal=null;
     }else if(action==='discard'){
-      if(modal?.type!=='material'||modal.id!==id)return;
+      if(modal?.type!=='material'||modal.id!==id||!state.collected.includes(id))return;
       if(R.discard(state,id)){
         achievements.discarded++;persistAchievements();if(achievements.discarded>=20)unlock('discard20');
         if(state.scene==='palace'&&gifts.includes(id)&&state.quests.princessClaimed.includes(id)){
