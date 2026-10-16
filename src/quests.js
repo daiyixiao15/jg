@@ -6,7 +6,8 @@
   ];
   function normalize(state){
     const q=state.quests||{};
-    state.quests={cat:'new',catRewardGround:false,hatTaken:false,princessMet:false,princessOffered:false,princessClaimed:[],princessReturned:[],princessDiscards:0,princessLocked:false,clicks:{},...q};
+    state.quests={ladder:false,tvIntroDone:false,tvTripOrigin:null,tvReturnOrigin:null,tvReturnPending:false,tvLastReturn:{},tvLadderReaction:false,chickenStage:'new',hatOutcome:null,hatRewardPending:false,catFarewellDone:false,groundFurSeen:false,princessGiftBatch:0,princessGiftReminderDone:false,cat:'new',catRewardGround:false,hatTaken:false,princessMet:false,princessOffered:false,princessClaimed:[],princessReturned:[],princessDiscards:0,princessLocked:false,clicks:{},...q};
+    if(q.chickenStage===undefined&&q.hatTaken)state.quests.chickenStage='done';
     state.quests.clicks=state.quests.clicks||{};
     state.quests.princessClaimed=state.quests.princessClaimed||[];
     state.quests.princessReturned=state.quests.princessReturned||[];

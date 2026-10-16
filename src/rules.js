@@ -7,7 +7,7 @@
     if(!m || m.scene!==state.scene || (m.section && m.section!==state.section)) return {ok:false,message:'请先前往材料所在的地方。'};
     if(state.collected.includes(id)) return {ok:false,message:'这份宝物已经在你的收集栏里了。'};
     if(state.collected.length>=8) return {ok:false,message:'已经收满八种宝物，去大锅那里吧。'};
-    if(id==='bleach' && state.bleachStage<2) return {ok:false,message:'女巫毒药太高了，现在还够不到。'};
+    if(id==='bleach' && !state.quests?.ladder && state.bleachStage<2) return {ok:false,message:'女巫毒药太高了，现在还够不到。'};
     state.collected.push(id);
     if(m.scene==='palace' || m.scene==='sky') state.risk++;
     if(state.risk>5) {state.phase='ending';state.ending='caught';}
@@ -23,7 +23,7 @@
     const rows=state.pot.map(id=>root.GameData.materials.find(m=>m.id===id));
     if(rows.length!==8 || new Set(state.pot).size!==8 || rows.some(m=>!m)) throw new Error('制药需要八种不同的有效材料');
     if(state.dialogueCount>=3) return 'six';
-    if(rows.some(m=>m.tags.includes('toxic'))) return 'five';
+    if(rows.some(m=>m.id==='bleach')) return 'five';
     if(rows.filter(m=>m.tags.includes('foaming')).length>=3) return 'four';
     const allEdible=rows.every(m=>m.tags.includes('edible'));
     if(allEdible && rows.filter(m=>m.tags.includes('tasty')).length>=4) return 'two';

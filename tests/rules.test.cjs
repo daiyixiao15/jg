@@ -12,7 +12,7 @@ assert.equal(R.resolveEnding(make(['apple','grape','dumpling','frost','plants','
 assert.equal(R.resolveEnding(make(['apple','grape','cabbage','ice_cream','dumpling','frost','plants','cat_fur'])),'three');
 assert.equal(R.resolveEnding(make(['apple','grape','cabbage','ice_cream','dumpling','frost','shampoo','body_wash'])),'three');
 assert.equal(R.resolveEnding(make(['apple','grape','cabbage','ice_cream','dumpling','shampoo','body_wash','detergent'])),'four');
-assert.equal(R.resolveEnding(make(['apple','grape','cabbage','ice_cream','dumpling','frost','plants','skincare'])),'five');
+assert.equal(R.resolveEnding(make(['apple','grape','cabbage','ice_cream','dumpling','frost','plants','skincare'])),'three');
 assert.equal(R.resolveEnding(make(['apple','grape','cabbage','ice_cream','shampoo','body_wash','detergent','bleach'])),'five');
 assert.equal(R.resolveEnding(make(['apple','grape','cabbage','ice_cream','shampoo','body_wash','detergent','bleach'],3)),'six');
 assert.equal(R.resolveEnding(make(base,3,6)),'caught');
