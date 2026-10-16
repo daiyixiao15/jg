@@ -192,9 +192,10 @@
     if(state.scene==='dragon')return hot('与恶龙互动','talk','',[21,46,76,37])+hot('被恶龙挡住的石头门','gate','',[66,7,34,50])+hot('草丛里的花','dragon-flowers','',[1,82,27,17]);
     if(state.scene==='forest'){
       const q=state.quests;
-      let view=hot('毛绒绒怪','cat-talk','',[74,60,26,40])+hot('身上的毛绒绒','body-fur','',[83,66,13,17])+hot('奇幻花','inspect','plants',spots.plants)+hot('落叶','inspect','fallen_leaves',spots.fallen_leaves)+hot('地上的毛绒绒','inspect','cat_fur',spots.cat_fur);
+      let view=hot('毛绒绒怪','cat-talk','',[73,58,27,42])+hot('奇幻花','inspect','plants',spots.plants)+hot('落叶','inspect','fallen_leaves',spots.fallen_leaves)+hot('地上的毛绒绒','inspect','cat_fur',spots.cat_fur);
 
 
+      view+=[[85.8,59,6.5,8.7],[94.1,68,5.9,8],[73.6,80.4,6.5,8.7]].map((rect,i)=>`<button type="button" class="body-fur-icon" data-action="body-fur" data-id="${i+1}" aria-label="身上的小毛绒绒 ${i+1}" style="left:${rect[0]}%;top:${rect[1]}%;width:${rect[2]}%;height:${rect[3]}%">${sprite('fur-icon.png','身上的小毛绒绒')}</button>`).join('');
       if(q.cat!=='rewarded')for(const [id,rect] of [['snack_small',[29,36,20,19]],['snack_large',[44,14,22,21]]])if(!state.collected.includes(id))view+=hot(material(id).name,'inspect',id,rect);
       if(q.catRewardGround)view+=spriteObject('fluffy-reward.png','毛绒绒怪的美食',[67,76,9,14],'inspect','cat_food');
       return view;
@@ -253,12 +254,18 @@
     else body=`<h2>提示</h2><p>${esc(modal.text)}</p>`;
     return `<div class="shade"><section class="modal" role="dialog" aria-modal="true" aria-label="${modal.type==='material'?esc(material(modal.id).name):'游戏提示'}">${button('×','close','class="close" aria-label="关闭窗口"')}${body}</section></div>`;
   }
+  function companionFarewellIndex(n){
+    return state.ending==='six'&&n?.after==='ending-summary'?n.lines.findIndex(line=>line.moment==='farewell'||line.text==='你是不是还没和他们好好道别呢'):-1;
+  }
   function narrativeView(){
     const n=state.narrative;if(!n)return '';
     const line=n.lines[n.index],speaker=line.speaker==='player'?state.playerName:({dragon:'恶龙',cat:'毛绒绒怪',chicken:'傻不拉鸡',princess:'小公主',unknown:'未知的声音',tv:'电视机先生',mother:'妈妈',fur:'毛绒绒'})[line.speaker]||'';
-    const npcFile=line.speaker==='dragon'?(line.expression==='smile'?'dragon-smile.png':'dragon.png'):line.speaker==='cat'?(['accepted','rewarded'].includes(state.quests.cat)?'fluffy-reward.png':'fluffy-wait.png'):line.speaker==='chicken'?(state.quests.hatTaken?'chicken.png':'chicken-hat.png'):line.speaker==='princess'?'princess-dialogue.png':line.speaker==='fur'?'fur.png':null;
+    if(n.index===companionFarewellIndex(n))return `<div class="reading-layer centered-reading"><button type="button" class="reading-surface" data-action="advance" aria-label="点击画面推进文字"></button><div class="centered-message"><p id="dialog-text">${esc(line.text.replaceAll('{name}',state.playerName).slice(0,n.shown))}</p></div><small>点击画面继续</small></div>`;
+    const catThinking=n.after==='cat-choice'&&(line.expression==='thinking'||line.text==='魔法材料？'||line.text.includes('这只黑色毛球的眼睛藏在'));
+    const portraitSpeaker=catThinking?'cat':line.speaker;
+    const npcFile=catThinking?'fluffy-thinking.png':line.speaker==='dragon'?(line.expression==='smile'?'dragon-smile.png':'dragon.png'):line.speaker==='cat'?(state.quests.cat==='rewarded'?'fluffy-delivered.png':state.quests.cat==='accepted'?'fluffy-reward.png':'fluffy-wait.png'):line.speaker==='chicken'?(state.quests.hatTaken?'chicken.png':'chicken-hat.png'):line.speaker==='princess'?'princess-dialogue.png':line.speaker==='fur'?'fur-dialogue.png':null;
     const playerFile=line.form==='pig'?'ending-pig.png':line.form==='ugly'?'ending-ugly.png':'player.png';
-    return `<div class="reading-layer"><button type="button" class="reading-surface" data-action="advance" aria-label="点击画面推进文字"></button>${npcFile?(line.speaker==='dragon'?`<img class="npc-portrait" src="assets/${npcFile}" alt="恶龙立绘">`:`<div class="npc-portrait other-npc" data-npc="${line.speaker}">${sprite(npcFile,speaker+'立绘')}</div>`):''}${speaker&&line.speaker!=='unknown'&&!state.endingReality?`<img class="player-portrait" src="assets/${playerFile}" alt="玩家立绘">`:''}<div class="dialogue ${speaker?'':'narration'}" role="button" tabindex="0" data-action="advance" aria-label="点击推进对话">${speaker?`<div class="speaker">${esc(speaker)}</div>`:''}<p id="dialog-text">${esc(line.text.replaceAll('{name}',state.playerName).slice(0,n.shown))}</p><small>${state.phase==='prologue'?'点击画面翻页':'点击画面继续'}</small></div></div>`;
+    return `<div class="reading-layer"><button type="button" class="reading-surface" data-action="advance" aria-label="点击画面推进文字"></button>${npcFile?(line.speaker==='dragon'?`<img class="npc-portrait" src="assets/${npcFile}" alt="恶龙立绘">`:`<div class="npc-portrait other-npc" data-npc="${portraitSpeaker}">${sprite(npcFile,speaker+'立绘')}</div>`):''}${speaker&&line.speaker!=='unknown'&&!state.endingReality&&n.after!=='easter-finished'?`<img class="player-portrait" src="assets/${playerFile}" alt="玩家立绘">`:''}<div class="dialogue ${speaker?'':'narration'}" role="button" tabindex="0" data-action="advance" aria-label="点击推进对话">${speaker?`<div class="speaker">${esc(speaker)}</div>`:''}<p id="dialog-text">${esc(line.text.replaceAll('{name}',state.playerName).slice(0,n.shown))}</p><small>${state.phase==='prologue'?'点击画面翻页':'点击画面继续'}</small></div></div>`;
   }
 
   function render(){
@@ -266,11 +273,12 @@
     if(['intro','exit'].includes(state.phase)){
       app.innerHTML=`<div class="stage menu"><div class="menu-content" ${modal?'inert':''}><h1>一锅小小的魔法</h1><p>${state.phase==='exit'?'游戏已结束':'小精灵的第一次冒险'}</p>${button('开始','start')}${button('继续','continue',library.autosave||library.slots.some(Boolean)?'':'disabled')}${button('结束游戏','exit')}${button('成就','achievements')}</div>${popup()}${achievementView()}</div>`;
     }else{
-      const prologue=state.phase==='prologue',ending=state.phase==='ending',bg=prologue?null:ending?(['gate','companion'].includes(state.endingStage)||state.narrative&&!state.endingReality&&!['light-story','easter'].includes(state.endingStage)?'dragon-empty.png':null):state.scene==='ice'&&state.section==='upper'?'ice-upper.png':state.scene==='dragon'&&state.narrative?'dragon-empty.png':backgrounds[state.scene];
+      const prologue=state.phase==='prologue',ending=state.phase==='ending',companionCG=ending&&state.ending==='six'&&state.endingReality&&state.narrative?.after==='ending-summary',farewellIndex=companionFarewellIndex(state.narrative),friendsRevealed=companionCG&&farewellIndex>=0&&state.narrative.index>farewellIndex,bg=prologue?null:companionCG?(friendsRevealed?'ending-companion-friends.png':'ending-companion.png'):ending?(['gate','companion'].includes(state.endingStage)||state.narrative&&!state.endingReality&&!['light-story','easter'].includes(state.endingStage)?'dragon-empty.png':null):state.scene==='ice'&&state.section==='upper'?'ice-upper.png':state.scene==='dragon'&&state.narrative?'dragon-empty.png':backgrounds[state.scene];
       let view='';
       if(prologue)view=`<div class="storybook" aria-label="翻开的故事书"><div class="book-left"><span>一锅小小的魔法</span><i>✦</i></div><div class="book-right"><span>第 ${state.narrative.index+1} 页</span><i>✧</i></div><div class="turning-page" style="--page:${state.narrative.index}"></div></div>`;
       else if(ending){
         if(state.cinematic)view=`<div class="cinematic ${state.cinematic.kind}" aria-live="polite">${state.cinematic.kind==='impact'?'<span>✿</span><span>✿</span><span>✿</span><span>✿</span>':''}</div>`;
+        else if(companionCG)view='';
         else if(state.endingStage==='mother-call')view='<button class="ending-screen" data-action="ending-wake">是妈妈在叫我</button>';
         else if(state.endingStage==='credits')view=`<button class="ending-screen credits" data-action="credits-skip"><strong>制作团队</strong><span>${esc(X.creditsName)}</span><p>感谢游玩</p><small>本游戏所有情节均为虚构，千万不要模仿小精灵乱喝东西哦～<br>点击任意位置继续</small></button>`;
         else if(state.endingStage==='epilogue')view=`<button class="ending-screen" data-action="ending-next"><span>${esc(X.epilogue[0].text).replaceAll('\n','<br>')}</span><small>点击画面继续</small></button>`;

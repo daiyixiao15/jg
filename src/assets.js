@@ -1,5 +1,17 @@
 (function(root){
   root.GameAssets={
+  "ending-companion.png": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      0,
+      0,
+      2800,
+      2100
+    ],
+    "source": "image_1792138203114.png",
+    "sha256": "e96d99921623ec432d7719698d40da5b185ea8c5e5502721790c8ecf3e8d062d"
+  },
   "ice-upper.png": {
     "width": 2463,
     "height": 1840,
@@ -311,6 +323,66 @@
     ],
     "source": "previous-player.png (corrected princess portrait)",
     "sha256": "d29427c805313193d56e1f4087a8f3e60ea46273bb475647cab6ece7fb94dcd2"
+  },
+  "ending-companion-friends.png": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      0,
+      0,
+      2800,
+      2100
+    ],
+    "source": "image_1792138200285.png",
+    "sha256": "5013a47ea27a6e274ffd6eab5307b42fe64714c47fa52ff9cf15b73210e2916e"
+  },
+  "fluffy-delivered.png": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      201,
+      482,
+      1299,
+      1430
+    ],
+    "source": "image_1792138192990.png",
+    "sha256": "16cba648dc420be71155b4509decdcae30dc0ad0ecd6ff566efcf0d83ec384b5"
+  },
+  "fluffy-thinking.png": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      231,
+      561,
+      1204,
+      1430
+    ],
+    "source": "image_1792138191570.png",
+    "sha256": "38958ca5d00ef324d5112503f0647998ddc827016dc419d011e22d685ae5fd56"
+  },
+  "fur-dialogue.png": {
+    "width": 2800,
+    "height": 1840,
+    "bounds": [
+      898,
+      397,
+      2360,
+      1286
+    ],
+    "source": "image_1792138193958.png",
+    "sha256": "b567c8a14cb9b896ffabf70e3c3befab28ccac0a9e278677822c8b2ba4b20d71"
+  },
+  "fur-icon.png": {
+    "width": 2800,
+    "height": 1840,
+    "bounds": [
+      898,
+      397,
+      1716,
+      1263
+    ],
+    "source": "image_1792138195013.png",
+    "sha256": "15bc0410327ab49ea38ead2e714147e97e043d762a70044ab88c0a7d45af6197"
   }
 };
 })(globalThis);

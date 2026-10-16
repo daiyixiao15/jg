@@ -1,6 +1,11 @@
 (function(root){
   root.GameExpansion={
-  "tvRush": [{"speaker":"tv","text":"收到！着急赶路的小精灵，你想去哪？"}],
+  "tvRush": [
+    {
+      "speaker": "tv",
+      "text": "收到！着急赶路的小精灵，你想去哪？"
+    }
+  ],
   "tvIntro": [
     {
       "text": "站住！这里是奇幻世界交通办！前方的小精灵，请接受本公园最重要的检查！",
@@ -784,10 +789,12 @@
     },
     {
       "text": "魔法材料？",
-      "speaker": "cat"
+      "speaker": "cat",
+      "expression": "thinking"
     },
     {
-      "text": "这只黑色毛球的眼睛藏在它厚厚的绒毛里看不见，但小精灵就是感觉此刻它们在转来转去"
+      "text": "这只黑色毛球的眼睛藏在它厚厚的绒毛里看不见，但小精灵就是感觉此刻它们在转来转去",
+      "expression": "thinking"
     },
     {
       "text": "那你可找对人了！！",
@@ -2469,7 +2476,8 @@
     },
     {
       "text": "你是不是还没和他们好好道别呢",
-      "speaker": "mother"
+      "speaker": "mother",
+      "moment": "farewell"
     },
     {
       "text": "你不可思议地看着妈妈"
