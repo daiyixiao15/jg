@@ -383,6 +383,18 @@
     ],
     "source": "image_1792138195013.png",
     "sha256": "15bc0410327ab49ea38ead2e714147e97e043d762a70044ab88c0a7d45af6197"
+  },
+  "dragon-boarding.png": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      0,
+      0,
+      2800,
+      2100
+    ],
+    "source": "codex-clipboard-27c0c5d5-35ba-4956-aeb0-9230f26c2ee2.png",
+    "sha256": "a044a54d39eaeb92b03e5e128bb39825b08d31bf0dc8077fc6679a8a0b6a0e4e"
   }
 };
 })(globalThis);

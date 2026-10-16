@@ -158,7 +158,7 @@
     const next=state.cinematic?.next;if(!next)return;state.cinematic=null;cinematicTimer=null;
     if(next==='five-after-hit'){say(X.fiveAfterHit,'ending-story');return;}
     if(next==='five-hospital'){state.endingReality=true;say(X.fiveHospital,'five-finish');return;}
-    if(next==='six-reality'){state.endingReality=true;say(X.sixReality,'ending-summary');return;}
+    if(next==='six-reality'){state.endingReality=true;say(X.sixReality,'ending-summary',{preview:true});return;}
     if(next==='credits'){showCredits();return;}
     state.endingStage='summary';autosave(true);render();
   }
@@ -259,6 +259,7 @@
   }
   function narrativeView(){
     const n=state.narrative;if(!n)return '';
+    if(n.preview)return '<div class="reading-layer cg-preview"><button type="button" class="reading-surface" data-action="advance" aria-label="点击开始牵手对白"></button></div>';
     const line=n.lines[n.index],speaker=line.speaker==='player'?state.playerName:({dragon:'恶龙',cat:'毛绒绒怪',chicken:'傻不拉鸡',princess:'小公主',unknown:'未知的声音',tv:'电视机先生',mother:'妈妈',fur:'毛绒绒'})[line.speaker]||'';
     if(n.index===companionFarewellIndex(n))return `<div class="reading-layer centered-reading"><button type="button" class="reading-surface" data-action="advance" aria-label="点击画面推进文字"></button><div class="centered-message"><p id="dialog-text">${esc(line.text.replaceAll('{name}',state.playerName).slice(0,n.shown))}</p></div><small>点击画面继续</small></div>`;
     const catThinking=n.after==='cat-choice'&&(line.expression==='thinking'||line.text==='魔法材料？'||line.text.includes('这只黑色毛球的眼睛藏在'));
@@ -273,7 +274,7 @@
     if(['intro','exit'].includes(state.phase)){
       app.innerHTML=`<div class="stage menu"><div class="menu-content" ${modal?'inert':''}><h1>一锅小小的魔法</h1><p>${state.phase==='exit'?'游戏已结束':'小精灵的第一次冒险'}</p>${button('开始','start')}${button('继续','continue',library.autosave||library.slots.some(Boolean)?'':'disabled')}${button('结束游戏','exit')}${button('成就','achievements')}</div>${popup()}${achievementView()}</div>`;
     }else{
-      const prologue=state.phase==='prologue',ending=state.phase==='ending',companionCG=ending&&state.ending==='six'&&state.endingReality&&state.narrative?.after==='ending-summary',farewellIndex=companionFarewellIndex(state.narrative),friendsRevealed=companionCG&&farewellIndex>=0&&state.narrative.index>farewellIndex,bg=prologue?null:companionCG?(friendsRevealed?'ending-companion-friends.png':'ending-companion.png'):ending?(['gate','companion'].includes(state.endingStage)||state.narrative&&!state.endingReality&&!['light-story','easter'].includes(state.endingStage)?'dragon-empty.png':null):state.scene==='ice'&&state.section==='upper'?'ice-upper.png':state.scene==='dragon'&&state.narrative?'dragon-empty.png':backgrounds[state.scene];
+      const prologue=state.phase==='prologue',ending=state.phase==='ending',boardingCG=ending&&state.ending==='six'&&state.endingStage==='companion'&&!state.endingReality,companionCG=ending&&state.ending==='six'&&state.endingReality&&state.narrative?.after==='ending-summary',farewellIndex=companionFarewellIndex(state.narrative),friendsRevealed=companionCG&&farewellIndex>=0&&(state.narrative.friendsRevealed||state.narrative.index>farewellIndex),bg=prologue?null:companionCG?(friendsRevealed?'ending-companion-friends.png':'ending-companion.png'):boardingCG?'dragon-boarding.png':ending?(['gate','companion'].includes(state.endingStage)||state.narrative&&!state.endingReality&&!['light-story','easter'].includes(state.endingStage)?'dragon-empty.png':null):state.scene==='ice'&&state.section==='upper'?'ice-upper.png':state.scene==='dragon'&&state.narrative?'dragon-empty.png':backgrounds[state.scene];
       let view='';
       if(prologue)view=`<div class="storybook" aria-label="翻开的故事书"><div class="book-left"><span>一锅小小的魔法</span><i>✦</i></div><div class="book-right"><span>第 ${state.narrative.index+1} 页</span><i>✧</i></div><div class="turning-page" style="--page:${state.narrative.index}"></div></div>`;
       else if(ending){
@@ -284,26 +285,28 @@
         else if(state.endingStage==='epilogue')view=`<button class="ending-screen" data-action="ending-next"><span>${esc(X.epilogue[0].text).replaceAll('\n','<br>')}</span><small>点击画面继续</small></button>`;
         else if(state.endingStage==='white')view='<button class="white-screen" data-action="ending-white">点击空白处继续</button>';
         else if(state.endingStage==='gate')view=hot('前往光明世界的门','ending-gate','',[66,7,34,50]);
-        else if(state.endingStage==='companion')view=spriteObject('dragon-smile.png','与你一起出发的大龙',[26,12,48,76],'ending-companion','');
+        else if(state.endingStage==='companion')view=hot('爬上大龙的背','ending-companion','',[20,46,80,39]);
         else if(!state.narrative)view=`<button class="ending-screen" data-action="ending-next"><span>${state.endingStage==='fin'?'完':`达成结局${({one:'一',two:'二',three:'三',four:'四'})[state.ending]||''}<br>${esc(state.ending==='five'?'光明世界的尽头是一双手':state.ending==='six'?'和我一起去光明世界吧！':D.endings[state.ending].title)}`}</span><small>点击任意空白处继续</small></button>`;
       }
       else if(['brew','mixing','ready'].includes(state.phase)&&state.scene==='lab')view=`<div class="brew-panel ${state.phase==='mixing'?'mixing':''}"><h2>${state.phase==='mixing'?'魔法正在涌现……':state.phase==='ready'?'魔法药做好了':'把背包材料直接拖到锅口'}</h2><p>${state.pot.length}/8 已入锅</p><div id="pot" role="img" aria-label="制药大锅"><div id="pot-mouth" aria-label="锅口">${state.phase==='brew'?'拖到锅口松开':'✦'}</div><span class="pot-decoration" aria-hidden="true">✦</span></div>${state.phase==='brew'?button('开始制药','mix',R.canBrew(state)?'':'disabled'):state.phase==='ready'?button('前往恶龙盘踞之地','potion-prompt'):''}</div>`;
       else view=scene()+(state.phase==='ready'&&state.scene==='dragon'?button('拿出魔法药','potion-prompt','class="potion-button"'):'');
-      app.innerHTML=`<div class="stage ${bg?'illustrated':''} ${state.narrative?.allowNavigation?'npc-navigation':''}" ${bg?`style="background-image:url(assets/${bg})"`:''}><div class="world" ${state.narrative&&!state.narrative.allowNavigation||modal?'inert':''}>${!prologue?`<header>${!ending?button('← 返回','back'):''}<div>${button('设置','settings')}${button('背包','bag',`aria-expanded="${bag}"`)}</div></header>`:''}${view}${bag&&!prologue?inventory():''}</div>${state.phase==='ending'&&state.narrative?.lines[state.narrative.index].form&&!state.narrative.lines[state.narrative.index].speaker?`<div class="ending-form-art">${sprite(state.narrative.lines[state.narrative.index].form==='pig'?'ending-pig.png':'ending-ugly.png','变身形态')}</div>`:''}${notice?`<div class="notice" role="status">${esc(notice)}</div>`:''}${narrativeView()}${popup()}${achievementView()}${state.effects?'<div class="magic-smoke" aria-hidden="true"></div>':''}</div>`;
+      app.innerHTML=`<div class="stage ${bg?'illustrated':''} ${state.narrative?.preview?'cg-preview-stage':''} ${state.narrative?.allowNavigation?'npc-navigation':''}" ${bg?`style="background-image:url(assets/${bg})"`:''}><div class="world" ${state.narrative&&!state.narrative.allowNavigation||modal?'inert':''}>${!prologue?`<header>${!ending?button('← 返回','back'):''}<div>${button('设置','settings')}${button('背包','bag',`aria-expanded="${bag}"`)}</div></header>`:''}${view}${bag&&!prologue?inventory():''}</div>${state.phase==='ending'&&state.narrative?.lines[state.narrative.index].form&&!state.narrative.lines[state.narrative.index].speaker?`<div class="ending-form-art">${sprite(state.narrative.lines[state.narrative.index].form==='pig'?'ending-pig.png':'ending-ugly.png','变身形态')}</div>`:''}${notice?`<div class="notice" role="status">${esc(notice)}</div>`:''}${narrativeView()}${popup()}${achievementView()}${state.effects?'<div class="magic-smoke" aria-hidden="true"></div>':''}</div>`;
     }
     if(state.endingStage==='light-story')app.querySelector?.('.stage')?.classList.add('light-story');
     if(modal?.type==='name')document.getElementById('player-name').focus();
     else if(modal){const controls=app.querySelectorAll('.modal button:not([disabled])');controls[0]?.focus();}
-    if(state.narrative){
+    if(state.narrative&&!state.narrative.preview){
       const n=state.narrative,line=n.lines[n.index],node=document.getElementById('dialog-text'),fullText=line.text.replaceAll('{name}',state.playerName);
       typingTimer=setInterval(()=>{if(state.narrative!==n){clearInterval(typingTimer);return;}n.shown=Math.min(fullText.length,n.shown+1);node.textContent=fullText.slice(0,n.shown);if(n.shown===fullText.length)clearInterval(typingTimer);},50);
     }
   }
-  function say(lines,after=''){modal=null;bag=false;state.narrative={lines:clone(lines),index:0,shown:0,after,allowNavigation:state.scene==='palace'&&state.phase!=='ending'};autosave(true);render();}
+  function say(lines,after='',options={}){modal=null;bag=false;state.narrative={lines:clone(lines),index:0,shown:0,after,allowNavigation:state.scene==='palace'&&state.phase!=='ending',...options};autosave(true);render();}
   function advance(){
     const n=state.narrative;if(!n)return;
+    if(n.preview){n.preview=false;autosave(true);render();return;}
     const text=n.lines[n.index].text.replaceAll('{name}',state.playerName);
     if(state.phase!=='prologue'&&n.shown<text.length){n.shown=text.length;autosave(true);render();return;}
+    if(n.index===companionFarewellIndex(n)&&!n.friendsRevealed){n.friendsRevealed=true;autosave(true);render();return;}
     if(n.index<n.lines.length-1){n.index++;n.shown=0;autosave(true);render();return;}
     state.narrative=null;clearInterval(typingTimer);
     if(n.after==='lab'){

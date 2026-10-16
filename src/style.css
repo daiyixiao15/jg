@@ -63,3 +63,5 @@ header{position:absolute;inset:2% 2% auto;display:flex;justify-content:space-bet
 
 .other-npc[data-npc="fur"]{left:55%;top:30%;width:27%;height:27%}
 .body-fur-icon{position:absolute;z-index:2;padding:0;border:0;border-radius:50%;background:transparent;display:flex;align-items:center;justify-content:center}.body-fur-icon:hover{background:transparent}.body-fur-icon .sprite-art{width:100%;height:100%;pointer-events:none}
+
+.cg-preview-stage header,.cg-preview-stage .notice,.cg-preview-stage .achievement-toasts,.cg-preview-stage .magic-smoke{display:none}
