@@ -443,6 +443,282 @@
     ],
     "source": "codex-clipboard-60610025-da66-4aa9-a6f9-7b8e5ea87cd7.png",
     "sha256": "67e159460f2094819f7b745d74365acb1bfacdd39c5dfaa97874586136f1a738"
+  },
+  "cover.png": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      0,
+      0,
+      2800,
+      2100
+    ],
+    "source": "codex-clipboard-0dd295d8-25fb-4b40-8616-cf47f5f691ce.png",
+    "sha256": "fe4395dd6bf0bbf7d3239bcf7957de911600b58d3e67820bce2b7bcf961362c7"
+  },
+  "ending-home.png": {
+    "width": 2304,
+    "height": 1728,
+    "bounds": [
+      0,
+      0,
+      2304,
+      1728
+    ],
+    "source": "codex-clipboard-d73c2db1-efac-4244-a949-6c6c5b370960.png",
+    "sha256": "66200309258a535a354bc78fc6f5110d7ee6480de9499c89768c44c2fbf6ad22"
+  },
+  "chicken-dialogue.png": {
+    "width": 2800,
+    "height": 1840,
+    "bounds": [
+      903,
+      540,
+      1793,
+      1498
+    ],
+    "source": "codex-clipboard-b91ac4bd-e5d8-4ff8-b5fa-794f617ed532.png",
+    "sha256": "cc3180d3b6ea266ac083e1b9888a5f2e8a5836122ae2a1a74b8bc542ce659b31"
+  },
+  "chicken-hat-dialogue.png": {
+    "width": 2800,
+    "height": 1840,
+    "bounds": [
+      872,
+      141,
+      1812,
+      1498
+    ],
+    "source": "codex-clipboard-411f7dff-ff78-476e-a9f7-ecfb83994eda.png",
+    "sha256": "8d84ef761a9610562221ae84340aa15dbf686620c049625e9c2491e47b311a83"
+  },
+  "tv-dialogue.png": {
+    "width": 2800,
+    "height": 1840,
+    "bounds": [
+      1042,
+      376,
+      1711,
+      1206
+    ],
+    "source": "codex-clipboard-db1aa1c2-841e-4f09-b336-65af83161c4b.png",
+    "sha256": "98692c40695dca97a0322322ca16c7db5ac41dc6c732a7f599546d87977f7520"
+  },
+  "central-park-dialogue.png": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      0,
+      0,
+      2800,
+      2100
+    ],
+    "source": "codex-clipboard-685498f1-7475-4a89-ac87-b0b6fb9e4f54.png",
+    "sha256": "8549bc381f5c7d9ecddf4af5a5c8e2e0cb7cb198fa63b4b1a65f36e669c1618c"
+  },
+  "chicken-leaf.png": {
+    "width": 2800,
+    "height": 1840,
+    "bounds": [
+      872,
+      141,
+      1812,
+      1124
+    ],
+    "source": "codex-clipboard-3b2b40e2-bbb7-47dc-bdbf-37736bc50fa5.png",
+    "sha256": "fb697658ef1a36afa917e2ab91347c4f07b574003f14f51a686ecdff1f368d1f"
+  },
+  "material-body-wash.png": {
+    "width": 1237,
+    "height": 1271,
+    "bounds": [
+      0,
+      0,
+      1228,
+      1223
+    ],
+    "source": "bath.jpg; transparent cutout",
+    "sha256": "74abe6afbf139a7a95bad82d35abf7cc6097c9cf398bf7cc7b9782ff01425c79"
+  },
+  "material-shampoo.png": {
+    "width": 1312,
+    "height": 1199,
+    "bounds": [
+      0,
+      23,
+      1298,
+      1199
+    ],
+    "source": "bath.jpg; transparent cutout",
+    "sha256": "316bdc820ea84b4ebf9b2dcc97744fd785bb3fbd57d13c132fb8b65b874a7788"
+  },
+  "material-detergent.png": {
+    "width": 1314,
+    "height": 1197,
+    "bounds": [
+      0,
+      21,
+      1306,
+      1181
+    ],
+    "source": "bath.jpg; transparent cutout",
+    "sha256": "292abf13d711205a75416815fce13a74c66857872f25125a3be502dce84c6dc8"
+  },
+  "material-toothpaste.png": {
+    "width": 1024,
+    "height": 1536,
+    "bounds": [
+      273,
+      23,
+      897,
+      1493
+    ],
+    "source": "bath.jpg; transparent cutout",
+    "sha256": "5d8c215e15b0dca86f2c493563ba601ae27d5109703280cdafe1cae31c8b54b0"
+  },
+  "material-bleach.png": {
+    "width": 1448,
+    "height": 1086,
+    "bounds": [
+      0,
+      0,
+      1420,
+      1086
+    ],
+    "source": "bath.jpg; transparent cutout",
+    "sha256": "b49372b1d3f606ca115594047499a278216d1ad29e2aaa0554b17a21a2da20b2"
+  },
+  "material-soy-sauce.png": {
+    "width": 1024,
+    "height": 1536,
+    "bounds": [
+      73,
+      32,
+      1021,
+      1414
+    ],
+    "source": "sky.jpg; transparent cutout",
+    "sha256": "d81eb2e7fcf7a01df4a75ce5efbe262d3cf6ade95bc2799d5a43cd73fdc65b76"
+  },
+  "material-vinegar.png": {
+    "width": 1176,
+    "height": 1338,
+    "bounds": [
+      0,
+      9,
+      1175,
+      1338
+    ],
+    "source": "sky.jpg; transparent cutout",
+    "sha256": "9b6c1ca5ca55eb4c59c0a908b4fc200b0fefa892f24d9551af46e8a1c7714234"
+  },
+  "material-salt.png": {
+    "width": 1218,
+    "height": 1291,
+    "bounds": [
+      0,
+      20,
+      1194,
+      1269
+    ],
+    "source": "sky.jpg; transparent cutout",
+    "sha256": "036763bd44ed1dfe6f77ca062bb9e9a2469e33c9620a6e1a3ae9d96aa5ea6826"
+  },
+  "material-sugar.png": {
+    "width": 1312,
+    "height": 1199,
+    "bounds": [
+      0,
+      33,
+      1294,
+      1150
+    ],
+    "source": "sky.jpg; transparent cutout",
+    "sha256": "cd6e0a89244b920fbeea79b3fa079d52bca461fd5fdc48fed225dc24d2c1e0f4"
+  },
+  "material-cooking-wine.png": {
+    "width": 1402,
+    "height": 1122,
+    "bounds": [
+      0,
+      0,
+      1402,
+      1122
+    ],
+    "source": "sky.jpg; transparent cutout",
+    "sha256": "191178dc51d9715ecf983d5e55baf9fc6307f248e24dd2e54e63eeef3d5f0413"
+  },
+  "chicken-hat-dialogue-preview.png": {
+    "width": 1024,
+    "height": 672,
+    "bounds": [
+      318,
+      50,
+      663,
+      549
+    ],
+    "source": "未命名 188_202610171432_20228.gopaint#snapshot/snapshot_740c41de-8a86-b0a6-b5d2-496fbeab7bdf.png",
+    "sha256": "88454f11623787b7e3a93ab008ed53f174f77531174c86ce4f97c43761c75ad4"
+  },
+  "chicken-dialogue-preview.png": {
+    "width": 1024,
+    "height": 672,
+    "bounds": [
+      242,
+      75,
+      704,
+      574
+    ],
+    "source": "未命名 188_202610171425_38471.gopaint#snapshot/snapshot_740c41de-8a86-b0a6-b5d2-496fbeab7bdf.png",
+    "sha256": "6e52f4cafc6382f8a574ef065efa1b5a62de8a079ba5b11ec0e17a9d54e58c7d"
+  },
+  "chicken-leaf-preview.png": {
+    "width": 1024,
+    "height": 672,
+    "bounds": [
+      318,
+      50,
+      663,
+      412
+    ],
+    "source": "未命名 188_202610171444_23442.gopaint#snapshot/snapshot_740c41de-8a86-b0a6-b5d2-496fbeab7bdf.png",
+    "sha256": "058219383d2bca81dff4f1ffe2463ab7a7c3a3e9ce51fc62042e20a81fa828e7"
+  },
+  "tv-dialogue-preview.png": {
+    "width": 1024,
+    "height": 672,
+    "bounds": [
+      380,
+      137,
+      627,
+      442
+    ],
+    "source": "未命名 194-副本_202610171435_14593.gopaint#snapshot/snapshot_cd06df23-61b9-78fb-cfd9-38bfdc11848f.png",
+    "sha256": "66189d41a1884be8aadb0cb6bea5cc386ab5d9053783acc9381e36a9d3821be4"
+  },
+  "central-park-dialogue-preview.png": {
+    "width": 1024,
+    "height": 768,
+    "bounds": [
+      0,
+      0,
+      1024,
+      768
+    ],
+    "source": "未命名 193-副本_202610171437_27778.gopaint#snapshot/snapshot_aa56d56e-6926-6747-a975-6f6a1b5454c5.png",
+    "sha256": "53555539a2c96bc6f3f673623f4e902fa8033b88eac7d58bd54453a0a60b40f8"
+  },
+  "red-dragon.png": {
+    "width": 1840,
+    "height": 2800,
+    "bounds": [
+      52,
+      327,
+      1682,
+      2508
+    ],
+    "source": "codex-clipboard-1be59685-513a-42ed-b9f7-b6493083e8ec.png",
+    "sha256": "6308be09cffa580d3b0dd16a45e0108165842f6a2ad9e8dbd06cba7748e67acc"
   }
 };
 })(globalThis);

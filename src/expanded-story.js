@@ -2153,50 +2153,63 @@
     },
     {
       "text": "我成功了！我终于成功变成最强大的魔兽了！",
-      "speaker": "player"
+      "speaker": "player",
+      "form": "beast"
     },
     {
       "text": "你...",
-      "speaker": "dragon"
+      "speaker": "dragon",
+      "form": "beast"
     },
     {
-      "text": "它没有像往常一样拦住你。只是第一次，露出了你从没见过的慌乱神情。"
+      "text": "它没有像往常一样拦住你。只是第一次，露出了你从没见过的慌乱神情。",
+      "form": "beast"
     },
     {
       "text": "原来你也会害怕啊...",
-      "speaker": "player"
+      "speaker": "player",
+      "form": "beast"
     },
     {
-      "text": "你手里的大爪子停顿了一瞬，还是再次抬了起来"
+      "text": "你手里的大爪子停顿了一瞬，还是再次抬了起来",
+      "form": "beast"
     },
     {
       "text": "对不起了恶龙，接招吧！",
-      "speaker": "player"
+      "speaker": "player",
+      "form": "beast"
     }
   ],
   "fiveAfterHit": [
     {
-      "text": "庞大而沉默的恶龙倒下了"
+      "text": "庞大而沉默的恶龙倒下了",
+      "form": "beast"
     },
     {
-      "text": "她的身体化成了无数花瓣，洒落在漫山遍野的野花中"
+      "text": "她的身体化成了无数花瓣，洒落在漫山遍野的野花中",
+      "form": "beast"
     },
     {
-      "text": "很快，你就分不清哪片属于她了"
+      "text": "很快，你就分不清哪片属于她了",
+      "form": "beast"
     },
     {
-      "text": "你的心里有一种说不上来的滋味..."
+      "text": "你的心里有一种说不上来的滋味...",
+      "form": "beast"
     },
     {
-      "text": "但是那扇吸引着你目光很久了的门，今天，此时此刻，第一次完整地展现在了你的面前"
+      "text": "但是那扇吸引着你目光很久了的门，今天，此时此刻，第一次完整地展现在了你的面前",
+      "form": "beast"
     },
     {
       "text": "大龙，我终于站在了你一直守护的门前了",
-      "speaker": "player"
+      "speaker": "player",
+      "form": "beast"
     },
     {
       "text": "今天门里的光，怎么好像比任何时候都要明亮刺眼...",
-      "speaker": "player"
+      "speaker": "player",
+      "form": "beast"
     }
   ],
   "fiveWhite": [

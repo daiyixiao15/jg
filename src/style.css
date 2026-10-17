@@ -68,3 +68,8 @@ header{position:absolute;inset:2% 2% auto;display:flex;justify-content:space-bet
 /* Kept outside the dialogue advance surface so skipping is a separate action. */
 .skip-read{position:absolute;z-index:21;right:4%;bottom:29%;font-size:1.35cqw;padding:.45em .8em;background:#14273cdd;border:1px solid #fff9;color:#fff}
 .ending-caption{display:inline-block;margin-top:1.4em;font-size:.55em;color:#ddd}
+
+.cover-menu{background-size:100% 100%;background-repeat:no-repeat}
+.cover-menu .menu-content{inset:70% 22% 5%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:10% 8%}.cover-menu .menu-content>button{width:100%;min-height:0;font-size:2cqw;background:#09262ce8;border-color:#fce7ad99}.cover-menu .menu-content>button:hover{background:#244b52}.cover-menu h1,.cover-menu p{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+
+.player-portrait[src$="/ending-ugly.png"]{bottom:4%}

@@ -1,0 +1,11 @@
+const {game,seed,KEY}=require('./game.test.cjs');
+const assert=require('node:assert/strict');
+function start(){const g=game(seed({scene:'forest',visited:['forest'],collected:[]}));g.act('continue');g.act('restore','auto');g.act('inspect','fallen_leaves');g.finishText();g.act('chicken-hold');g.finishText();return g;}
+function reach(g,index){for(let i=0;i<100&&g.library.autosave.narrative.index<index;i++)g.next();assert.equal(g.library.autosave.narrative.index,index);}
+function portrait(g,taken){assert.equal(g.library.autosave.quests.hatTaken,taken);assert.match(g.html,new RegExp('assets/'+(taken?'chicken-dialogue.png':'chicken-hat-dialogue.png')));}
+function reload(g){const r=game(g.storage);r.act('continue');r.act('restore','auto');return r;}
+const returned=start();returned.act('chicken-grab');reach(returned,2);portrait(returned,true);returned.finishText();returned.act('chicken-return');reach(returned,4);portrait(returned,false);portrait(reload(returned),false);reach(returned,8);portrait(returned,false);reach(returned,11);portrait(returned,true);portrait(reload(returned),true);returned.finishText();assert.ok(returned.library.autosave.collected.includes('fallen_leaves'));
+const kept=start();kept.act('chicken-grab');kept.finishText();kept.act('chicken-keep');reach(kept,2);portrait(kept,true);kept.finishText();assert.equal(kept.library.autosave.quests.hatTaken,true);
+const offered=start();offered.act('chicken-plead');portrait(offered,false);reach(offered,8);portrait(offered,false);reach(offered,11);portrait(offered,true);offered.finishText();offered.act('chicken-return');reach(offered,4);portrait(offered,false);reach(offered,11);portrait(offered,true);offered.finishText();assert.ok(offered.library.autosave.collected.includes('fallen_leaves'));
+const legacy=JSON.parse(JSON.stringify(returned.library));legacy.autosave.narrative={lines:returned.context.GameExpansion.chickenReturn,index:4,shown:0,after:'chicken-grant'};legacy.autosave.quests.hatOutcome='returned';legacy.autosave.quests.hatTaken=true;const repaired=game({[KEY]:JSON.stringify(legacy)});repaired.act('continue');repaired.act('restore','auto');portrait(repaired,false);
+console.log('PASS: grabbed hat, voluntary handover, return, re-gift, refusal, inventory reward, save restoration and old-save portrait correction.');
