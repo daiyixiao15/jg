@@ -501,8 +501,8 @@
       1711,
       1206
     ],
-    "source": "codex-clipboard-db1aa1c2-841e-4f09-b336-65af83161c4b.png",
-    "sha256": "98692c40695dca97a0322322ca16c7db5ac41dc6c732a7f599546d87977f7520"
+    "source": "codex-clipboard-97219f0c-7f10-42ae-9abd-3fe1ca8d8778.png",
+    "sha256": "97d071591f7c5e5e49e713d2c322d8d45946c8b904ae3b84d2f329a31d5f3c9b"
   },
   "central-park-dialogue.png": {
     "width": 2800,

@@ -77,3 +77,21 @@ header{position:absolute;inset:2% 2% auto;display:flex;justify-content:space-bet
 .reading-layer:not(:has(.player-portrait)) .dialogue p{left:4%;justify-content:flex-start;text-align:left}
 .reading-layer:not(:has(.player-portrait)) .dialogue .speaker{left:4%}
 .world header>div{margin-left:auto}.rename-save{flex:none;font-size:.75em;padding:.5em .7em}.save-slot{overflow-wrap:anywhere}
+
+.ending-form-art.transformation-reveal{left:10%;top:10%;width:48%;height:62%;z-index:2}
+
+/* Dialogue portrait placement follows the supplied 4:3 composition references. */
+.other-npc[data-npc="chicken"]{left:43.5%;top:29.5%;width:30.5%;height:44%}
+.other-npc[data-npc="chicken"]:has(image[href$="/chicken-hat-dialogue.png"]){left:43%;top:10%;width:31.5%;height:64%}
+.other-npc[data-npc="cat"]{left:41.5%;top:33%;width:35%;height:39%}
+.other-npc[data-npc="cat"]:has(image[href$="/fluffy-thinking.png"]){left:41.5%;top:35%;width:30.6%;height:36%}
+.other-npc[data-npc="fur"]{left:49%;top:56%;width:13%;height:11%}
+.other-npc[data-npc="tv"]{left:43%;top:28.5%;width:24%;height:40%}
+.reading-layer:has(.other-npc:is([data-npc="chicken"],[data-npc="cat"],[data-npc="fur"],[data-npc="tv"])) .player-portrait{z-index:2}
+.reading-layer:has(.other-npc:is([data-npc="chicken"],[data-npc="cat"],[data-npc="fur"],[data-npc="tv"])) .player-portrait[src$="/player.png"]{left:0%;bottom:4%;width:38%;height:70%}
+
+/* Larger route beacons for the ice tower and dragon destination. */
+.travel-arrow{right:2%;bottom:3%;width:24%;height:11%;min-height:36px;animation:travel-beacon 1.6s ease-in-out infinite}
+.travel-arrow span{display:block;position:absolute;bottom:108%;left:-12%;width:124%;padding:.3em .45em;border-radius:.5cqw;background:#182b43e6;color:#fff9d7;text-align:center;font-size:1.8cqw;line-height:1.3;text-shadow:0 1px 2px #000;pointer-events:none}
+@keyframes travel-beacon{0%,100%{transform:translateX(-.35cqw) scale(.97);filter:drop-shadow(0 2px 2px #18243f) drop-shadow(0 0 6px #fff) drop-shadow(0 0 12px #ffd561)}50%{transform:translateX(.35cqw) scale(1.05);filter:drop-shadow(0 2px 2px #18243f) drop-shadow(0 0 10px #fff) drop-shadow(0 0 22px #ffcf3f)}}
+@media(prefers-reduced-motion:reduce){.travel-arrow{animation:none}}

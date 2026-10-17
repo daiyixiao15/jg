@@ -1,11 +1,5 @@
 (function(root){
   root.GameExpansion={
-  "tvRush": [
-    {
-      "speaker": "tv",
-      "text": "收到！着急赶路的小精灵，你想去哪？"
-    }
-  ],
   "tvIntro": [
     {
       "text": "站住！这里是奇幻世界交通办！前方的小精灵，请接受本公园最重要的检查！",
@@ -2187,32 +2181,32 @@
   "fiveAfterHit": [
     {
       "text": "庞大而沉默的恶龙倒下了。",
-      "form": "beast"
+      "hidePortrait": true
     },
     {
       "text": "她的身体化成了无数花瓣，洒落在漫山遍野的野花中。",
-      "form": "beast"
+      "hidePortrait": true
     },
     {
       "text": "很快，你就分不清哪片属于她了。",
-      "form": "beast"
+      "hidePortrait": true
     },
     {
       "text": "你的心里有一种说不上来的滋味……",
-      "form": "beast"
+      "hidePortrait": true
     },
     {
       "text": "但是那扇吸引着你目光很久了的门，今天，此时此刻，第一次完整地展现在了你的面前。",
-      "form": "beast"
+      "hidePortrait": true
     },
     {
       "text": "大龙，我终于站在了你一直守护的门前了。",
-      "form": "beast",
+      "hidePortrait": true,
       "speaker": "player"
     },
     {
       "text": "今天门里的光，怎么好像比任何时候都要明亮刺眼……",
-      "form": "beast",
+      "hidePortrait": true,
       "speaker": "player"
     }
   ],
@@ -2308,7 +2302,7 @@
       "speaker": "mother"
     },
     {
-      "text": "要是知道你问我要椅子是为了去喝【那个】，我绝对不会给你的。",
+      "text": "要是知道你问我要椅子是为了去喝那瓶消毒水，我绝对不会给你的。",
       "setting": "home",
       "speaker": "mother"
     },

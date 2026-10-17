@@ -1,0 +1,7 @@
+const {game,seed,KEY}=require('./game.test.cjs');const assert=require('node:assert/strict');
+const AK='little-magic-achievements-v1';
+const storage=seed({phase:'ending',ending:'caught',risk:6,round:3,scene:'palace',endingStage:'summary',narrative:{lines:[{text:'旧的被发现对白'}],index:0,shown:0,after:'ending-story'}});
+const lib=JSON.parse(storage[KEY]);lib.slots[0]={name:'旧存档',date:'test',state:JSON.parse(JSON.stringify(lib.autosave))};storage[KEY]=JSON.stringify(lib);storage[AK]=JSON.stringify({unlocked:['ending_caught','ending_one'],collected:['apple'],discarded:2});
+for(const id of ['auto','0']){const g=game({...storage});g.act('continue');g.act('restore',id);const s=g.library.autosave;assert.equal(s.phase,'explore');assert.equal(s.scene,'lab');assert.equal(s.round,3);assert.equal(s.ending,null);assert.equal(s.narrative,null);assert.equal(s.risk,undefined);assert.equal(s.collected.length,8);assert.equal(s.pot.length,0);assert.doesNotMatch(g.html,/旧的被发现对白/);g.act('achievements');assert.doesNotMatch(g.html,/药还没喝呢/);assert.match(g.html,/软绵绵的小猪/);}
+const ordinary=game(seed({risk:99,round:4,scene:'sky',visited:['sky']}));ordinary.act('continue');ordinary.act('restore','auto');assert.equal(ordinary.library.autosave.round,4);assert.equal(ordinary.library.autosave.scene,'sky');assert.equal(ordinary.library.autosave.risk,undefined);
+console.log('PASS: old capture-ending auto/manual saves recover inventory and round at lab; legacy risk disappears; ordinary saves and remaining achievements survive.');

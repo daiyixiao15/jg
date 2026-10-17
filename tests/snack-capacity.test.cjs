@@ -1,0 +1,11 @@
+const {game,seed,KEY}=require('./game.test.cjs');const assert=require('node:assert/strict');
+const ids=['apple','grape','cabbage','ice_cream','dumpling','frost','plants','cat_fur'];
+function load(storage){const g=game(storage);g.act('continue');g.act('restore','auto');return g;}
+const g=load(seed({scene:'forest',visited:['forest'],collected:ids,quests:{cat:'accepted'}}));
+for(const id of ['snack_small','snack_large']){g.act('inspect',id);g.act('collect',id);assert.deepEqual(g.library.autosave.collected,ids);}
+assert.deepEqual(g.library.autosave.quests.snacks,['snack_small','snack_large']);g.act('bag');assert.match(g.html,/背包 · 8\/8/);assert.match(g.html,/任务道具 · 妙脆角小一/);g.act('bag');
+const restored=load(g.storage);assert.equal(restored.library.autosave.quests.snacks.length,2);restored.act('scene','lab');restored.finishText();restored.act('brew');assert.equal(restored.library.autosave.phase,'brew');assert.doesNotMatch(restored.html,/data-draggable="true"[^>]*snack/);restored.drag('snack_small');assert.equal(restored.library.autosave.pot.length,0);
+g.act('cat-talk');assert.equal(g.library.autosave.quests.snacks.length,0);assert.deepEqual(g.library.autosave.collected,ids);g.finishText();g.act('cat-far');g.finishText();assert.match(g.html,/获得奖励/);assert.equal(g.library.autosave.quests.catRewardGround,true);assert.equal(g.library.autosave.collected.length,8);
+const legacy=load(seed({scene:'forest',collected:['snack_small','snack_large',...ids.slice(0,6)],quests:{cat:'accepted'}}));assert.equal(legacy.library.autosave.collected.length,6);assert.equal(legacy.library.autosave.quests.snacks.length,2);
+legacy.act('bag');legacy.act('item','snack_small');legacy.act('discard','snack_small');legacy.act('discard-confirm');assert.deepEqual(legacy.library.autosave.quests.snacks,['snack_large']);assert.equal(legacy.library.autosave.collected.length,6);legacy.act('inspect','snack_small');legacy.act('collect','snack_small');assert.equal(legacy.library.autosave.quests.snacks.length,2);
+console.log('PASS: full material bag plus two snacks, independent task display, save restoration, brewing without snack consumption, delivery with full reward bag, old-save migration, discard and re-collection.');

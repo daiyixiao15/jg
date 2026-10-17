@@ -1,6 +1,6 @@
 (function(root) {
   'use strict';
-  function createState() {return {phase:'intro',scene:'ice',section:'upper',collected:[],pot:[],risk:0,dialogueCount:0,bleachStage:0,ending:null};}
+  function createState() {return {phase:'intro',scene:'ice',section:'upper',collected:[],pot:[],dialogueCount:0,bleachStage:0,ending:null};}
   function collect(state,id) {
     if(state.phase!=='explore') return {ok:false,message:'现在不能收集材料。'};
     const m=root.GameData.materials.find(x=>x.id===id);
@@ -9,8 +9,6 @@
     if(state.collected.length>=8) return {ok:false,message:'已经收满八种宝物，去大锅那里吧。'};
     if(id==='bleach' && !state.quests?.ladder && state.bleachStage<2) return {ok:false,message:'女巫毒药太高了，现在还够不到。'};
     state.collected.push(id);
-    if(m.scene==='palace' || m.scene==='sky') state.risk++;
-    if(state.risk>5) {state.phase='ending';state.ending='caught';}
     return {ok:true,message:'收好了：'+m.name};
   }
   function putInPot(state,id) {
@@ -19,14 +17,13 @@
   }
   function canBrew(state) {return state.phase==='brew' && state.collected.length===8 && state.collected.every(id=>root.GameData.materials.some(m=>m.id===id)) && state.pot.length===8 && new Set(state.pot).size===8 && state.pot.every(id=>state.collected.includes(id));}
   function resolveEnding(state) {
-    if(state.risk>5) return 'caught';
     const rows=state.pot.map(id=>root.GameData.materials.find(m=>m.id===id));
     if(rows.length!==8 || new Set(state.pot).size!==8 || rows.some(m=>!m)) throw new Error('制药需要八种不同的有效材料');
     if(state.dialogueCount>=3 && state.dragonProgress?.poisonSeen) return 'six';
     if(rows.some(m=>m.id==='bleach')) return 'five';
     if(rows.filter(m=>m.tags.includes('foaming')).length>=3) return 'four';
     const allEdible=rows.every(m=>m.tags.includes('edible'));
-    if(allEdible && rows.filter(m=>m.tags.includes('tasty')).length>=4) return 'two';
+    if(allEdible && rows.filter(m=>m.tags.includes('tasty')).length>=3) return 'two';
     if(allEdible) return 'one';
     return 'three';
   }
@@ -35,7 +32,6 @@
     state.collected=state.collected.filter(x=>x!==id);
     state.pot=state.pot.filter(x=>x!==id);
     if(state.phase!=='explore') {state.phase='explore';state.scene='lab';}
-    // Picking up risky objects has already drawn attention; dropping them cannot undo it.
     return true;
   }
   root.GameRules={createState,collect,discard,putInPot,canBrew,resolveEnding};
