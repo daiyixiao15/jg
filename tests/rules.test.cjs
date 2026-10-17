@@ -5,7 +5,7 @@ const path = require('node:path');
 const sandbox = {}; vm.createContext(sandbox);
 for (const file of ['data.js','rules.js']) vm.runInContext(fs.readFileSync(path.join(__dirname,'../src',file),'utf8'),sandbox);
 const R=sandbox.GameRules,D=sandbox.GameData;
-const make=(ids,dialogueCount=0,risk=0)=>({...R.createState(),phase:'brew',collected:ids,pot:ids,dialogueCount,risk});
+const make=(ids,dialogueCount=0,risk=0,poisonSeen=false)=>({...R.createState(),phase:'brew',collected:ids,pot:ids,dialogueCount,risk,dragonProgress:{poisonSeen}});
 const base=['apple','grape','cabbage','ice_cream','dumpling','frost','plants','cat_food'];
 assert.equal(R.resolveEnding(make(base)),'two');
 assert.equal(R.resolveEnding(make(['apple','grape','dumpling','frost','plants','cat_food','salt','vinegar'])),'one');
@@ -14,7 +14,7 @@ assert.equal(R.resolveEnding(make(['apple','grape','cabbage','ice_cream','dumpli
 assert.equal(R.resolveEnding(make(['apple','grape','cabbage','ice_cream','dumpling','shampoo','body_wash','detergent'])),'four');
 assert.equal(R.resolveEnding(make(['apple','grape','cabbage','ice_cream','dumpling','frost','plants','skincare'])),'three');
 assert.equal(R.resolveEnding(make(['apple','grape','cabbage','ice_cream','shampoo','body_wash','detergent','bleach'])),'five');
-assert.equal(R.resolveEnding(make(['apple','grape','cabbage','ice_cream','shampoo','body_wash','detergent','bleach'],3)),'six');
+assert.equal(R.resolveEnding(make(['apple','grape','cabbage','ice_cream','shampoo','body_wash','detergent','bleach'],3,0,true)),'six');
 assert.equal(R.resolveEnding(make(base,3,6)),'caught');
 assert.throws(()=>R.resolveEnding(make(base.slice(0,7))));
 assert.throws(()=>R.resolveEnding(make([...base.slice(0,7),'apple'])));
@@ -36,5 +36,5 @@ assert.equal(R.discard(dropped,'apple'),true);assert.equal(dropped.collected.len
 // Enumerate every legal eight-material combination: no unresolved ending, all six reachable.
 const found=new Set();let count=0;
 function visit(start,ids){if(ids.length===8){const rows=ids.map(id=>D.materials.find(m=>m.id===id));const risk=rows.filter(m=>['palace','sky'].includes(m.scene)).length;if(risk<=5){found.add(R.resolveEnding(make(ids,0,risk)));count++;}return;}for(let i=start;i<=D.materials.length-(8-ids.length);i++)visit(i+1,[...ids,D.materials[i].id]);}
-visit(0,[]);for(const id of ['one','two','three','four','five'])assert.ok(found.has(id),id+' must be reachable');found.add(R.resolveEnding(make(base,3)));assert.ok(found.has('six'));
+visit(0,[]);for(const id of ['one','two','three','four','five'])assert.ok(found.has(id),id+' must be reachable');found.add(R.resolveEnding(make(base,3,0,true)));assert.ok(found.has('six'));
 console.log('PASS: collection, risk boundaries, 84 gate, brewing gates, ending priorities; '+count+' legal combinations checked; all six endings reachable.');

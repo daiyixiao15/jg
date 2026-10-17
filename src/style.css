@@ -76,3 +76,4 @@ header{position:absolute;inset:2% 2% auto;display:flex;justify-content:space-bet
 
 .reading-layer:not(:has(.player-portrait)) .dialogue p{left:4%;justify-content:flex-start;text-align:left}
 .reading-layer:not(:has(.player-portrait)) .dialogue .speaker{left:4%}
+.world header>div{margin-left:auto}.rename-save{flex:none;font-size:.75em;padding:.5em .7em}.save-slot{overflow-wrap:anywhere}

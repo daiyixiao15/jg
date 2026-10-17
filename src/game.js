@@ -18,7 +18,7 @@
   }
   const names={lab:'制药所',hub:'中央公园',bath:'泡泡王国',sky:'天空之城',ice:'冰雪塔楼',forest:'梦幻森林',palace:'宫殿长廊',dragon:'恶龙盘踞之地'};
   const backgrounds={hub:'central-park.png',lab:'lab.jpg',bath:'bath.jpg',sky:'sky.jpg',ice:'ice.jpg',forest:'forest.png',palace:'palace.png',dragon:'dragon-resting.png'};
-  const itemImages={body_wash:'material-body-wash.png',shampoo:'material-shampoo.png',detergent:'material-detergent.png',toothpaste:'material-toothpaste.png',bleach:'material-bleach.png',soy_sauce:'material-soy-sauce.png',vinegar:'material-vinegar.png',salt:'material-salt.png',sugar:'material-sugar.png',cooking_wine:'material-cooking-wine.png',ice_cream:'sweet-snow.png',dumpling:'dumplings.png',frost:'frost.png',apple:'ice-fruit.png',grape:'grape.png',cabbage:'ice-grass.png',plants:'flowers.png',fallen_leaves:'chicken-leaf.png',cat_fur:'fur.png',skincare:'skincare.png',perfume:'perfume.png',lipstick:'sunset.png',snack_small:'snack-small.png',snack_large:'snack-large.png'};
+  const itemImages={body_wash:'bath-yellow.png',shampoo:'bath-pink.png',detergent:'bath-powder.png',toothpaste:'bath-berry.png',bleach:'bath-poison.png',soy_sauce:'material-soy-sauce.png',vinegar:'material-vinegar.png',salt:'material-salt.png',sugar:'material-sugar.png',cooking_wine:'material-cooking-wine.png',ice_cream:'sweet-snow.png',dumpling:'dumplings.png',frost:'frost.png',apple:'ice-fruit.png',grape:'grape.png',cabbage:'ice-grass.png',plants:'flowers.png',fallen_leaves:'chicken-leaf.png',cat_fur:'fur.png',skincare:'skincare.png',perfume:'perfume.png',lipstick:'sunset.png',snack_small:'snack-small.png',snack_large:'snack-large.png'};
   const spots={shampoo:[10,29,14,22],body_wash:[22,32,10,23],detergent:[68,37,14,23],toothpaste:[86,37,10,28],bleach:[79,1,15,19],soy_sauce:[88,46,10,25],vinegar:[30,4,10,21],salt:[64,33,9,15],sugar:[13,53,10,17],cooking_wine:[17,14,10,12],ice_cream:[54,53,39,22],dumpling:[60,73,38,15],frost:[0,30,12,22]};
   Object.assign(spots,{apple:[28,76,24,24],grape:[58,0,25,30],cabbage:[67,41,32,50],plants:[68,0,20,30],cat_fur:[54,79,11,18],fallen_leaves:[0,49,25,50],skincare:[13,45,23,27],perfume:[34,29,17,28],lipstick:[55,37,33,45]});
   let state=Q.normalize(R.createState()),bag=false,modal=null,notice='',typingTimer=null,mixingTimer=null,drag=null,suppressClickUntil=0,autosavePaused=false;
@@ -34,7 +34,23 @@
   function countClick(id,achievement){const q=state.quests;q.clicks[id]=(q.clicks[id]||0)+1;if(q.clicks[id]>=3)unlock(achievement);}
   const button=(label,action,attrs='')=>`<button type="button" data-action="${action}" ${attrs}>${esc(label)}</button>`;
   const clone=value=>JSON.parse(JSON.stringify(value));
+  function dragonProgress(s=state){
+    if(!s.dragonProgress)s.dragonProgress={stage:Math.min(Math.max(s.round||1,1),4),poisonSeen:false,talked:false};
+    if(s.dragonProgress.stage===5&&!s.dragonProgress.poisonSeen)s.dragonProgress.stage=4;
+    return s.dragonProgress;
+  }
+  function renameSave(){
+    if(modal?.type!=='rename-save')return;
+    const name=document.getElementById('save-name').value.trim();
+    if(!name||name.length>30){notice='请输入1至30个字的存档名。';render();return;}
+    const previous=clone(library),id=modal.id;
+    if(id==='auto'&&library.autosave)library.autosaveName=name;
+    else if(library.slots[Number(id)])library.slots[Number(id)].name=name;else return;
+    if(persist()){modal={type:'saves',mode:modal.mode};notice='存档已重命名。';}else library=previous;
+    render();
+  }
   function valid(s){
+    if(s?.dragonProgress&&(!Number.isInteger(s.dragonProgress.stage)||s.dragonProgress.stage<1||s.dragonProgress.stage>5||typeof s.dragonProgress.poisonSeen!=='boolean'||typeof s.dragonProgress.talked!=='boolean'))return false;
     if(s?.quests){const q=s.quests;if(!['new','refused','accepted','rewarded'].includes(q.cat)||!Array.isArray(q.princessClaimed)||!Array.isArray(q.princessReturned)||!Number.isInteger(q.princessDiscards)||q.princessDiscards<0||!q.clicks||typeof q.clicks!=='object')return false;}
     if(s?.phase==='prologue'&&!s.narrative)return false;
     if(s?.phase==='brew'&&s.collected?.length!==8)return false;
@@ -46,7 +62,7 @@
   function readLibrary(){
     try{
       const raw=JSON.parse(localStorage.getItem(KEY));
-      if(raw&&raw.version===2)return {version:2,autosave:valid(raw.autosave)?raw.autosave:null,slots:Array.from({length:3},(_,i)=>raw.slots?.[i]&&valid(raw.slots[i].state)?raw.slots[i]:null),televisionSeen:!!raw.televisionSeen,completed:Array.isArray(raw.completed)?raw.completed.filter(id=>typeof id==='string'):[]};
+      if(raw&&raw.version===2)return {version:2,autosave:valid(raw.autosave)?raw.autosave:null,slots:Array.from({length:3},(_,i)=>raw.slots?.[i]&&valid(raw.slots[i].state)?raw.slots[i]:null),autosaveName:typeof raw.autosaveName==="string"?raw.autosaveName.slice(0,30):"",televisionSeen:!!raw.televisionSeen,completed:Array.isArray(raw.completed)?raw.completed.filter(id=>typeof id==='string'):[]};
       const old=JSON.parse(localStorage.getItem(OLD_KEY));
       return {version:2,autosave:old?.version===1&&valid(old.state)?{...old.state,dialogueCount:0,round:1,visited:[],adventureId:'legacy',narrative:null}:null,slots:[null,null,null],completed:[]};
     }catch{return {version:2,autosave:null,slots:[null,null,null],completed:[]};}
@@ -196,7 +212,7 @@
   }
   function startEaster(){
     if(state.phase!=='ending'||state.ending!=='six'||state.endingStage!=='credits')return;
-    clearTimeout(cinematicTimer);state.endingStage='easter';state.endingReality=false;say(X.easter,'easter-finished',{preview:true,title:'彩蛋'});
+    clearTimeout(cinematicTimer);state.endingStage='easter';state.endingReality=false;say(X.easter,'easter-finished',{preview:true,title:'接“光明世界的尽头是一双手”结局'});
   }
   function inspectMaterial(id){
     if(id==='bleach'){if(state.collected.includes(id)){modal={type:'material',id};render();return;}if(state.quests.ladder){say(X.bleachReach,'bleach-window');return;}say([S.player('呜呜呜太高了够不着，有什么办法可以拿到它呢。可惜我的翅膀是装饰，不然就可以飞起来了！')]);return;}
@@ -242,14 +258,15 @@
   }
   function saveList(){
     const saveMode=modal.mode==='save';
-    const row=(label,id,exists,action)=>`<div class="save-row">${button(label,action,`data-id="${id}" class="save-slot" ${!saveMode&&!exists?'disabled':''}`)}${exists?button('删除','delete-save',`data-id="${id}" class="delete-save" aria-label="删除${id==='auto'?'自动存档':'存档 '+(Number(id)+1)}"`):''}</div>`;
-    return `<h2>${saveMode?'选择存档位置':'选择要继续的存档'}</h2>${!saveMode&&library.autosave?row('自动存档 · '+library.autosave.playerName,'auto',true,'restore'):''}${library.slots.map((slot,i)=>row('存档 '+(i+1)+(slot?' · '+slot.state.playerName+' · '+slot.date:' · 空'),i,!!slot,saveMode?'save-slot':'restore')).join('')}`;
+    const row=(label,id,exists,action)=>`<div class="save-row">${button(label,action,`data-id="${id}" class="save-slot" ${!saveMode&&!exists?'disabled':''}`)}${exists?button('重命名','rename-save',`data-id="${id}" class="rename-save"`)+button('删除','delete-save',`data-id="${id}" class="delete-save" aria-label="删除${id==='auto'?'自动存档':'存档 '+(Number(id)+1)}"`):''}</div>`;
+    return `<h2>${saveMode?'选择存档位置':'选择要继续的存档'}</h2>${!saveMode&&library.autosave?row((library.autosaveName||'自动存档')+' · '+library.autosave.playerName,'auto',true,'restore'):''}${library.slots.map((slot,i)=>row((slot?.name||'存档 '+(i+1))+(slot?' · '+slot.state.playerName+' · '+slot.date:' · 空'),i,!!slot,saveMode?'save-slot':'restore')).join('')}`;
   }
   function popup(){
     if(!modal)return '';
     let body='';
     if(modal.type==='name')body=`<form id="name-form"><h2>小精灵，你叫什么名字？</h2><input id="player-name" maxlength="24" required autocomplete="off" aria-label="玩家名字" placeholder="输入你的名字"><div class="choices">${button('取消','close')}<button type="button" data-action="begin-adventure">开始冒险</button></div></form>`;
     else if(modal.type==='reuse-name')body=`<h2>继续使用上次的名字吗？</h2><p>上次使用的名字是「${esc(lastName)}」。</p><div class="choices">${button('继续使用','reuse-name')}${button('换一个名字','change-name')}</div>`;
+    else if(modal.type==='rename-save')body=`<form id="rename-save-form"><h2>重命名存档</h2><input id="save-name" value="${esc(modal.name)}" maxlength="30" required aria-label="存档名字"><div class="choices">${button('取消','rename-cancel')}${button('保存名字','rename-confirm')}</div></form>`;
     else if(modal.type==='settings')body=`<h2>设置</h2><div class="setting-buttons">${button('存档','save-list')}${button('读档','load-list')}${button('重置游玩数据','reset-data')}${button('返回启动界面','menu')}</div><p class="storage-note">存档保存在当前浏览器，共三个手动存档位置。重置游玩数据会保留成就。</p>`;
     else if(modal.type==='reset-data')body=`<h2>重置游玩数据？</h2><p>将清除当前进度、自动存档、全部手动存档、周目记录和上次使用的名字，重新从第一周目开始。已获得的成就及成就累计进度保留。</p><p>此操作无法撤销。</p><div class="choices">${button('取消','reset-cancel')}${button('确认重置','reset-confirm')}</div>`;
     else if(modal.type==='saves')body=saveList();
@@ -292,14 +309,21 @@
     if(n.title)return `<div class="reading-layer"><button type="button" class="ending-screen" data-action="advance" aria-label="点击观看彩蛋画面"><span>${esc(n.title)}</span><small>点击画面继续</small></button></div>`;
     if(n.preview)return '<div class="reading-layer cg-preview"><button type="button" class="reading-surface" data-action="advance" aria-label="点击开始对白"></button></div>';
     const line=n.lines[n.index],speaker=line.speaker==='player'?state.playerName:({dragon:'恶龙',cat:'毛绒绒怪',chicken:'傻不拉鸡',princess:'小公主',unknown:'未知的声音',tv:'电视机先生',mother:'妈妈',fur:'毛绒绒'})[line.speaker]||'';
-    if(n.index===companionFarewellIndex(n))return `<div class="reading-layer centered-reading"><button type="button" class="reading-surface" data-action="advance" aria-label="点击画面推进文字"></button><div class="centered-message"><p id="dialog-text">${esc(line.text.replaceAll('{name}',state.playerName).slice(0,n.shown))}</p></div><small>点击画面继续</small></div>`;
+    if(line.centered||n.index===companionFarewellIndex(n))return `<div class="reading-layer centered-reading"><button type="button" class="reading-surface" data-action="advance" aria-label="点击画面推进文字"></button><div class="centered-message"><p id="dialog-text">${esc(line.text.replaceAll('{name}',state.playerName).slice(0,n.shown))}</p></div><small>点击画面继续</small></div>`;
+    const cgOnly=state.phase==='ending'&&(state.ending==='four'||state.endingStage==='easter');
     const catThinking=n.after==='cat-choice'&&(line.expression==='thinking'||line.text==='魔法材料？'||line.text.includes('这只黑色毛球的眼睛藏在'));
     const portraitSpeaker=catThinking?'cat':line.speaker;
-    const npcFile=line.setting==='black'?null:catThinking?'fluffy-thinking.png':line.speaker==='dragon'?(line.expression==='smile'?'dragon-smile.png':'dragon.png'):line.speaker==='cat'?(state.quests.cat==='rewarded'?'fluffy-delivered.png':state.quests.cat==='accepted'?'fluffy-reward.png':'fluffy-wait.png'):line.speaker==='chicken'?(state.quests.hatTaken?'chicken-dialogue.png':'chicken-hat-dialogue.png'):line.speaker==='princess'?'princess-dialogue.png':line.speaker==='fur'?'fur-dialogue.png':line.speaker==='tv'?'tv-dialogue.png':null;
+    const npcFile=cgOnly||line.setting==='black'?null:catThinking?'fluffy-thinking.png':line.speaker==='dragon'?(line.expression==='smile'?'dragon-smile.png':'dragon.png'):line.speaker==='cat'?(state.quests.cat==='rewarded'?'fluffy-delivered.png':state.quests.cat==='accepted'?'fluffy-reward.png':'fluffy-wait.png'):line.speaker==='chicken'?(state.quests.hatTaken?'chicken-dialogue.png':'chicken-hat-dialogue.png'):line.speaker==='princess'?'princess-dialogue.png':line.speaker==='fur'?'fur-dialogue.png':line.speaker==='tv'?'tv-dialogue.png':null;
     const playerFile=line.form==='beast'?'red-dragon.png':line.form==='pig'?'ending-pig.png':line.form==='ugly'?'ending-ugly.png':'player.png';
-    return `<div class="reading-layer"><button type="button" class="reading-surface" data-action="advance" aria-label="点击画面推进文字"></button>${npcFile?(line.speaker==='dragon'?`<img class="npc-portrait" src="assets/${npcFile}" alt="恶龙立绘">`:`<div class="npc-portrait other-npc" data-npc="${portraitSpeaker}">${sprite(npcFile,speaker+'立绘')}</div>`):''}${speaker&&line.speaker!=='unknown'&&!state.endingReality&&n.after!=='easter-finished'&&!['chef','bubble'].includes(line.form)&&line.setting!=='black'?`<img class="player-portrait" src="assets/${playerFile}" alt="玩家立绘">`:''}<div class="dialogue ${speaker?'':'narration'}" role="button" tabindex="0" data-action="advance" aria-label="点击推进对话">${speaker?`<div class="speaker">${esc(speaker)}</div>`:''}<p id="dialog-text">${esc(line.text.replaceAll('{name}',state.playerName).slice(0,n.shown))}</p><small>${state.phase==='prologue'?'点击画面翻页':'点击画面继续'}</small></div></div>`;
+    return `<div class="reading-layer"><button type="button" class="reading-surface" data-action="advance" aria-label="点击画面推进文字"></button>${npcFile?(line.speaker==='dragon'?`<img class="npc-portrait" src="assets/${npcFile}" alt="恶龙立绘">`:`<div class="npc-portrait other-npc" data-npc="${portraitSpeaker}">${sprite(npcFile,speaker+'立绘')}</div>`):''}${!cgOnly&&speaker&&line.speaker!=='unknown'&&!state.endingReality&&n.after!=='easter-finished'&&!['chef','bubble'].includes(line.form)&&line.setting!=='black'?`<img class="player-portrait" src="assets/${playerFile}" alt="玩家立绘">`:''}<div class="dialogue ${speaker?'':'narration'}" role="button" tabindex="0" data-action="advance" aria-label="点击推进对话">${speaker?`<div class="speaker">${esc(speaker)}</div>`:''}<p id="dialog-text">${esc(line.text.replaceAll('{name}',state.playerName).slice(0,n.shown))}</p><small>${state.phase==='prologue'?'点击画面翻页':'点击画面继续'}</small></div></div>`;
   }
 
+  function endingBackground(){
+    if(state.phase!=='ending'||!state.narrative)return null;
+    if(state.ending==='four')return 'ending-bubble.jpg';
+    const setting=state.narrative.lines[state.narrative.index].setting;
+    return ({ceiling:'ending-ceiling.png',home:'ending-home.jpg',peek:'ending-easter.jpg'})[setting]||null;
+  }
   function chefBackground(){
     const n=state.narrative;
     if(state.phase!=='ending'||state.ending!=='two'||n?.lines[n.index]?.setting!=='park')return null;
@@ -313,9 +337,9 @@
   function render(){
     clearInterval(typingTimer);
     if(['intro','exit'].includes(state.phase)){
-      app.innerHTML=`<div class="stage menu cover-menu" style="background-image:url(assets/cover.png)"><div class="menu-content" ${modal?'inert':''}><h1>一锅小小的魔法</h1><p>${state.phase==='exit'?'游戏已结束':'小精灵的第一次冒险'}</p>${button('开始','start')}${button('继续','continue',library.autosave||library.slots.some(Boolean)?'':'disabled')}${button('结束游戏','exit')}${button('成就','achievements')}</div>${popup()}${achievementView()}</div>`;
+      app.innerHTML=`<div class="stage menu cover-menu" style="background-image:url(assets/cover.png)"><div class="menu-content" ${modal?'inert':''}><h1>一锅小小的魔法</h1><p>${state.phase==='exit'?'游戏已结束':'小精灵的第一次冒险'}</p>${button('开始','start')}${button('继续','continue',library.autosave||library.slots.some(Boolean)?'':'disabled')}${button('设置','settings')}${button('成就','achievements')}</div>${popup()}${achievementView()}</div>`;
     }else{
-      const prologue=state.phase==='prologue',ending=state.phase==='ending',tvConversation=state.scene==='hub'&&!ending&&(state.narrative?.lines.some(line=>line.speaker==='tv')||modal?.type.startsWith('tv-')),boardingCG=ending&&state.ending==='six'&&state.endingStage==='companion'&&!state.endingReality,companionCG=ending&&state.ending==='six'&&state.endingReality&&state.narrative?.after==='ending-summary',farewellIndex=companionFarewellIndex(state.narrative),friendsRevealed=companionCG&&farewellIndex>=0&&(state.narrative.friendsRevealed||state.narrative.index>farewellIndex),bg=prologue||state.narrative?.title?null:chefBackground()?chefBackground():tvConversation?'central-park-dialogue.png':ending&&state.ending==='five'&&state.endingReality&&state.narrative?.after==='five-finish'?'ending-home.png':companionCG?(friendsRevealed?'ending-companion-friends.jpg':'ending-companion.png'):boardingCG?'dragon-boarding.png':ending&&state.endingStage==='easter'?'ending-easter.jpg':ending?(state.narrative?.lines[state.narrative.index].setting?null:['gate','companion'].includes(state.endingStage)||state.narrative&&!state.endingReality&&!['light-story','easter'].includes(state.endingStage)?'dragon-empty.png':null):state.scene==='ice'&&state.section==='upper'?'ice-upper.png':state.scene==='dragon'&&state.narrative?'dragon-empty.png':backgrounds[state.scene];
+      const prologue=state.phase==='prologue',ending=state.phase==='ending',tvConversation=state.scene==='hub'&&!ending&&(state.narrative?.lines.some(line=>line.speaker==='tv')||modal?.type.startsWith('tv-')),boardingCG=ending&&state.ending==='six'&&state.endingStage==='companion'&&!state.endingReality,companionCG=ending&&state.ending==='six'&&state.endingReality&&state.narrative?.after==='ending-summary',farewellIndex=companionFarewellIndex(state.narrative),friendsRevealed=companionCG&&farewellIndex>=0&&(state.narrative.friendsRevealed||state.narrative.index>farewellIndex),bg=prologue||state.narrative?.title||state.narrative?.lines[state.narrative.index].setting==='black'?null:endingBackground()?endingBackground():chefBackground()?chefBackground():tvConversation?'central-park-dialogue.png':ending&&state.ending==='five'&&state.endingReality&&state.narrative?.after==='five-finish'?'ending-home.jpg':companionCG?(friendsRevealed?'ending-companion-friends.jpg':'ending-companion.png'):boardingCG?'dragon-boarding.png':ending&&state.endingStage==='easter'?'ending-easter.jpg':ending?(state.narrative?.lines[state.narrative.index].setting?null:['gate','companion'].includes(state.endingStage)||state.narrative&&!state.endingReality&&!['light-story','easter'].includes(state.endingStage)?'dragon-empty.png':null):state.scene==='ice'&&state.section==='upper'?'ice-upper.png':state.scene==='dragon'&&state.narrative?'dragon-empty.png':backgrounds[state.scene];
       let view='';
       if(prologue)view=`<div class="storybook" aria-label="翻开的故事书"><div class="book-left"><span>一锅小小的魔法</span><i>✦</i></div><div class="book-right"><span>第 ${state.narrative.index+1} 页</span><i>✧</i></div><div class="turning-page" style="--page:${state.narrative.index}"></div></div>`;
       else if(ending){
@@ -331,9 +355,9 @@
       }
       else if(['brew','mixing','ready'].includes(state.phase)&&state.scene==='lab')view=`<div class="brew-panel ${state.phase==='mixing'?'mixing':''}"><h2>${state.phase==='mixing'?'魔法正在涌现……':state.phase==='ready'?'魔法药做好了':'把背包材料直接拖到锅口'}</h2><p>${state.pot.length}/8 已入锅</p><div id="pot" role="img" aria-label="制药大锅"><div id="pot-mouth" aria-label="锅口">${state.phase==='brew'?'拖到锅口松开':'✦'}</div><span class="pot-decoration" aria-hidden="true">✦</span></div>${state.phase==='brew'?button('开始制药','mix',R.canBrew(state)?'':'disabled'):state.phase==='ready'?button('前往恶龙盘踞之地','potion-prompt'):''}</div>`;
       else view=(tvConversation?'':scene())+(state.phase==='ready'&&state.scene==='dragon'?button('拿出魔法药','potion-prompt','class="potion-button"'):'');
-      app.innerHTML=`<div class="stage ${bg?'illustrated':''} ${state.narrative?.preview?'cg-preview-stage':''} ${state.narrative?.allowNavigation?'npc-navigation':''}" ${bg?`style="background-image:url(assets/${bg})"`:''}><div class="world" ${state.narrative&&!state.narrative.allowNavigation||modal?'inert':''}>${!prologue?`<header>${!ending?button('← 返回','back'):''}<div>${button('设置','settings')}${button('背包','bag',`aria-expanded="${bag}"`)}</div></header>`:''}${view}${bag&&!prologue?inventory():''}</div>${state.phase==='ending'&&['pig','ugly','beast'].includes(state.narrative?.lines[state.narrative.index].form)&&!state.narrative.lines[state.narrative.index].setting&&!state.narrative.lines[state.narrative.index].speaker?`<div class="ending-form-art">${sprite(state.narrative.lines[state.narrative.index].form==='beast'?'red-dragon.png':state.narrative.lines[state.narrative.index].form==='pig'?'ending-pig.png':'ending-ugly.png','变身形态')}</div>`:''}${notice?`<div class="notice" role="status">${esc(notice)}</div>`:''}${narrativeView()}${state.narrative&&!state.narrative.preview?button('快进至未读','skip-read','class="skip-read" aria-label="跳过已读对白，停在未读内容"'):''}${popup()}${achievementView()}${state.effects?'<div class="magic-smoke" aria-hidden="true"></div>':''}</div>`;
+      app.innerHTML=`<div class="stage ${bg?'illustrated':''} ${state.narrative?.preview?'cg-preview-stage':''} ${state.narrative?.allowNavigation?'npc-navigation':''}" ${bg?`style="background-image:url(assets/${bg})"`:''}><div class="world" ${state.narrative&&!state.narrative.allowNavigation||modal?'inert':''}>${!prologue?`<header>${!ending&&!(state.scene==='lab'&&state.phase==='explore')?button('← 返回','back'):''}<div>${button('设置','settings')}${button('背包','bag',`aria-expanded="${bag}"`)}</div></header>`:''}${view}${bag&&!prologue?inventory():''}</div>${state.phase==='ending'&&['pig','ugly','beast'].includes(state.narrative?.lines[state.narrative.index].form)&&!state.narrative.lines[state.narrative.index].setting&&!state.narrative.lines[state.narrative.index].speaker?`<div class="ending-form-art">${sprite(state.narrative.lines[state.narrative.index].form==='beast'?'red-dragon.png':state.narrative.lines[state.narrative.index].form==='pig'?'ending-pig.png':'ending-ugly.png','变身形态')}</div>`:''}${notice?`<div class="notice" role="status">${esc(notice)}</div>`:''}${narrativeView()}${state.narrative&&!state.narrative.preview?button('快进至未读','skip-read','class="skip-read" aria-label="跳过已读对白，停在未读内容"'):''}${popup()}${achievementView()}${state.effects?'<div class="magic-smoke" aria-hidden="true"></div>':''}</div>`;
     }
-    if(state.endingStage==='light-story')app.querySelector?.('.stage')?.classList.add('light-story');
+    if(state.endingStage==='light-story'&&!endingBackground())app.querySelector?.('.stage')?.classList.add('light-story');
     if(modal?.type==='name')document.getElementById('player-name').focus();
     else if(modal){const controls=app.querySelectorAll('.modal button:not([disabled])');controls[0]?.focus();}
     if(state.narrative&&!state.narrative.preview){
@@ -356,8 +380,9 @@
       state.phase='explore';state.scene='lab';state.visited=state.visited||[];
       if(!state.visited.includes('lab')){state.visited.push('lab');say([S.narration(S.intros.lab)]);return;}
     }
-    if(n.after==='round'&&state.round===4){state.quests.ladder=true;state.bleachStage=2;notice='获得任务道具：小木梯';}
-    if(n.after==='round'&&state.round>=5){state.dialogueCount=3;showEnding('six');return;}
+    if(n.after==='round')dragonProgress().talked=true;
+    if(n.after==='round'&&state.quests.dragonSceneStage===4){state.quests.ladder=true;state.bleachStage=2;notice='获得任务道具：小木梯';}
+    if(n.after==='round'&&state.quests.dragonSceneStage===5&&dragonProgress().poisonSeen){state.dialogueCount=3;showEnding('six');return;}
     if(n.after==='princess-choice'||n.after==='cat-choice'||n.after==='cat-retry'||n.after==='princess-reclaim'){modal={type:n.after};autosave(true);render();return;}
     if(n.after==='princess-gifts'){giftMenu();return;}
     if(n.after==='princess-gift-menu'){giftMenu(true);return;}
@@ -393,7 +418,7 @@
     if(n.after==='ending-white'){state.endingStage='white';state.whiteReadyAt=Date.now()+3000;}
     if(n.after==='ending-summary')state.endingStage='summary';
     if(n.after==='ending-gate-choice')modal={type:'gate-ready'};
-    if(n.after==='round'&&state.round===4)unlock('listen');
+    if(n.after==='round'&&state.quests.dragonSceneStage===4)unlock('listen');
     if(state.phase==='ready'&&state.scene==='dragon')modal={type:'drink'};
     autosave(true);render();
   }
@@ -421,6 +446,7 @@
     autosave();render();
   }
   function showEnding(id){
+    if(id==='five'&&state.pot.includes('bleach'))dragonProgress().poisonSeen=true;
     clearTimeout(mixingTimer);state.ending=id;state.phase='ending';state.endingStage='story';state.endingReality=false;state.effects=true;setTimeout(()=>{state.effects=false;app.querySelector('.magic-smoke')?.remove();},1400);state.narrative=null;bag=false;modal=null;markEnding();unlock('ending_'+id);if(['one','two','three','four','five','six'].every(e=>achievements.unlocked.includes('ending_'+e)))unlock('all_endings');if(id==='six'){state.endingStage='companion';autosave(true);render();return;}say(id==='five'?[S.narration('恭喜你！成功做出了可以变身为最强大魔兽的超级魔法药！快去战胜恶龙，到达光明的彼岸吧！'),...X.fiveStart]:E.endings[id],id==='five'?'five-hit':'ending-story');
   }
   function returnTarget(){
@@ -443,6 +469,7 @@
     say(S.opening,'lab');
   }
   app.addEventListener('submit',event=>{
+    if(event.target.id==='rename-save-form'){event.preventDefault();renameSave();return;}
     if(event.target.id!=='name-form')return;event.preventDefault();
     if(modal?.type!=='name')return;
     startAdventure(document.getElementById('player-name').value);
@@ -457,7 +484,7 @@
     if(!el||el.disabled)return;
     const action=el.dataset.action,id=el.dataset.id;
     // A popup blocks all underlying world controls, including keyboard activation.
-    const popupActions=['park-jam-taste','park-jam-refuse','begin-adventure','reset-data','reset-cancel','reset-confirm','achievements','cat-accept','cat-refuse','reward-take','reward-leave','reward-discard','reward-discard-item','hat-take','hat-leave','princess-answer','princess-reclaim-yes','princess-reclaim-no','gift-inspect','gifts-all','gifts-select','gifts-later','next-round','next-save','gate-ready','companion-ready','tv-rush','tv-wander','tv-go','tv-chat','tv-topic','tv-route','tv-routes-done','tv-clap','tv-thumb','tv-hurry','cat-far','cat-dragon','chicken-laugh','chicken-hold','chicken-grab','chicken-plead','chicken-return','chicken-keep','grip-ready','close','reuse-name','change-name','save-list','load-list','menu','restore','save-slot','delete-save','collect','discard','potion-travel','drink'];
+    const popupActions=['rename-save','rename-confirm','rename-cancel','park-jam-taste','park-jam-refuse','begin-adventure','reset-data','reset-cancel','reset-confirm','achievements','cat-accept','cat-refuse','reward-take','reward-leave','reward-discard','reward-discard-item','hat-take','hat-leave','princess-answer','princess-reclaim-yes','princess-reclaim-no','gift-inspect','gifts-all','gifts-select','gifts-later','next-round','next-save','gate-ready','companion-ready','tv-rush','tv-wander','tv-go','tv-chat','tv-topic','tv-route','tv-routes-done','tv-clap','tv-thumb','tv-hurry','cat-far','cat-dragon','chicken-laugh','chicken-hold','chicken-grab','chicken-plead','chicken-return','chicken-keep','grip-ready','close','reuse-name','change-name','save-list','load-list','menu','restore','save-slot','delete-save','collect','discard','potion-travel','drink'];
     if(modal&&!popupActions.includes(action))return;
     notice='';
     if(!['advance','stone','close'].includes(action)&&!modal)state.quests.clicks.lastAction=action;
@@ -478,9 +505,15 @@
       library=empty;lastName='';readLines.clear();autosavePaused=true;achievementToasts=[];bag=false;modal=null;
       state={...Q.normalize(R.createState()),phase:'intro'};notice='游玩数据已重置，成就已保留。';render();return;
     }
+    else if(action==='rename-save'&&modal?.type==='saves'){
+      const slot=id==='auto'?library.autosave:library.slots[Number(id)];if(!slot)return;
+      modal={type:'rename-save',id,mode:modal.mode,name:id==='auto'?(library.autosaveName||'自动存档'):(slot.name||'存档 '+(Number(id)+1))};
+    }
+    else if(action==='rename-confirm'){renameSave();return;}
+    else if(action==='rename-cancel'&&modal?.type==='rename-save')modal={type:'saves',mode:modal.mode};
     else if(action==='save-list')modal={type:'saves',mode:'save'};
     else if(action==='save-slot'){
-      if(valid(state)&&[0,1,2].includes(Number(id))){const date=new Date().toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'});library.slots[Number(id)]={date,state:clone(state)};if(persist()){modal={type:'settings'};notice='进度已保存到存档 '+(Number(id)+1)+'。';}}
+      if(valid(state)&&[0,1,2].includes(Number(id))){const date=new Date().toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'});library.slots[Number(id)]={name:library.slots[Number(id)]?.name||'',date,state:clone(state)};if(persist()){modal={type:'settings'};notice='进度已保存到存档 '+(Number(id)+1)+'。';}}
     }else if(action==='delete-save'){
       if(modal?.type!=='saves'||!(id==='auto'||['0','1','2'].includes(id)))return;
       const previous=clone(library);
@@ -533,7 +566,7 @@
     }else if(action==='talk'){
       // The story changes by completed playthroughs, never by repeated clicks.
       if(state.collected.length===0&&!state.quests.hasCollected)unlock('early_dragon');
-      say(S.rounds[Math.min((state.round||1)-1,4)],'round');return;
+      const progress=dragonProgress();state.quests.dragonSceneStage=progress.stage;say(S.rounds[progress.stage-1],'round');return;
     }else if(action==='cat-talk'){catTalk();return;}
     else if(action==='cat-accept'){state.quests.cat='accepted';say(X.catAccept);return;}
     else if(action==='cat-refuse'){state.quests.cat='refused';unlock('refuse_cat');say(X.catRefuse);return;}
@@ -580,7 +613,8 @@
       else if(state.endingStage==='epilogue'){timedScene('black',3000,'credits');return;}
       else if(state.endingStage==='fin')modal={type:'next-round'};
     }else if(action==='next-round'||action==='next-save'){
-      clearTimeout(mixingTimer);state={...Q.normalize(R.createState()),phase:'explore',scene:'lab',playerName:state.playerName,section:'lower',round:(state.round||1)+1,adventureId:Date.now().toString(36)+'-'+Math.random().toString(36).slice(2),visited:[],narrative:null};bag=false;autosave(true);
+      clearTimeout(mixingTimer);const progress=dragonProgress(),nextStage=progress.talked?Math.min(progress.stage+1,progress.poisonSeen?5:4):progress.stage;
+      state={...Q.normalize(R.createState()),dragonProgress:{stage:nextStage,poisonSeen:progress.poisonSeen,talked:false},phase:'explore',scene:'lab',playerName:state.playerName,section:'lower',round:(state.round||1)+1,adventureId:Date.now().toString(36)+'-'+Math.random().toString(36).slice(2),visited:[],narrative:null};bag=false;autosave(true);
       if(action==='next-save')modal={type:'saves',mode:'save'};else{enter('lab');return;}
     }else if(action==='brew'){
       if(state.phase==='ready')modal={type:'travel'};
@@ -639,6 +673,7 @@
   app.addEventListener('dragstart',event=>{if(event.target.closest('[data-draggable]'))event.preventDefault();});
   document.addEventListener('keydown',event=>{
     if(event.isComposing)return;
+    if(event.key==='Enter'&&event.target.id==='save-name'&&modal?.type==='rename-save'){event.preventDefault();renameSave();return;}
     if(event.key==='Enter'&&event.target.id==='player-name'&&modal?.type==='name'){event.preventDefault();const input=event.target;if(!input.reportValidity||input.reportValidity())startAdventure(input.value);return;}
     if(['INPUT','TEXTAREA'].includes(event.target.tagName))return;
     if(state.narrative&&!modal){if(['Enter',' '].includes(event.key)){event.preventDefault();advance();}else if(event.key==='Tab'){event.preventDefault();}return;}

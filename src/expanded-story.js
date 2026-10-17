@@ -2152,14 +2152,18 @@
       "text": "你感到一阵头晕目眩，身体里好像有什么东西在隐隐地涌现"
     },
     {
-      "text": "我成功了！我终于成功变成最强大的魔兽了！",
-      "speaker": "player",
+      "text": "此时外面的世界已经不再是你还是精灵的时候看到的那样了",
       "form": "beast"
     },
     {
+      "text": "我成功了！我终于成功变成最强大的魔兽了！",
+      "form": "beast",
+      "speaker": "player"
+    },
+    {
       "text": "你...",
-      "speaker": "dragon",
-      "form": "beast"
+      "form": "beast",
+      "speaker": "dragon"
     },
     {
       "text": "它没有像往常一样拦住你。只是第一次，露出了你从没见过的慌乱神情。",
@@ -2167,8 +2171,8 @@
     },
     {
       "text": "原来你也会害怕啊...",
-      "speaker": "player",
-      "form": "beast"
+      "form": "beast",
+      "speaker": "player"
     },
     {
       "text": "你手里的大爪子停顿了一瞬，还是再次抬了起来",
@@ -2176,8 +2180,8 @@
     },
     {
       "text": "对不起了恶龙，接招吧！",
-      "speaker": "player",
-      "form": "beast"
+      "form": "beast",
+      "speaker": "player"
     }
   ],
   "fiveAfterHit": [
@@ -2203,13 +2207,13 @@
     },
     {
       "text": "大龙，我终于站在了你一直守护的门前了",
-      "speaker": "player",
-      "form": "beast"
+      "form": "beast",
+      "speaker": "player"
     },
     {
       "text": "今天门里的光，怎么好像比任何时候都要明亮刺眼...",
-      "speaker": "player",
-      "form": "beast"
+      "form": "beast",
+      "speaker": "player"
     }
   ],
   "fiveWhite": [
@@ -2263,115 +2267,164 @@
   ],
   "fiveWake": [
     {
-      "text": "是妈妈在叫我"
+      "text": "你终于在强光中挣扎着睁开了眼",
+      "setting": "ceiling"
     },
     {
-      "text": "你终于在强光中挣扎着睁开了眼"
+      "text": "面前没有魔法，没有巨龙，也没有通往远方的门。",
+      "setting": "ceiling"
     },
     {
-      "text": "面前没有魔法，没有巨龙，也没有通往远方的门。"
-    },
-    {
-      "text": "只有陌生的天花板，消毒水的气味，和床边一双很久没有松开的手。"
+      "text": "只有陌生的天花板，消毒水的气味，和床边一双很久没有松开的手。",
+      "setting": "ceiling"
     }
   ],
   "fiveHospital": [
     {
+      "text": "你不小心食用了妈妈放在浴室高处的清洁剂，那瓶女巫毒药让你在医院里躺上了一段时间。",
+      "setting": "ceiling"
+    },
+    {
+      "text": "妈妈一直在照顾你，现在你终于康复出院，可以回家啦！",
+      "setting": "ceiling"
+    },
+    {
+      "text": "夕阳下，妈妈抱着你走在回家的路上。",
+      "setting": "home"
+    },
+    {
       "text": "傻孩子，肚子还疼吗？",
+      "setting": "home",
       "speaker": "mother"
     },
     {
       "text": "不疼了。",
+      "setting": "home",
       "speaker": "player"
     },
     {
       "text": "你呀你，一个没看住净给我捣乱",
+      "setting": "home",
       "speaker": "mother"
     },
     {
       "text": "要是知道你问我要椅子是为了去喝【那个】，我绝对不会给你的",
+      "setting": "home",
       "speaker": "mother"
     },
     {
       "text": "诶，也怪我...",
+      "setting": "home",
       "speaker": "mother"
     },
     {
       "text": "以后别一个人乱折腾了。",
+      "setting": "home",
       "speaker": "mother"
     },
     {
       "text": "你想玩什么、想去哪儿……先跟我说。",
+      "setting": "home",
       "speaker": "mother"
     },
     {
       "text": "我和你一起",
+      "setting": "home",
       "speaker": "mother"
     },
     {
       "text": "对不起...妈妈",
+      "setting": "home",
       "speaker": "player"
     },
     {
       "text": "我保证再也不乱喝了...",
+      "setting": "home",
       "speaker": "player"
     },
     {
       "text": "死孩子，回去我再收拾你",
+      "setting": "home",
       "speaker": "mother"
     },
     {
-      "text": "妈妈脸上眉头紧锁，丝毫没有要放松的意思"
+      "text": "妈妈脸上眉头紧锁，丝毫没有要放松的意思",
+      "setting": "home"
     },
     {
       "text": "真的...妈妈...对不起，让你担心了...",
+      "setting": "home",
       "speaker": "player"
     },
     {
-      "text": "你小小的肩膀微微颤抖着，语气里是止不住的抽泣"
+      "text": "你小小的肩膀微微颤抖着，语气里是止不住的抽泣",
+      "setting": "home"
     },
     {
-      "text": "妈妈望着你梗咽到发抖的模样，心头一软，但眉头依然紧蹙着，刚刚强撑着的严厉褪去了一些，眼底只剩下心疼"
+      "text": "妈妈望着你哽咽到发抖的模样，心头一软，但眉头依然紧蹙着，刚刚强撑着的严厉褪去了一些，眼底只剩下心疼",
+      "setting": "home"
     },
     {
-      "text": "她长叹了一口气，摸了摸孩子的头"
+      "text": "她长叹了一口气，摸了摸孩子的头",
+      "setting": "home"
     },
     {
       "text": "你是不是又去抢小黑的猫粮了？房间洒了一地/它又不够吃了",
+      "setting": "home",
       "speaker": "mother"
     },
     {
       "text": "那是毛绒绒怪送我的！",
+      "setting": "home",
       "speaker": "player"
     },
     {
       "text": "什么怪？",
+      "setting": "home",
       "speaker": "mother"
     },
     {
       "text": "妈妈，你今天嘴上抹了小公主的晚霞诶，真好看......",
+      "setting": "home",
       "speaker": "player"
     },
     {
-      "text": "你和妈妈牵着手走在熟悉的回家路上，好像周围的一切都很静很静..."
+      "text": "你和妈妈牵着手走在熟悉的回家路上，好像周围的一切都很静很静...",
+      "setting": "home"
     },
     {
-      "text": "静到好像只有你们两个人"
+      "text": "静到好像只有你们两个人",
+      "setting": "home"
     },
     {
-      "text": "这条路你们走了无数次"
+      "text": "这条路你们走了无数次",
+      "setting": "home"
     },
     {
-      "text": "但是今天的阳光好像格外的明媚，路格外的亮"
+      "text": "但是今天的阳光好像格外的明媚，路格外的亮",
+      "setting": "home"
     },
     {
-      "text": "突然你好像听到后面有什么声音"
+      "text": "突然你好像听到后面有什么动静",
+      "setting": "home"
     },
     {
-      "text": "你回过头去"
+      "text": "你回过头去，只看到不远处的一棵树的树叶晃动着，它发出沙沙沙的声音。似乎是风吹动了它。",
+      "setting": "home"
     },
     {
-      "text": "你笑了笑，将妈妈的手又握紧了一些"
+      "text": "怎么了宝贝？",
+      "setting": "home",
+      "speaker": "mother"
+    },
+    {
+      "text": "没事妈妈！我听见风把树叶吹得呼啦哗啦的！",
+      "setting": "home",
+      "speaker": "player"
+    },
+    {
+      "text": "你笑了笑没有多想，转回头更紧地环住了妈妈的脖子。",
+      "setting": "home"
     }
   ],
   "sixBoard": [
@@ -2536,70 +2589,107 @@
   ],
   "easter": [
     {
-      "text": "从医院出来的路上……"
+      "text": "你回过头去，只看到不远处的一棵树的树叶晃动着，它发出沙沙沙的声音。似乎是风吹动了它。",
+      "setting": "home"
+    },
+    {
+      "text": "怎么了宝贝？",
+      "setting": "home",
+      "speaker": "mother"
+    },
+    {
+      "text": "没事妈妈！我听见风把树叶吹得呼啦哗啦的！",
+      "setting": "home",
+      "speaker": "player"
+    },
+    {
+      "text": "你笑了笑没有多想，转回头更紧地抱住了妈妈。",
+      "setting": "home"
+    },
+    {
+      "text": "此时此刻树丛中......",
+      "centered": true,
+      "setting": "black"
     },
     {
       "text": "嘘，本王都说了安静点了，吵吵什么，差点被发现了吧",
+      "setting": "peek",
       "speaker": "cat"
     },
     {
       "text": "吵吵 吵吵！",
+      "setting": "peek",
       "speaker": "fur"
     },
     {
       "text": "都是你们在吵好吧！公主说话的时候是没有声音的！",
+      "setting": "peek",
       "speaker": "princess"
     },
     {
       "text": "咕！没有声音怎么说话呀？",
+      "setting": "peek",
       "speaker": "chicken"
     },
     {
       "text": "闭嘴！",
+      "setting": "peek",
       "speaker": "princess"
     },
     {
       "text": "咕咕。",
+      "setting": "peek",
       "speaker": "chicken"
     },
     {
       "text": "真好啊，{name}这次是牵着妈妈的手回去的",
+      "setting": "peek",
       "speaker": "tv"
     },
     {
       "text": "那他还会回来看我们吗...",
+      "setting": "peek",
       "speaker": "princess"
     },
     {
       "text": "她...她肯定会回来的！她答应过本大王要睡本大王亲手摘的云朵！",
+      "setting": "peek",
       "speaker": "cat"
     },
     {
       "text": "云朵 云朵！",
+      "setting": "peek",
       "speaker": "fur"
     },
     {
-      "text": "那不是你偷的吗（鄙夷脸）",
-      "speaker": "princess"
+      "text": "那不是你偷的吗",
+      "setting": "peek",
+      "speaker": "princess",
+      "expression": "default"
     },
     {
       "text": "你给我小声点！",
+      "setting": "peek",
       "speaker": "cat"
     },
     {
       "text": "咕！她还说要给我做新帽子嘞，嘿嘿...",
+      "setting": "peek",
       "speaker": "chicken"
     },
     {
-      "text": "她也答应过我……（待补充）",
+      "text": "她也答应过我要回来讲她的冒险故事。",
+      "setting": "peek",
       "speaker": "princess"
     },
     {
       "text": "你看，她都已经告诉我我们了",
+      "setting": "peek",
       "speaker": "tv"
     },
     {
-      "text": "她一定会回来的"
+      "text": "她会回来的，只要童心未泯。",
+      "setting": "peek"
     }
   ],
   "one": [
@@ -2661,6 +2751,6 @@
     }
   ],
   "creditsName": "涂涂画画团队共同制作",
-  "source": "需更改 (1).docx，2026-10-16；用户确认仅在最终结局制作名单后播放彩蛋。"
+  "source": "最终真结局一、彩蛋采用桌面同名docx，2026-10-17；其他剧情保留原文档版本。"
 };
 })(globalThis);

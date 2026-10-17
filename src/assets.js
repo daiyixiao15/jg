@@ -791,6 +791,66 @@
     ],
     "source": "codex-clipboard-cbdd3571-50ca-4dcb-aafa-d22f2a40f697.png",
     "sha256": "7e0a37998b8c025d7c0d0af80312008272a03127f85f685ba303f2eb5758efab"
+  },
+  "bath-pink.png": {
+    "width": 320,
+    "height": 361,
+    "bounds": [
+      17,
+      37,
+      320,
+      352
+    ],
+    "source": "codex-clipboard-49995dc7-000e-48a6-8a15-5594d289d617.png",
+    "sha256": "b598d134ac7a0b5027e32dfa47b7b5034d11fc74498c2bb6c059d54eb687cc67"
+  },
+  "bath-yellow.png": {
+    "width": 240,
+    "height": 335,
+    "bounds": [
+      0,
+      5,
+      212,
+      318
+    ],
+    "source": "codex-clipboard-80b26383-3a62-445a-8b3a-80e17cf49619.png",
+    "sha256": "b2441af064759c1a69592ff0f48eb51bdc386930bfd8e18f24aefb23845fc12b"
+  },
+  "bath-powder.png": {
+    "width": 588,
+    "height": 630,
+    "bounds": [
+      55,
+      36,
+      559,
+      579
+    ],
+    "source": "codex-clipboard-1a24f383-0e28-45a0-929c-4ed3c81459ca.png",
+    "sha256": "1bc128cd1f6219ad589d31bd11c468ad90748262cd9423c555975e2e0b0d8faa"
+  },
+  "bath-poison.png": {
+    "width": 480,
+    "height": 328,
+    "bounds": [
+      71,
+      9,
+      398,
+      262
+    ],
+    "source": "codex-clipboard-3bde2e24-4ad7-4edb-b337-2ba53745186c.png",
+    "sha256": "941a75fadb0ed9e24c7edb24a10e4ab169338a0809e8b8e94064efa91344e20b"
+  },
+  "bath-berry.png": {
+    "width": 291,
+    "height": 422,
+    "bounds": [
+      57,
+      24,
+      234,
+      417
+    ],
+    "source": "codex-clipboard-a65e94e9-deb8-42d2-9b3f-957ae2a4108c.png",
+    "sha256": "fa39cd586e88fda12b95b937536dd5b9a3999cd9986b2a60c108b6dfdd532a25"
   }
 };
 })(globalThis);

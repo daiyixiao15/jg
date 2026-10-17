@@ -22,7 +22,7 @@
     if(state.risk>5) return 'caught';
     const rows=state.pot.map(id=>root.GameData.materials.find(m=>m.id===id));
     if(rows.length!==8 || new Set(state.pot).size!==8 || rows.some(m=>!m)) throw new Error('制药需要八种不同的有效材料');
-    if(state.dialogueCount>=3) return 'six';
+    if(state.dialogueCount>=3 && state.dragonProgress?.poisonSeen) return 'six';
     if(rows.some(m=>m.id==='bleach')) return 'five';
     if(rows.filter(m=>m.tags.includes('foaming')).length>=3) return 'four';
     const allEdible=rows.every(m=>m.tags.includes('edible'));
