@@ -2279,7 +2279,7 @@
       "setting": "ceiling"
     },
     {
-      "text": "妈妈一直在照顾你，现在你终于康复出院，可以回家啦！",
+      "text": "妈妈一直在照顾你，现在你终于康复了。今天是出院的那天。",
       "setting": "ceiling"
     },
     {
@@ -2404,16 +2404,16 @@
     },
     {
       "text": "你回过头去，只看到不远处的一棵树的树叶晃动着，它发出沙沙沙的声音。似乎是风吹动了它。",
-      "setting": "home"
+      "setting": "home-lookback"
     },
     {
       "text": "怎么了宝贝？",
-      "setting": "home",
+      "setting": "home-lookback",
       "speaker": "mother"
     },
     {
       "text": "没事妈妈！我听见风把树叶吹得呼啦哗啦的！",
-      "setting": "home",
+      "setting": "home-lookback",
       "speaker": "player"
     },
     {

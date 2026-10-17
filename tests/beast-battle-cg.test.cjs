@@ -1,0 +1,6 @@
+const {game,seed}=require('./game.test.cjs');const assert=require('node:assert/strict');const base=game(),X=base.context.GameExpansion;
+const lines=[{text:'恭喜你！成功做出了魔法药！'},...JSON.parse(JSON.stringify(X.fiveStart))];
+function load(lines,index,after){const g=game(seed({phase:'ending',ending:'five',endingStage:'story',endingReality:false,scene:'dragon',narrative:{lines,index,shown:0,after}}));g.act('continue');g.act('restore','auto');return g;}
+for(let i=0;i<lines.length;i++){const g=load(lines,i,'five-hit');if(i===0)assert.doesNotMatch(g.html,/ending-beast-battle.png/);else assert.match(g.html,/background-image:url\(assets\/ending-beast-battle.png\)/);}
+const end=load(lines,lines.length-1,'five-hit');end.next();end.next();assert.equal(end.library.autosave.cinematic.next,'five-after-hit');end.timer();assert.equal(end.library.autosave.narrative.lines[0].text,'庞大而沉默的恶龙倒下了。');assert.match(end.html,/background-image:url\(assets\/dragon-empty.png\)/);assert.doesNotMatch(end.html,/ending-beast-battle.png|red-dragon.png/);
+console.log('PASS: new CG starts exactly at dizziness, lasts through final attack, restores at each line and switches back at collapse without beast portrait.');

@@ -272,7 +272,7 @@
     else if(modal.type==='reuse-name')body=`<h2>继续使用上次的名字吗？</h2><p>上次使用的名字是「${esc(lastName)}」。</p><div class="choices">${button('继续使用','reuse-name')}${button('换一个名字','change-name')}</div>`;
     else if(modal.type==='rename-save')body=`<form id="rename-save-form"><h2>重命名存档</h2><input id="save-name" value="${esc(modal.name)}" maxlength="30" required aria-label="存档名字"><div class="choices">${button('取消','rename-cancel')}${button('保存名字','rename-confirm')}</div></form>`;
     else if(modal.type==='settings')body=`<h2>设置</h2><div class="setting-buttons">${button('存档','save-list')}${button('读档','load-list')}${button('返回启动界面','menu')}</div><p class="storage-note">存档保存在当前浏览器，共三个手动存档位置。开始新冒险会覆盖自动存档，手动存档和成就会保留。</p>`;
-    else if(modal.type==='new-confirm')body=`<h2>要开启一段全新的冒险吗？</h2><p>已有冒险尚未达到最终结局。开始新冒险会从第一周目重新开始，大龙的剧情进度重新计算，自动存档将被覆盖。手动存档和成就会保留。若想接着揭示故事，请选择‘继续已有冒险’。</p><div class="choices">${button('继续已有冒险','load-list')}${library.autosave?button('先保存旧进度','start-backup'):''}${button('开始新冒险','new-confirm')}${button('取消','close')}</div>`;
+    else if(modal.type==='new-confirm')body=`<h2>要开启一段全新的冒险吗？</h2><p>已有冒险尚未达到最终结局。开始新冒险会从第一周目重新开始，大龙的剧情进度重新计算，自动存档将被覆盖。手动存档和成就会保留。若想接着揭示故事，请选择‘继续已有冒险’。</p><div class="choices new-adventure-choices">${button('继续已有冒险','load-list')}${library.autosave?button('先保存旧进度','start-backup'):''}${button('开始新冒险','new-confirm')}${button('取消','close')}</div>`;
     else if(modal.type==='delete-confirm')body=`<h2>你确定要删除吗？</h2><p>即将删除「${esc(modal.name)}」。删除后无法恢复，其他存档和已获得的成就会保留。</p><div class="choices">${button('确定','delete-confirm')}${button('取消','confirm-cancel')}</div>`;
     else if(modal.type==='discard-confirm')body=`<h2>丢弃这件物品吗？</h2><p>${modal.id==='fallen_leaves'?'你确定要丢掉傻不拉鸡送你的帽子吗？丢了就再也找不到了哦。':`即将从背包中丢弃「${esc(material(modal.id).name)}」。${gifts.includes(modal.id)?'小公主可能会在意你丢弃她的礼物。':'需要时可能要重新寻找。'}`}</p><div class="choices">${button('取消','confirm-cancel')}${button('确认丢弃','discard-confirm')}</div>`;
     else if(modal.type==='saved-menu')body=`<h2>冒险记录已保存。</h2><p>下次在标题页点击‘继续’，选择这份存档，就能接着冒险。</p><div class="choices">${button('返回标题','saved-menu')}</div>`;
@@ -328,7 +328,8 @@
   function endingFormArt(){
     const n=state.narrative,line=n?.lines[n.index];
     if(state.phase!=='ending'||!n||n.preview||n.title||!line||line.hidePortrait||line.setting||line.speaker)return '';
-    const file=({pig:'ending-pig.png',ugly:'ending-ugly.png',beast:'red-dragon.png'})[line.form];
+    if(line.form==='beast')return '';
+    const file=({pig:'ending-pig.png',ugly:'ending-ugly.png'})[line.form];
     if(!file)return '';
     const reveal=['one','three'].includes(state.ending)&&!n.lines.slice(0,n.index).some(previous=>previous.form===line.form);
     return `<div class="ending-form-art${reveal?' transformation-reveal':''}" aria-label="${reveal?'变身立绘展示':'变身形态'}">${sprite(file,'变身形态')}</div>`;
@@ -337,8 +338,18 @@
   function endingBackground(){
     if(state.phase!=='ending'||!state.narrative)return null;
     if(state.ending==='four')return 'ending-bubble.jpg';
-    const setting=state.narrative.lines[state.narrative.index].setting;
-    return ({ceiling:'ending-ceiling.png',home:'ending-home.jpg',peek:'ending-easter.jpg'})[setting]||null;
+    const n=state.narrative,setting=n.lines[n.index].setting;
+    if(state.ending==='five'&&n.after==='five-hit'&&!state.endingReality){
+      const from=n.lines.findIndex(line=>line.text.startsWith('你感到一阵头晕目眩'));
+      if(from>=0&&n.index>=from)return 'ending-beast-battle.png';
+    }
+    if(state.ending==='five'&&n.after==='five-finish'&&['home','home-lookback'].includes(setting)){
+      // Derive the range from dialogue too, so existing saves get the corrected CG sequence.
+      const from=n.lines.findIndex(line=>line.text.startsWith('你回过头去'));
+      const to=n.lines.findIndex((line,i)=>i>=from&&line.text.startsWith('没事妈妈'));
+      return from>=0&&to>=from&&n.index>=from&&n.index<=to?'ending-home.jpg':'ending-home.png';
+    }
+    return ({ceiling:'ending-ceiling.png',home:'ending-home.png','home-lookback':'ending-home.jpg',peek:'ending-easter.jpg'})[setting]||null;
   }
   function chefBackground(){
     const n=state.narrative;
@@ -355,7 +366,7 @@
     if(['intro','exit'].includes(state.phase)){
       app.innerHTML=`<div class="stage menu cover-menu" style="background-image:url(assets/cover.png)"><div class="menu-content" ${modal?'inert':''}><h1>一锅小小的魔法</h1><p>${state.phase==='exit'?'游戏已结束':'小精灵的第一次冒险'}</p>${button('开始','start')}${button('继续','continue',library.autosave||library.slots.some(Boolean)?'':'disabled')}${button('设置','settings')}${button('成就','achievements')}</div>${popup()}${achievementView()}</div>`;
     }else{
-      const prologue=state.phase==='prologue',ending=state.phase==='ending',tvConversation=state.scene==='hub'&&!ending&&(state.narrative?.lines.some(line=>line.speaker==='tv')||modal?.type.startsWith('tv-')),boardingCG=ending&&state.ending==='six'&&state.endingStage==='companion'&&!state.endingReality,companionCG=ending&&state.ending==='six'&&state.endingReality&&state.narrative?.after==='ending-summary',farewellIndex=companionFarewellIndex(state.narrative),friendsRevealed=companionCG&&farewellIndex>=0&&(state.narrative.friendsRevealed||state.narrative.index>farewellIndex),bg=prologue||state.narrative?.title||state.narrative?.lines[state.narrative.index].setting==='black'?null:endingBackground()?endingBackground():chefBackground()?chefBackground():tvConversation?'central-park-dialogue.png':ending&&state.ending==='five'&&state.endingReality&&state.narrative?.after==='five-finish'?'ending-home.jpg':companionCG?(friendsRevealed?'ending-companion-friends.jpg':'ending-companion.png'):boardingCG?'dragon-boarding.png':ending&&state.endingStage==='easter'?'ending-easter.jpg':ending?(state.narrative?.lines[state.narrative.index].setting?null:['gate','companion'].includes(state.endingStage)||state.narrative&&!state.endingReality&&!['light-story','easter'].includes(state.endingStage)?'dragon-empty.png':null):state.scene==='ice'&&state.section==='upper'?'ice-upper.png':state.scene==='dragon'&&state.narrative?'dragon-empty.png':backgrounds[state.scene];
+      const prologue=state.phase==='prologue',ending=state.phase==='ending',tvConversation=state.scene==='hub'&&!ending&&(state.narrative?.lines.some(line=>line.speaker==='tv')||modal?.type.startsWith('tv-')),boardingCG=ending&&state.ending==='six'&&state.endingStage==='companion'&&!state.endingReality,companionCG=ending&&state.ending==='six'&&state.endingReality&&state.narrative?.after==='ending-summary',farewellIndex=companionFarewellIndex(state.narrative),friendsRevealed=companionCG&&farewellIndex>=0&&(state.narrative.friendsRevealed||state.narrative.index>farewellIndex),bg=prologue||state.narrative?.title||state.narrative?.lines[state.narrative.index].setting==='black'?null:endingBackground()?endingBackground():chefBackground()?chefBackground():tvConversation?'central-park-dialogue.png':ending&&state.ending==='five'&&state.endingReality&&state.narrative?.after==='five-finish'?'ending-home.png':companionCG?(friendsRevealed?'ending-companion-friends.jpg':'ending-companion.png'):boardingCG?'dragon-boarding.png':ending&&state.endingStage==='easter'?'ending-easter.jpg':ending?(state.narrative?.lines[state.narrative.index].setting?null:['gate','companion'].includes(state.endingStage)||state.narrative&&!state.endingReality&&!['light-story','easter'].includes(state.endingStage)?'dragon-empty.png':null):state.scene==='ice'&&state.section==='upper'?'ice-upper.png':state.scene==='dragon'&&state.narrative?'dragon-empty.png':backgrounds[state.scene];
       let view='';
       if(prologue)view=`<div class="storybook" aria-label="翻开的故事书"><div class="book-left"><span>一锅小小的魔法</span><i>✦</i></div><div class="book-right"><span>第 ${state.narrative.index+1} 页</span><i>✧</i></div><div class="turning-page" style="--page:${state.narrative.index}"></div></div>`;
       else if(ending){

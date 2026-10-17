@@ -465,8 +465,8 @@
       2304,
       1728
     ],
-    "source": "codex-clipboard-d73c2db1-efac-4244-a949-6c6c5b370960.png",
-    "sha256": "66200309258a535a354bc78fc6f5110d7ee6480de9499c89768c44c2fbf6ad22"
+    "source": "codex-clipboard-51b61e34-d2a9-4a67-8f2e-5b904e121054.png",
+    "sha256": "40f46d089525f677520c8aaca0428f131f9370ddfbb1d8750f5824c7eefd0fd9"
   },
   "chicken-dialogue.png": {
     "width": 2800,
@@ -851,6 +851,18 @@
     ],
     "source": "codex-clipboard-a65e94e9-deb8-42d2-9b3f-957ae2a4108c.png",
     "sha256": "fa39cd586e88fda12b95b937536dd5b9a3999cd9986b2a60c108b6dfdd532a25"
+  },
+  "ending-beast-battle.png": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      0,
+      0,
+      2800,
+      2100
+    ],
+    "source": "codex-clipboard-54940469-383b-4dd3-8263-93d02cfc76a4.png",
+    "sha256": "e7827f1d7ac1de21d9fb9f018b97ea49231d7d895c3106d66541c25ddd3cd0e9"
   }
 };
 })(globalThis);

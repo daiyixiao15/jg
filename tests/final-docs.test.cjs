@@ -18,7 +18,7 @@ for(const [lines,after,stage] of [[X.fiveWake,'five-wake','light-story'],[X.five
  for(let index=0;index<lines.length;index++){
   const l=lines[index],g=load({phase:'ending',ending:stage==='easter'?'six':'five',endingStage:stage,endingReality:stage!=='easter',narrative:{lines,index,shown:0,after}});
   if(l.setting==='black'){assert.doesNotMatch(g.html,/background-image:url/);assert.match(g.html,/centered-message/);assert.doesNotMatch(g.html,/class="dialogue/);}
-  else assert.match(g.html,new RegExp('assets/'+({ceiling:'ending-ceiling.png',home:'ending-home.jpg',peek:'ending-easter.jpg'})[l.setting]));
+  else assert.match(g.html,new RegExp('assets/'+({ceiling:'ending-ceiling.png',home:'ending-home.png','home-lookback':'ending-home.jpg',peek:'ending-easter.jpg'})[l.setting]));
  }
 }
 console.log('PASS: bubble CG throughout dialogue without portraits, clean ending summary, final document wording, ceiling/home/easter background order and per-line save restoration.');
