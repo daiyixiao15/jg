@@ -4,7 +4,7 @@
   S.rounds=X.rounds;
   const KEY='little-magic-library-v2',OLD_KEY='little-magic-save-v1',NAME_KEY='little-magic-last-name';
   const names={lab:'制药所',hub:'中央公园',bath:'泡泡王国',sky:'天空之城',ice:'冰雪塔楼',forest:'梦幻森林',palace:'宫殿长廊',dragon:'恶龙盘踞之地'};
-  const backgrounds={lab:'lab.jpg',bath:'bath.jpg',sky:'sky.jpg',ice:'ice.jpg',forest:'forest.png',palace:'palace.png',dragon:'dragon-resting.png'};
+  const backgrounds={hub:'central-park.png',lab:'lab.jpg',bath:'bath.jpg',sky:'sky.jpg',ice:'ice.jpg',forest:'forest.png',palace:'palace.png',dragon:'dragon-resting.png'};
   const itemImages={ice_cream:'sweet-snow.png',dumpling:'dumplings.png',frost:'frost.png',apple:'ice-fruit.png',grape:'grape.png',cabbage:'ice-grass.png',plants:'flowers.png',fallen_leaves:'chicken-hat.png',cat_fur:'fur.png',skincare:'skincare.png',perfume:'perfume.png',lipstick:'sunset.png',snack_small:'snack-small.png',snack_large:'snack-large.png'};
   const spots={shampoo:[10,29,14,22],body_wash:[22,32,10,23],detergent:[68,37,14,23],toothpaste:[86,37,10,28],bleach:[79,1,15,19],soy_sauce:[88,46,10,25],vinegar:[30,4,10,21],salt:[64,33,9,15],sugar:[13,53,10,17],cooking_wine:[17,14,10,12],ice_cream:[54,53,39,22],dumpling:[60,73,38,15],frost:[0,30,12,22]};
   Object.assign(spots,{apple:[28,76,24,24],grape:[58,0,25,30],cabbage:[67,41,32,50],plants:[68,0,20,30],cat_fur:[54,79,11,18],fallen_leaves:[0,49,25,50],skincare:[13,45,23,27],perfume:[34,29,17,28],lipstick:[55,37,33,45]});
@@ -168,7 +168,7 @@
   }
   function startEaster(){
     if(state.phase!=='ending'||state.ending!=='six'||state.endingStage!=='credits')return;
-    clearTimeout(cinematicTimer);state.endingStage='easter';state.endingReality=false;say(X.easter,'easter-finished');
+    clearTimeout(cinematicTimer);state.endingStage='easter';state.endingReality=false;say(X.easter,'easter-finished',{preview:true,title:'彩蛋',endingInfo:true});
   }
   function inspectMaterial(id){
     if(id==='bleach'){if(state.collected.includes(id)){modal={type:'material',id};render();return;}if(state.quests.ladder){say(X.bleachReach,'bleach-window');return;}say([S.player('呜呜呜太高了够不着，有什么办法可以拿到它呢。可惜我的翅膀是装饰，不然就可以飞起来了！')]);return;}
@@ -187,7 +187,7 @@
     notice=result.message;return result;
   }
   function scene(){
-    if(state.scene==='hub')return `<button type="button" class="television" data-action="tv-entry" aria-label="电视机先生"><span class="tv-antenna"></span><span class="tv-screen">・ᴗ・</span><strong>电视机先生</strong></button><div class="hub">${['lab','bath','sky','forest','palace'].map(id=>button(names[id],'scene',`data-id="${id}"`)).join('')}</div>`;
+    if(state.scene==='hub')return `${hot('电视机先生','tv-entry','',[19,49,19,29])}<div class="hub">${['lab','bath','sky','forest','palace'].map(id=>button(names[id],'scene',`data-id="${id}"`)).join('')}</div>`;
     if(state.scene==='lab')return hot('离开制药所','scene','hub',[40,19,15,35])+hot('紫色大锅与搅拌木棍','brew','',[35,53,62,44]);
     if(state.scene==='dragon')return hot('与恶龙互动','talk','',[21,46,76,37])+hot('被恶龙挡住的石头门','gate','',[66,7,34,50])+hot('草丛里的花','dragon-flowers','',[1,82,27,17]);
     if(state.scene==='forest'){
@@ -220,7 +220,7 @@
   function popup(){
     if(!modal)return '';
     let body='';
-    if(modal.type==='name')body=`<form id="name-form"><h2>小精灵，你叫什么名字？</h2><input id="player-name" maxlength="24" required autocomplete="off" aria-label="玩家名字" placeholder="输入你的名字"><div class="choices">${button('取消','close')}<button type="submit">开始冒险</button></div></form>`;
+    if(modal.type==='name')body=`<form id="name-form"><h2>小精灵，你叫什么名字？</h2><input id="player-name" maxlength="24" required autocomplete="off" aria-label="玩家名字" placeholder="输入你的名字"><div class="choices">${button('取消','close')}<button type="button" data-action="begin-adventure">开始冒险</button></div></form>`;
     else if(modal.type==='reuse-name')body=`<h2>继续使用上次的名字吗？</h2><p>上次使用的名字是「${esc(lastName)}」。</p><div class="choices">${button('继续使用','reuse-name')}${button('换一个名字','change-name')}</div>`;
     else if(modal.type==='settings')body=`<h2>设置</h2><div class="setting-buttons">${button('存档','save-list')}${button('读档','load-list')}${button('返回启动界面','menu')}</div><p class="storage-note">存档保存在当前浏览器，共三个手动存档位置。</p>`;
     else if(modal.type==='saves')body=saveList();
@@ -259,7 +259,9 @@
   }
   function narrativeView(){
     const n=state.narrative;if(!n)return '';
-    if(n.preview)return '<div class="reading-layer cg-preview"><button type="button" class="reading-surface" data-action="advance" aria-label="点击开始牵手对白"></button></div>';
+    if(n.title)return `<div class="reading-layer"><button type="button" class="ending-screen" data-action="advance" aria-label="点击观看彩蛋画面"><span>${esc(n.title)}</span><small>点击画面继续</small></button></div>`;
+    if(n.endingInfo)return '<div class="reading-layer"><button type="button" class="ending-screen" data-action="advance" aria-label="点击进入彩蛋画面"><span>达成真结局二<br>和我一起去光明世界吧！</span><small>点击画面继续</small></button></div>';
+    if(n.preview)return '<div class="reading-layer cg-preview"><button type="button" class="reading-surface" data-action="advance" aria-label="点击开始对白"></button></div>';
     const line=n.lines[n.index],speaker=line.speaker==='player'?state.playerName:({dragon:'恶龙',cat:'毛绒绒怪',chicken:'傻不拉鸡',princess:'小公主',unknown:'未知的声音',tv:'电视机先生',mother:'妈妈',fur:'毛绒绒'})[line.speaker]||'';
     if(n.index===companionFarewellIndex(n))return `<div class="reading-layer centered-reading"><button type="button" class="reading-surface" data-action="advance" aria-label="点击画面推进文字"></button><div class="centered-message"><p id="dialog-text">${esc(line.text.replaceAll('{name}',state.playerName).slice(0,n.shown))}</p></div><small>点击画面继续</small></div>`;
     const catThinking=n.after==='cat-choice'&&(line.expression==='thinking'||line.text==='魔法材料？'||line.text.includes('这只黑色毛球的眼睛藏在'));
@@ -274,7 +276,7 @@
     if(['intro','exit'].includes(state.phase)){
       app.innerHTML=`<div class="stage menu"><div class="menu-content" ${modal?'inert':''}><h1>一锅小小的魔法</h1><p>${state.phase==='exit'?'游戏已结束':'小精灵的第一次冒险'}</p>${button('开始','start')}${button('继续','continue',library.autosave||library.slots.some(Boolean)?'':'disabled')}${button('结束游戏','exit')}${button('成就','achievements')}</div>${popup()}${achievementView()}</div>`;
     }else{
-      const prologue=state.phase==='prologue',ending=state.phase==='ending',boardingCG=ending&&state.ending==='six'&&state.endingStage==='companion'&&!state.endingReality,companionCG=ending&&state.ending==='six'&&state.endingReality&&state.narrative?.after==='ending-summary',farewellIndex=companionFarewellIndex(state.narrative),friendsRevealed=companionCG&&farewellIndex>=0&&(state.narrative.friendsRevealed||state.narrative.index>farewellIndex),bg=prologue?null:companionCG?(friendsRevealed?'ending-companion-friends.png':'ending-companion.png'):boardingCG?'dragon-boarding.png':ending?(['gate','companion'].includes(state.endingStage)||state.narrative&&!state.endingReality&&!['light-story','easter'].includes(state.endingStage)?'dragon-empty.png':null):state.scene==='ice'&&state.section==='upper'?'ice-upper.png':state.scene==='dragon'&&state.narrative?'dragon-empty.png':backgrounds[state.scene];
+      const prologue=state.phase==='prologue',ending=state.phase==='ending',boardingCG=ending&&state.ending==='six'&&state.endingStage==='companion'&&!state.endingReality,companionCG=ending&&state.ending==='six'&&state.endingReality&&state.narrative?.after==='ending-summary',farewellIndex=companionFarewellIndex(state.narrative),friendsRevealed=companionCG&&farewellIndex>=0&&(state.narrative.friendsRevealed||state.narrative.index>farewellIndex),bg=prologue||state.narrative?.title||state.narrative?.endingInfo?null:companionCG?(friendsRevealed?'ending-companion-friends.jpg':'ending-companion.png'):boardingCG?'dragon-boarding.png':ending&&state.endingStage==='easter'?'ending-easter.jpg':ending?(['gate','companion'].includes(state.endingStage)||state.narrative&&!state.endingReality&&!['light-story','easter'].includes(state.endingStage)?'dragon-empty.png':null):state.scene==='ice'&&state.section==='upper'?'ice-upper.png':state.scene==='dragon'&&state.narrative?'dragon-empty.png':backgrounds[state.scene];
       let view='';
       if(prologue)view=`<div class="storybook" aria-label="翻开的故事书"><div class="book-left"><span>一锅小小的魔法</span><i>✦</i></div><div class="book-right"><span>第 ${state.narrative.index+1} 页</span><i>✧</i></div><div class="turning-page" style="--page:${state.narrative.index}"></div></div>`;
       else if(ending){
@@ -303,6 +305,8 @@
   function say(lines,after='',options={}){modal=null;bag=false;state.narrative={lines:clone(lines),index:0,shown:0,after,allowNavigation:state.scene==='palace'&&state.phase!=='ending',...options};autosave(true);render();}
   function advance(){
     const n=state.narrative;if(!n)return;
+    if(n.title){delete n.title;autosave(true);render();return;}
+    if(n.endingInfo){delete n.endingInfo;autosave(true);render();return;}
     if(n.preview){n.preview=false;autosave(true);render();return;}
     const text=n.lines[n.index].text.replaceAll('{name}',state.playerName);
     if(state.phase!=='prologue'&&n.shown<text.length){n.shown=text.length;autosave(true);render();return;}
@@ -406,11 +410,12 @@
     if(!el||el.disabled)return;
     const action=el.dataset.action,id=el.dataset.id;
     // A popup blocks all underlying world controls, including keyboard activation.
-    const popupActions=['achievements','cat-accept','cat-refuse','reward-take','reward-leave','reward-discard','reward-discard-item','hat-take','hat-leave','princess-answer','princess-reclaim-yes','princess-reclaim-no','gift-inspect','gifts-all','gifts-select','gifts-later','next-round','next-save','gate-ready','companion-ready','tv-rush','tv-wander','tv-go','tv-chat','tv-topic','tv-route','tv-routes-done','tv-clap','tv-thumb','tv-hurry','cat-far','cat-dragon','chicken-laugh','chicken-hold','chicken-grab','chicken-plead','chicken-return','chicken-keep','grip-ready','close','reuse-name','change-name','save-list','load-list','menu','restore','save-slot','delete-save','collect','discard','potion-travel','drink'];
+    const popupActions=['begin-adventure','achievements','cat-accept','cat-refuse','reward-take','reward-leave','reward-discard','reward-discard-item','hat-take','hat-leave','princess-answer','princess-reclaim-yes','princess-reclaim-no','gift-inspect','gifts-all','gifts-select','gifts-later','next-round','next-save','gate-ready','companion-ready','tv-rush','tv-wander','tv-go','tv-chat','tv-topic','tv-route','tv-routes-done','tv-clap','tv-thumb','tv-hurry','cat-far','cat-dragon','chicken-laugh','chicken-hold','chicken-grab','chicken-plead','chicken-return','chicken-keep','grip-ready','close','reuse-name','change-name','save-list','load-list','menu','restore','save-slot','delete-save','collect','discard','potion-travel','drink'];
     if(modal&&!popupActions.includes(action))return;
     notice='';
     if(!['advance','stone','close'].includes(action)&&!modal)state.quests.clicks.lastAction=action;
     if(action==='start')modal={type:lastName?'reuse-name':'name'};
+    else if(action==='begin-adventure'&&modal?.type==='name'){const input=document.getElementById('player-name');if(!input.reportValidity||input.reportValidity())startAdventure(input.value);return;}
     else if(action==='reuse-name'&&modal?.type==='reuse-name'){startAdventure(lastName);return;}
     else if(action==='change-name'&&modal?.type==='reuse-name')modal={type:'name'};
     else if(action==='continue'||action==='load-list')modal={type:'saves',mode:'load'};
@@ -572,7 +577,9 @@
   window.addEventListener('blur',()=>{if(drag?.active)suppressClickUntil=Date.now()+250;cancelDrag();});
   app.addEventListener('dragstart',event=>{if(event.target.closest('[data-draggable]'))event.preventDefault();});
   document.addEventListener('keydown',event=>{
-    if(event.isComposing||['INPUT','TEXTAREA'].includes(event.target.tagName))return;
+    if(event.isComposing)return;
+    if(event.key==='Enter'&&event.target.id==='player-name'&&modal?.type==='name'){event.preventDefault();const input=event.target;if(!input.reportValidity||input.reportValidity())startAdventure(input.value);return;}
+    if(['INPUT','TEXTAREA'].includes(event.target.tagName))return;
     if(state.narrative&&!modal){if(['Enter',' '].includes(event.key)){event.preventDefault();advance();}else if(event.key==='Tab'){event.preventDefault();}return;}
     if(event.key==='Escape'&&drag){cancelDrag();return;}
     const item=event.target.closest?.('[data-draggable]');

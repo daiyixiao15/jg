@@ -395,6 +395,54 @@
     ],
     "source": "codex-clipboard-27c0c5d5-35ba-4956-aeb0-9230f26c2ee2.png",
     "sha256": "a044a54d39eaeb92b03e5e128bb39825b08d31bf0dc8077fc6679a8a0b6a0e4e"
+  },
+  "ending-companion-friends.jpg": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      0,
+      0,
+      2800,
+      2100
+    ],
+    "source": "codex-clipboard-a8721a58-971e-4d99-8ba9-09e00391741f.jpg",
+    "sha256": "698cb26a0d82b966c6aa31eb59ac551b9a1e6922035b469eca9d9f2460d446d4"
+  },
+  "central-park.jpg": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      0,
+      0,
+      2800,
+      2100
+    ],
+    "source": "codex-clipboard-d2f56328-efe3-418f-9d07-c7b1194dc27c.jpg",
+    "sha256": "b63253b93698170d5a0c8f568610552fca340ff1ec114113e7c246c09b5303a8"
+  },
+  "ending-easter.jpg": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      0,
+      0,
+      2800,
+      2100
+    ],
+    "source": "codex-clipboard-5682b610-cfda-4f7a-9dc8-c45cd0312d3f.jpg",
+    "sha256": "1f87903febacb47824261af26913a3ece420f52460f892be84efe86ddaec130f"
+  },
+  "central-park.png": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      0,
+      0,
+      2800,
+      2100
+    ],
+    "source": "codex-clipboard-60610025-da66-4aa9-a6f9-7b8e5ea87cd7.png",
+    "sha256": "67e159460f2094819f7b745d74365acb1bfacdd39c5dfaa97874586136f1a738"
   }
 };
 })(globalThis);
