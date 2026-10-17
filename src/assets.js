@@ -719,6 +719,78 @@
     ],
     "source": "codex-clipboard-1be59685-513a-42ed-b9f7-b6493083e8ec.png",
     "sha256": "6308be09cffa580d3b0dd16a45e0108165842f6a2ad9e8dbd06cba7748e67acc"
+  },
+  "chef-park-empty.png": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      0,
+      0,
+      2800,
+      2100
+    ],
+    "source": "codex-clipboard-1c86cff5-5681-4b59-9daf-b60b5fe8359c.png",
+    "sha256": "6a90c794a76484dcce706fd0423d3c2f8fc0653fd3971cba2d768a5bf523ccd8"
+  },
+  "chef-park-tv.png": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      0,
+      0,
+      2800,
+      2100
+    ],
+    "source": "codex-clipboard-25a642dd-e54d-493c-831f-e24dcc4beefb.png",
+    "sha256": "d8e0f8bf1e116658479f4e9e8eff2e0e97137e00f2b1c673a0261a221b768685"
+  },
+  "chef-park-cat.png": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      0,
+      0,
+      2800,
+      2100
+    ],
+    "source": "codex-clipboard-8984c09f-a8f0-42a5-861d-e58185b5f1f2.png",
+    "sha256": "650716976934d69352a59c7145d8b2876efb1e8cd469a1b0f2a6a068809db60e"
+  },
+  "chef-park-princess.png": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      0,
+      0,
+      2800,
+      2100
+    ],
+    "source": "codex-clipboard-219a674c-eee2-4b0e-b490-adf3c0e9d9dd.png",
+    "sha256": "148bb0b4323a890f2342bd04b9a587216352ef1dfcead26190551c8ae257f261"
+  },
+  "chef-park-dragon.png": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      0,
+      0,
+      2800,
+      2100
+    ],
+    "source": "codex-clipboard-7673eff3-dc94-480d-ae14-bcb6ad412a6e.png",
+    "sha256": "bb014dbf7469e9ded12af1b9be1fc5ccf786038806192fea2b6475b46c7627ce"
+  },
+  "chef-park-all.png": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      0,
+      0,
+      2800,
+      2100
+    ],
+    "source": "codex-clipboard-cbdd3571-50ca-4dcb-aafa-d22f2a40f697.png",
+    "sha256": "7e0a37998b8c025d7c0d0af80312008272a03127f85f685ba303f2eb5758efab"
   }
 };
 })(globalThis);
