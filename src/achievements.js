@@ -1,6 +1,7 @@
 (function(root){
   'use strict';
   const entries=[
+    ['park_jam','天酱好运！','尝了尝果酱。'],
     ['ending_one','软绵绵的小猪','达成结局一。'],['ending_two','大厨也是大魔法师','达成结局二。'],
     ['ending_three','屁股火辣的小英雄','达成结局三。'],['ending_four','咕噜咕噜','达成结局四。'],
     ['ending_five','光明世界的尽头是一双手','达成喝药中毒真结局。'],['ending_six','和我一起去光明世界吧！','达成陪伴真结局。'],

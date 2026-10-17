@@ -215,7 +215,7 @@
     notice=result.message;return result;
   }
   function scene(){
-    if(state.scene==='hub')return `${hot('电视机先生','tv-entry','',[19,49,19,29])}<div class="hub">${['lab','bath','sky','forest','palace'].map(id=>button(names[id],'scene',`data-id="${id}"`)).join('')}</div>`;
+    if(state.scene==='hub')return `${hot('电视机先生','tv-entry','',[19,49,19,29])}${hot('青苹果','park-apple','',[76,26,16,23])}<div class="hub">${['lab','bath','sky','forest','palace'].map(id=>button(names[id],'scene',`data-id="${id}"`)).join('')}</div>`;
     if(state.scene==='lab')return hot('离开制药所','scene','hub',[40,19,15,35])+hot('紫色大锅与搅拌木棍','brew','',[35,53,62,44]);
     if(state.scene==='dragon')return hot('与恶龙互动','talk','',[21,46,76,37])+hot('被恶龙挡住的石头门','gate','',[66,7,34,50])+hot('草丛里的花','dragon-flowers','',[1,82,27,17]);
     if(state.scene==='forest'){
@@ -254,6 +254,7 @@
     else if(modal.type==='reset-data')body=`<h2>重置游玩数据？</h2><p>将清除当前进度、自动存档、全部手动存档、周目记录和上次使用的名字，重新从第一周目开始。已获得的成就及成就累计进度保留。</p><p>此操作无法撤销。</p><div class="choices">${button('取消','reset-cancel')}${button('确认重置','reset-confirm')}</div>`;
     else if(modal.type==='saves')body=saveList();
     else if(modal.type==='achievements')body=`<h2>成就 · ${achievements.unlocked.length}/${A.entries.length}</h2><div class="achievement-list">${A.entries.map(a=>`<div class="${achievements.unlocked.includes(a.id)?'unlocked':'locked'}"><strong>${esc(a.title)}</strong><small>${esc(a.description)}</small><span>${achievements.unlocked.includes(a.id)?'已达成':'未达成'}</span></div>`).join('')}</div>`;
+    else if(modal.type==='park-jam-choice')body=`<h2>要尝尝吗？</h2><div class="choices">${button('尝尝','park-jam-taste')}${button('不要！','park-jam-refuse')}</div>`;
     else if(modal.type==='tv-entry')body=`<h2>电视机先生</h2><div class="setting-buttons">${button('我很着急！我要赶路！','tv-rush')}${button('和电视机先生聊聊天','tv-chat')}${button('我先自己逛逛','tv-wander')}</div>`;
     else if(modal.type==='tv-destinations')body=`<h2>你想去哪？</h2><div class="setting-buttons">${['lab','bath','sky','forest','palace'].map(id=>button(id==='lab'?'返回制药所':names[id],'tv-go',`data-id="${id}"`)).join('')}${button('暂时不走','tv-wander')}</div>`;
     else if(modal.type==='tv-menu')body=`<h2>想问哪条路？</h2><div class="setting-buttons">${['我想收集制药材料','我想去找大龙','介绍一下这里的路','你的方向真的靠谱吗？'].map((label,i)=>button(label,'tv-topic',`data-id="${i}"`)).join('')}${state.round>1&&library.televisionSeen?button('我赶时间，我先走了！','tv-hurry'):''}</div>`;
@@ -352,6 +353,8 @@
     if(n.after==='princess-gift-menu'){giftMenu(true);return;}
     if(n.after==='cat-reward'){if(state.collected.length<8){collectItem('cat_food');modal={type:'text',text:'获得奖励：毛绒绒怪的美食！'};}else modal={type:'cat-reward'};autosave(true);render();return;}
     if(n.after==='tv-first-menu'){state.quests.tvIntroDone=true;state.quests.tvNeedApplause=true;state.quests.tvReturnPending=false;library.televisionSeen=true;modal={type:'tv-menu'};}
+    if(n.after==='park-jam-choice')modal={type:'park-jam-choice'};
+    if(n.after==='park-jam-tasted')unlock('park_jam');
     if(n.after==='tv-destinations')modal={type:'tv-destinations'};
     if(n.after==='tv-menu')modal={type:'tv-menu'};
     if(n.after==='tv-routes')modal={type:'tv-routes'};
@@ -444,7 +447,7 @@
     if(!el||el.disabled)return;
     const action=el.dataset.action,id=el.dataset.id;
     // A popup blocks all underlying world controls, including keyboard activation.
-    const popupActions=['begin-adventure','reset-data','reset-cancel','reset-confirm','achievements','cat-accept','cat-refuse','reward-take','reward-leave','reward-discard','reward-discard-item','hat-take','hat-leave','princess-answer','princess-reclaim-yes','princess-reclaim-no','gift-inspect','gifts-all','gifts-select','gifts-later','next-round','next-save','gate-ready','companion-ready','tv-rush','tv-wander','tv-go','tv-chat','tv-topic','tv-route','tv-routes-done','tv-clap','tv-thumb','tv-hurry','cat-far','cat-dragon','chicken-laugh','chicken-hold','chicken-grab','chicken-plead','chicken-return','chicken-keep','grip-ready','close','reuse-name','change-name','save-list','load-list','menu','restore','save-slot','delete-save','collect','discard','potion-travel','drink'];
+    const popupActions=['park-jam-taste','park-jam-refuse','begin-adventure','reset-data','reset-cancel','reset-confirm','achievements','cat-accept','cat-refuse','reward-take','reward-leave','reward-discard','reward-discard-item','hat-take','hat-leave','princess-answer','princess-reclaim-yes','princess-reclaim-no','gift-inspect','gifts-all','gifts-select','gifts-later','next-round','next-save','gate-ready','companion-ready','tv-rush','tv-wander','tv-go','tv-chat','tv-topic','tv-route','tv-routes-done','tv-clap','tv-thumb','tv-hurry','cat-far','cat-dragon','chicken-laugh','chicken-hold','chicken-grab','chicken-plead','chicken-return','chicken-keep','grip-ready','close','reuse-name','change-name','save-list','load-list','menu','restore','save-slot','delete-save','collect','discard','potion-travel','drink'];
     if(modal&&!popupActions.includes(action))return;
     notice='';
     if(!['advance','stone','close'].includes(action)&&!modal)state.quests.clicks.lastAction=action;
@@ -480,6 +483,9 @@
     else if(action==='achievements')modal={type:'achievements'};
     else if(action==='bag')bag=!bag;
     else if(action==='ladder-info')modal={type:'text',text:'小木梯是大龙借给你的任务道具。可以用它够到高处的女巫毒药，不占八个制药材料格，也不能入锅。'};
+    else if(action==='park-apple'&&state.scene==='hub'){say([S.narration('呲，绿色的不明液体落在了你的头上'),S.narration('你用手摸了摸，拿到面前看了看'),S.player('晶莹剔透的')],'park-jam-choice');return;}
+    else if(action==='park-jam-taste'&&modal?.type==='park-jam-choice'){say([S.narration('你伸进嘴里尝了尝'),S.player('唔！是青苹果果酱！')],'park-jam-tasted');return;}
+    else if(action==='park-jam-refuse'&&modal?.type==='park-jam-choice'){say([S.narration('你嫌弃地擦干净然后丢到一边'),{speaker:'tv',text:'天哪！你怎么把奇幻世界第一美味的青苹果果酱丢掉了！'}]);return;}
     else if(action==='tv-entry')modal={type:'tv-entry'};
     else if(action==='tv-rush'){say(X.tvRush,'tv-destinations');return;}
     else if(action==='tv-wander'){modal=null;}

@@ -1,0 +1,8 @@
+const {game,seed}=require('./game.test.cjs');
+const assert=require('node:assert/strict');
+const AK='little-magic-achievements-v1';
+function enter(){const g=game(seed({scene:'hub',visited:['hub'],collected:[]}));g.act('continue');g.act('restore','auto');assert.match(g.html,/data-action="park-apple"/);g.act('park-apple');assert.equal(g.library.autosave.narrative.lines.length,3);assert.equal(g.library.autosave.narrative.lines[2].speaker,'player');g.finishText();assert.match(g.html,/>尝尝</);assert.match(g.html,/>不要！</);return g;}
+const yes=enter();yes.act('park-jam-taste');assert.equal(yes.library.autosave.narrative.lines[1].text,'唔！是青苹果果酱！');yes.finishText();assert.ok(JSON.parse(yes.storage[AK]).unlocked.includes('park_jam'));assert.equal(yes.library.autosave.collected.length,0);yes.act('park-apple');yes.finishText();yes.act('park-jam-taste');yes.finishText();assert.equal(JSON.parse(yes.storage[AK]).unlocked.filter(x=>x==='park_jam').length,1);
+const no=enter();no.act('park-jam-refuse');assert.equal(no.library.autosave.narrative.lines[1].speaker,'tv');no.next();no.next();assert.match(no.html,/tv-dialogue.png/);no.finishText();assert.ok(!JSON.parse(no.storage[AK]||'{"unlocked":[]}').unlocked.includes('park_jam'));assert.equal((no.html.match(/data-action="scene"/g)||[]).length,5);
+const saved=enter();saved.act('park-jam-taste');const loaded=game(saved.storage);loaded.act('continue');loaded.act('restore','auto');loaded.finishText();assert.ok(JSON.parse(loaded.storage[AK]).unlocked.includes('park_jam'));
+console.log('PASS: green apple hotspot, both choices, speaker portraits, achievement only after tasting, duplicate prevention, save resume and five hub exits.');
