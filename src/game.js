@@ -426,7 +426,7 @@
     name=name.trim();if(!name||name.length>24)return;
     clearTimeout(mixingTimer);clearTimeout(cinematicTimer);cancelDrag();notice='';autosavePaused=false;
     rememberName(name);
-    state={...Q.normalize(R.createState()),phase:'prologue',scene:'lab',playerName:name,section:'lower',round:library.completed.length+1,adventureId:Date.now().toString(36)+'-'+Math.random().toString(36).slice(2),visited:[],narrative:null};
+    state={...Q.normalize(R.createState()),phase:'prologue',scene:'lab',playerName:name,section:'lower',round:1,adventureId:Date.now().toString(36)+'-'+Math.random().toString(36).slice(2),visited:[],narrative:null};
     say(S.opening,'lab');
   }
   app.addEventListener('submit',event=>{
