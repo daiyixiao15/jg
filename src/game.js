@@ -273,7 +273,7 @@
     if(modal.type==='name')body=`<form id="name-form"><h2>小精灵，你叫什么名字？</h2><input id="player-name" maxlength="24" required autocomplete="off" aria-label="玩家名字" placeholder="输入你的名字"><div class="choices">${button('取消','close')}<button type="button" data-action="begin-adventure">开始冒险</button></div></form>`;
     else if(modal.type==='reuse-name')body=`<h2>继续使用上次的名字吗？</h2><p>上次使用的名字是「${esc(lastName)}」。</p><div class="choices">${button('继续使用','reuse-name')}${button('换一个名字','change-name')}</div>`;
     else if(modal.type==='rename-save')body=`<form id="rename-save-form"><h2>重命名存档</h2><input id="save-name" value="${esc(modal.name)}" maxlength="30" required aria-label="存档名字"><div class="choices">${button('取消','rename-cancel')}${button('保存名字','rename-confirm')}</div></form>`;
-    else if(modal.type==='settings')body=`<h2>设置</h2><div class="audio-settings"><label class="audio-setting-row"><span>音乐</span><input type="range" min="0" max="100" value="${Math.round((coverAudio?.muted?0:coverAudio?.volume??.45)*100)}" data-music-volume aria-label="音乐音量"><output>${Math.round((coverAudio?.muted?0:coverAudio?.volume??.45)*100)}%</output></label><label class="audio-setting-row"><span>音效</span><input type="range" min="0" max="100" value="${Math.round((coverAudio?.effectsVolume??.7)*100)}" data-effects-volume aria-label="音效音量"><output>${Math.round((coverAudio?.effectsVolume??.7)*100)}%</output></label>${button('重置游戏数据','reset-game','class="reset-game-button"')}</div>`;
+    else if(modal.type==='settings')body=`<h2>设置</h2>${!['intro','exit'].includes(state.phase)?`<div class="setting-buttons in-game-settings">${button('存档','save-list')}${button('读档','load-list')}${button('返回标题画面','menu')}</div>`:''}<div class="audio-settings"><label class="audio-setting-row"><span>音乐</span><input type="range" min="0" max="100" value="${Math.round((coverAudio?.muted?0:coverAudio?.volume??.45)*100)}" data-music-volume aria-label="音乐音量"><output>${Math.round((coverAudio?.muted?0:coverAudio?.volume??.45)*100)}%</output></label><label class="audio-setting-row"><span>音效</span><input type="range" min="0" max="100" value="${Math.round((coverAudio?.effectsVolume??.7)*100)}" data-effects-volume aria-label="音效音量"><output>${Math.round((coverAudio?.effectsVolume??.7)*100)}%</output></label>${button('重置游戏数据','reset-game','class="reset-game-button"')}</div>`;
     else if(modal.type==='reset-game-confirm')body=`<h2>确定重置游戏数据吗？</h2><p>所有自动存档、手动存档、成就和已读进度都会清空，游戏将从头开始。此操作无法恢复。</p><div class="choices">${button('取消','confirm-cancel')}${button('确定重置','reset-game-confirm')}</div>`;
     else if(modal.type==='new-confirm')body=`<h2>要开启一段全新的冒险吗？</h2><p>已有冒险尚未达到最终结局。开始新冒险会从第一周目重新开始，大龙的剧情进度重新计算，自动存档将被覆盖。手动存档和成就会保留。若想接着揭示故事，请选择‘继续已有冒险’。</p><div class="choices new-adventure-choices">${button('继续已有冒险','load-list')}${library.autosave?button('先保存旧进度','start-backup'):''}${button('开始新冒险','new-confirm')}${button('取消','close')}</div>`;
     else if(modal.type==='delete-confirm')body=`<h2>你确定要删除吗？</h2><p>即将删除「${esc(modal.name)}」。删除后无法恢复，其他存档和已获得的成就会保留。</p><div class="choices">${button('确定','delete-confirm')}${button('取消','confirm-cancel')}</div>`;
@@ -381,7 +381,6 @@
     const ink=image=>`<div class="book-ink" style="background-image:url(assets/${image})"></div>`;
     return `<div class="storybook illustrated-book${changed?' book-art-enter':''}" aria-label="绘本第 ${index+1} 页" data-page="${index+1}"><div class="book-left">${ink(file)}</div><div class="book-right">${ink(file)}</div>${changed&&previous?`<div class="book-previous" aria-hidden="true"><div class="book-left">${ink(previous)}</div><div class="book-right">${ink(previous)}</div></div>`:''}<div class="book-spine" aria-hidden="true"></div></div>`;
   }
-  let coverMusicStopped=false;
   const coverAudio=typeof GameCoverAudio!=='undefined'?GameCoverAudio.create():null;
   const backgroundLoader=typeof GameBackgroundLoader!=='undefined'?GameBackgroundLoader.create():null;
   function likelyBackgrounds(){
@@ -429,7 +428,7 @@
       else view=(tvConversation?'':scene())+(state.phase==='ready'&&state.scene==='dragon'?button('拿出魔法药','potion-prompt','class="potion-button"'):'');
       app.innerHTML=`<div class="stage ${bg?'illustrated':''} ${state.narrative?.preview?'cg-preview-stage':''} ${state.narrative?.allowNavigation?'npc-navigation':''}" ${bg?`style="background-image:url(assets/${bg})"`:''}><div class="world" ${state.narrative&&!state.narrative.allowNavigation||modal?'inert':''}>${!prologue?`<header>${!ending&&!(state.scene==='lab'&&state.phase==='explore')?button('← 返回','back'):''}<div>${button('设置','settings')}${button('背包','bag',`aria-expanded="${bag}"`)}</div></header>`:''}${view}${bag&&!prologue?inventory():''}</div>${endingFormArt()}${notice?`<div class="notice" role="status">${esc(notice)}</div>`:''}${narrativeView()}${state.narrative&&!state.narrative.preview?button('快进至未读','skip-read','class="skip-read" aria-label="跳过已读对白，停在未读内容"'):''}${popup()}${achievementView()}${state.effects?'<div class="magic-smoke" aria-hidden="true"></div>':''}</div>`;
     }
-    coverAudio?.update(state.phase==='intro'&&!coverMusicStopped);
+    coverAudio?.update(state.phase==='intro'?'cover':state.phase==='prologue'?'prologue':['explore','brew','mixing','ready'].includes(state.phase)?'collection':null);
     backgroundLoader?.update(visibleBackground,likelyBackgrounds());
     if(state.endingStage==='light-story'&&!endingBackground())app.querySelector?.('.stage')?.classList.add('light-story');
     if(modal?.type==='name')document.getElementById('player-name').focus();
@@ -554,7 +553,7 @@
     library={version:2,autosave:null,slots:[null,null,null],completed:[],televisionSeen:false,autosaveName:''};
     achievements.unlocked=[];achievements.collected=[];achievements.discarded=0;
     readLines.clear();lastName='';saveDestination=null;saveSource=null;achievementToasts=[];
-    state=Q.normalize(R.createState());bag=false;modal=null;notice='游戏数据已重置。';autosavePaused=false;lastBookPage=-1;bookTransitionPending=false;coverMusicStopped=false;render();
+    state=Q.normalize(R.createState());bag=false;modal=null;notice='游戏数据已重置。';autosavePaused=false;lastBookPage=-1;bookTransitionPending=false;render();
   }
   app.addEventListener('input',event=>{
     const input=event.target;
@@ -585,12 +584,12 @@
     if(modal&&!popupActions.includes(action))return;
     notice='';
     if(!['advance','stone','close'].includes(action)&&!modal)state.quests.clicks.lastAction=action;
-    if(action==='start'){coverMusicStopped=true;coverAudio?.update(false);saveDestination=null;saveSource=null;modal=(library.autosave&&library.autosave.ending!=='six')||library.slots.some(slot=>slot&&slot.state.ending!=='six')?{type:'new-confirm'}:{type:lastName?'reuse-name':'name'};}
+    if(action==='start'){saveDestination=null;saveSource=null;modal=(library.autosave&&library.autosave.ending!=='six')||library.slots.some(slot=>slot&&slot.state.ending!=='six')?{type:'new-confirm'}:{type:lastName?'reuse-name':'name'};}
     else if(action==='new-confirm'&&modal?.type==='new-confirm')modal={type:lastName?'reuse-name':'name'};
     else if(action==='confirm-cancel'&&modal?.previous)modal=modal.previous;
     else if(action==='start-backup'&&modal?.type==='new-confirm'){if(library.autosave){saveSource='auto';saveDestination='title';modal={type:'saves',mode:'save'};}else modal={type:'saves',mode:'load'};}
     else if(action==='ending-save-menu'){saveSource=null;saveDestination='title';modal={type:'saves',mode:'save'};}
-    else if(action==='saved-menu'){coverMusicStopped=false;saveDestination=null;clearTimeout(cinematicTimer);clearInterval(typingTimer);state={...Q.normalize(R.createState()),phase:'intro'};modal=null;bag=false;}
+    else if(action==='saved-menu'){saveDestination=null;clearTimeout(cinematicTimer);clearInterval(typingTimer);state={...Q.normalize(R.createState()),phase:'intro'};modal=null;bag=false;}
     else if(action==='begin-adventure'&&modal?.type==='name'){const input=document.getElementById('player-name');if(!input.reportValidity||input.reportValidity())startAdventure(input.value);return;}
     else if(action==='reuse-name'&&modal?.type==='reuse-name'){startAdventure(lastName);return;}
     else if(action==='change-name'&&modal?.type==='reuse-name')modal={type:'name'};
@@ -624,7 +623,7 @@
       if(persist()){if(id==='auto')autosavePaused=true;notice=id==='auto'?'自动存档已删除。':'存档 '+(Number(id)+1)+' 已删除。';}else library=previous;
       render();return;
     }else if(action==='restore'){restore(id);return;}
-    else if(action==='menu'||action==='exit'){coverMusicStopped=false;autosave();clearTimeout(mixingTimer);clearTimeout(cinematicTimer);clearInterval(typingTimer);state={...Q.normalize(R.createState()),phase:action==='exit'?'exit':'intro'};modal=null;bag=false;}
+    else if(action==='menu'||action==='exit'){autosave();clearTimeout(mixingTimer);clearTimeout(cinematicTimer);clearInterval(typingTimer);state={...Q.normalize(R.createState()),phase:action==='exit'?'exit':'intro'};modal=null;bag=false;}
     else if(action==='close'){const closing=modal;modal=null;if(['saves','saved-menu'].includes(closing?.type)){saveDestination=null;saveSource=null;}if(closing?.type==='material'&&gifts.includes(closing.id)&&giftAftercare('select'))return;}
     else if(action==='achievements')modal={type:'achievements'};
     else if(action==='bag')bag=!bag;

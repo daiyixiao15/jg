@@ -131,3 +131,5 @@ header{position:absolute;inset:2% 2% auto;display:flex;justify-content:space-bet
 .audio-setting-row input{width:100%;min-width:0;accent-color:#b9d8bd;cursor:pointer}
 .audio-setting-row output{text-align:right;font-size:.85em;font-variant-numeric:tabular-nums}
 .reset-game-button{width:100%;margin:0}
+
+.in-game-settings{margin-bottom:1em}.in-game-settings button{width:100%}
