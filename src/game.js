@@ -434,11 +434,12 @@
         else if(state.endingStage==='companion')view=hot('爬上大龙的背','ending-companion','',[20,46,80,39]);
         else if(!state.narrative)view=`<button class="ending-screen" data-action="ending-next"><span>${state.endingStage==='fin'?'完':`${state.ending==='six'?'达成真结局二':`达成结局${({one:'一',two:'二',three:'三',four:'四'})[state.ending]||''}`}<br>${esc(state.ending==='five'?'光明世界的尽头是一双手':state.ending==='six'?'和我一起去光明世界吧！':D.endings[state.ending].title)}${E.captions[state.ending]?`<br><span class="ending-caption">${esc(E.captions[state.ending])}</span>`:''}`}</span><small>点击任意空白处继续</small></button>`;
       }
-      else if(['brew','mixing','ready'].includes(state.phase)&&state.scene==='lab')view=`<div class="brew-panel ${state.phase==='mixing'?'mixing':''}"><h2>${state.phase==='mixing'?'魔法正在涌现……':state.phase==='ready'?'魔法药做好了':'把背包材料直接拖到锅口'}</h2><p>${state.pot.length}/8 已入锅</p><div id="pot" role="img" aria-label="制药大锅"><div id="pot-mouth" aria-label="锅口">${state.phase==='brew'?'拖到锅口松开':'✦'}</div><span class="pot-decoration" aria-hidden="true">✦</span></div>${state.phase==='brew'?button('开始制药','mix',R.canBrew(state)?'':'disabled'):state.phase==='ready'?button('前往恶龙盘踞之地','potion-prompt'):''}</div>`;
+      else if(['brew','mixing','ready'].includes(state.phase)&&state.scene==='lab')view=`<div class="brew-panel ${state.phase==='mixing'?'mixing':''}"><h2>${state.phase==='mixing'?'魔法正在涌现……':state.phase==='ready'?'魔法药做好了':'把背包材料直接拖到锅口'}</h2><p>${state.pot.length}/8 已入锅</p><div id="pot" role="img" aria-label="制药大锅"><img class="cauldron-art" src="assets/brewing-cauldron.png" alt="" draggable="false"><div id="pot-mouth" aria-label="锅口">${state.phase==='brew'?'拖到锅口松开':'✦'}</div></div>${state.phase==='brew'?button('开始制药','mix',R.canBrew(state)?'':'disabled'):state.phase==='ready'?button('前往恶龙盘踞之地','potion-prompt'):''}</div>`;
       else view=(tvConversation?'':scene())+(state.phase==='ready'&&state.scene==='dragon'?button('拿出魔法药','potion-prompt','class="potion-button"'):'');
       app.innerHTML=`<div class="stage ${bg?'illustrated':''} ${state.narrative?.preview?'cg-preview-stage':''} ${state.narrative?.allowNavigation?'npc-navigation':''}" ${bg?`style="background-image:url(assets/${bg})"`:''}><div class="world" ${state.narrative&&!state.narrative.allowNavigation||modal?'inert':''}>${!prologue?`<header>${!ending&&!(state.scene==='lab'&&state.phase==='explore')?button('← 返回','back'):''}<div>${button('设置','settings')}${button('背包','bag',`aria-expanded="${bag}"`)}</div></header>`:''}${view}${bag&&!prologue?inventory():''}</div>${endingFormArt()}${notice?`<div class="notice" role="status">${esc(notice)}</div>`:''}${narrativeView()}${state.narrative&&!state.narrative.preview?button('快进至未读','skip-read','class="skip-read" aria-label="跳过已读对白，停在未读内容"'):''}${popup()}${achievementView()}${state.effects?'<div class="magic-smoke" aria-hidden="true"></div>':''}</div>`;
     }
     coverAudio?.update(backgroundMusic());
+    coverAudio?.setBrewing?.(state.phase==='mixing'&&state.scene==='lab');
     backgroundLoader?.update(visibleBackground,likelyBackgrounds());
     if(state.endingStage==='light-story'&&!endingBackground())app.querySelector?.('.stage')?.classList.add('light-story');
     if(modal?.type==='name')document.getElementById('player-name').focus();
@@ -583,7 +584,7 @@
     if(state.cinematic)return;
     if(event.isTrusted&&Date.now()<suppressClickUntil)return;
     const el=event.target.closest('[data-action]');
-    if(el?.dataset.action==='skip-read'&&state.narrative&&!modal){skipRead();return;}
+    if(el?.dataset.action==='skip-read'&&!el.disabled&&state.narrative&&!modal){coverAudio?.click?.();skipRead();return;}
     if(state.narrative&&!modal&&!(state.narrative.allowNavigation&&['back','settings','bag'].includes(el?.dataset.action))){advance();return;}
     if(!el||el.disabled)return;
     let action=el.dataset.action,id=el.dataset.id;
@@ -592,6 +593,7 @@
     // A popup blocks all underlying world controls, including keyboard activation.
     const popupActions=['reset-game','reset-game-confirm','music-toggle','rename-save','rename-confirm','rename-cancel','park-jam-taste','park-jam-refuse','begin-adventure','new-confirm','confirm-cancel','delete-confirm','discard-confirm','ending-save-menu','saved-menu','start-backup','achievements','cat-accept','cat-refuse','reward-take','reward-leave','reward-discard','reward-discard-item','hat-take','hat-leave','princess-answer','princess-reclaim-yes','princess-reclaim-no','gift-inspect','gifts-all','gifts-select','gifts-later','next-round','next-save','gate-ready','companion-ready','tv-wander','tv-chat','tv-topic','tv-route','tv-routes-done','tv-clap','tv-thumb','tv-hurry','cat-far','cat-dragon','chicken-laugh','chicken-hold','chicken-grab','chicken-plead','chicken-return','chicken-keep','grip-ready','close','reuse-name','change-name','save-list','load-list','menu','restore','save-slot','delete-save','collect','discard','potion-travel','drink'];
     if(modal&&!popupActions.includes(action))return;
+    if(!['advance','ending-next','ending-white','ending-wake','credits-skip','inspect','item','gift-inspect','close'].includes(action))coverAudio?.click?.();
     notice='';
     if(!['advance','stone','close'].includes(action)&&!modal)state.quests.clicks.lastAction=action;
     if(action==='start'){saveDestination=null;saveSource=null;modal=(library.autosave&&library.autosave.ending!=='six')||library.slots.some(slot=>slot&&slot.state.ending!=='six')?{type:'new-confirm'}:{type:lastName?'reuse-name':'name'};}
@@ -775,7 +777,7 @@
     if(!current.active)return;
     suppressClickUntil=Date.now()+250;
     if(!cancelled&&state.phase==='brew'&&!modal&&!state.narrative&&atPotMouth(event.clientX,event.clientY)&&R.putInPot(state,current.id)){
-      notice='宝物放入大锅了。';autosave(true);
+      coverAudio?.splash?.();notice='宝物放入大锅了。';autosave(true);
     }else if(!cancelled)notice='把材料拖到锅口再松开，就能放入大锅。';
     render();
   }
@@ -791,7 +793,7 @@
     if(state.narrative&&!modal){if(['Enter',' '].includes(event.key)){event.preventDefault();advance();}else if(event.key==='Tab'){event.preventDefault();}return;}
     if(event.key==='Escape'&&drag){cancelDrag();return;}
     const item=event.target.closest?.('[data-draggable]');
-    if(event.key==='Enter'&&state.phase==='brew'&&!modal&&item){event.preventDefault();if(R.putInPot(state,item.dataset.id)){notice='宝物放入大锅了。';autosave(true);render();}return;}
+    if(event.key==='Enter'&&state.phase==='brew'&&!modal&&item){event.preventDefault();if(R.putInPot(state,item.dataset.id)){coverAudio?.splash?.();notice='宝物放入大锅了。';autosave(true);render();}return;}
     if(event.key==='Escape'){if(modal)modal=null;else bag=false;render();}
     if(event.key==='Tab'&&modal){const nodes=Array.from(app.querySelectorAll('.modal button:not([disabled]),.modal input'));if(!nodes.length)return;const first=nodes[0],last=nodes[nodes.length-1];if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
   });

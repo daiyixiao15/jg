@@ -133,3 +133,13 @@ header{position:absolute;inset:2% 2% auto;display:flex;justify-content:space-bet
 .reset-game-button{width:100%;margin:0}
 
 .in-game-settings{margin-bottom:1em}.in-game-settings button{width:100%}
+.brew-panel{gap:2%}
+.brew-panel h2{margin:.5em 0}
+.brew-panel #pot{width:80%;height:auto;min-height:0;aspect-ratio:3/2;flex:0 1 auto;margin-top:0;border:0;border-radius:0;background:transparent;box-shadow:none}
+.cauldron-art{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none}
+.brew-panel #pot-mouth{top:23%;left:17%;width:66%;height:20%;background:transparent;border:0;border-radius:50%;z-index:1;text-shadow:0 1px 4px #163561}
+.mixing #pot{animation:none;box-shadow:none}
+.mixing .cauldron-art{animation:cauldron-glow 1s ease-in-out infinite alternate}
+.mixing #pot::after{display:none}
+@keyframes cauldron-glow{from{filter:drop-shadow(0 0 4px #79e8ff55)}to{filter:drop-shadow(0 0 18px #79e8ffbb)}}
+@media(prefers-reduced-motion:reduce){.mixing .cauldron-art{animation:none}}
