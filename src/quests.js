@@ -5,6 +5,14 @@
     {id:'snack_large',scene:'forest',name:'妙脆角大二',description:'待补充',questOnly:true,tags:[]}
   ];
   function normalize(state){
+    if(['five','six'].includes(state.ending)&&Array.isArray(state.narrative?.lines)){
+      for(const line of state.narrative.lines){
+        if(typeof line.text!=='string')continue;
+        if(line.text.startsWith('你笑了笑'))line.text=line.text.replace('没有多想','');
+        if(line.text.startsWith('你回过头去'))line.text=line.text.replace('只看到','');
+      }
+    }
+    if(state.narrative?.title==='接“光明世界的尽头是一双手”结局')state.narrative.title='彩蛋';
     // Remove retired risk data; resume old capture endings with their inventory intact.
     delete state.risk;
     if(state.narrative?.after==='tv-destinations')state.narrative=null;

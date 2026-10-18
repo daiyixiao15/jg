@@ -1,7 +1,7 @@
 const {game,seed}=require('./game.test.cjs');
 const assert=require('node:assert/strict');
 const base=game(),lines=JSON.parse(JSON.stringify(base.context.GameEndingStory.endings.two));
-const files=['chef-park-empty.png','chef-park-tv.png','chef-park-cat.png','chef-park-princess.png','chef-park-dragon.png','chef-park-all.png'];
+const files=['chef-park-empty-q85.webp','chef-park-tv-q85.webp','chef-park-cat-q85.webp','chef-park-princess-q85.webp','chef-park-dragon-q85.webp','chef-park-all-q85.webp'];
 const stages={tv:1,cat:2,princess:3,dragon:4,chicken:5};let stage=0;
 const start=lines.findIndex(l=>l.setting==='park');
 const g=game(seed({phase:'ending',ending:'two',endingStage:'story',narrative:{lines,index:start,shown:0,after:'ending-story'}}));g.act('continue');g.act('restore','auto');

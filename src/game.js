@@ -18,7 +18,7 @@
   }
   let saveDestination=null,saveSource=null;
   const names={lab:'制药所',hub:'中央公园',bath:'泡泡王国',sky:'天空之城',ice:'冰雪塔楼',forest:'梦幻森林',palace:'宫殿长廊',dragon:'恶龙盘踞之地'};
-  const backgrounds={hub:'central-park.png',lab:'lab.jpg',bath:'bath.jpg',sky:'sky.jpg',ice:'ice.jpg',forest:'forest.png',palace:'palace.png',dragon:'dragon-resting.png'};
+  const backgrounds={hub:'central-park-q85.webp',lab:'lab-q85.webp',bath:'bath-q85.webp',sky:'sky-q85.webp',ice:'ice-q85.webp',forest:'forest-q85.webp',palace:'palace-q85.webp',dragon:'dragon-resting-q85.webp'};
   const itemImages={body_wash:'bath-yellow.png',shampoo:'bath-pink.png',detergent:'bath-powder.png',toothpaste:'bath-berry.png',bleach:'bath-poison.png',soy_sauce:'material-soy-sauce.png',vinegar:'material-vinegar.png',salt:'material-salt.png',sugar:'material-sugar.png',cooking_wine:'material-cooking-wine.png',ice_cream:'sweet-snow.png',dumpling:'dumplings.png',frost:'frost.png',apple:'ice-fruit.png',grape:'grape.png',cabbage:'ice-grass.png',plants:'flowers.png',fallen_leaves:'chicken-leaf.png',cat_fur:'fur.png',skincare:'skincare.png',perfume:'perfume.png',lipstick:'sunset.png',snack_small:'snack-small.png',snack_large:'snack-large.png'};
   const spots={shampoo:[10,29,14,22],body_wash:[22,32,10,23],detergent:[68,37,14,23],toothpaste:[86,37,10,28],bleach:[79,1,15,19],soy_sauce:[88,46,10,25],vinegar:[30,4,10,21],salt:[64,33,9,15],sugar:[13,53,10,17],cooking_wine:[17,14,10,12],ice_cream:[54,53,39,22],dumpling:[60,73,38,15],frost:[0,30,12,22]};
   Object.assign(spots,{apple:[28,76,24,24],grape:[58,0,25,30],cabbage:[67,41,32,50],plants:[68,0,20,30],cat_fur:[54,79,11,18],fallen_leaves:[0,49,25,50],skincare:[13,45,23,27],perfume:[34,29,17,28],lipstick:[55,37,33,45]});
@@ -217,7 +217,7 @@
   }
   function startEaster(){
     if(state.phase!=='ending'||state.ending!=='six'||state.endingStage!=='credits')return;
-    clearTimeout(cinematicTimer);state.endingStage='easter';state.endingReality=false;say(X.easter,'easter-finished',{preview:true,title:'接“光明世界的尽头是一双手”结局'});
+    clearTimeout(cinematicTimer);state.endingStage='easter';state.endingReality=false;say(X.easter,'easter-finished',{preview:true,title:'彩蛋'});
   }
   function inspectMaterial(id){
     if(id==='bleach'){if(state.collected.includes(id)){modal={type:'material',id};render();return;}if(state.quests.ladder){say(X.bleachReach,'bleach-window');return;}say([S.player('呜呜呜太高了够不着，有什么办法可以拿到它呢。可惜我的翅膀是装饰，不然就可以飞起来了！')]);return;}
@@ -338,19 +338,19 @@
 
   function endingBackground(){
     if(state.phase!=='ending'||!state.narrative)return null;
-    if(state.ending==='four')return 'ending-bubble.jpg';
+    if(state.ending==='four')return 'ending-bubble-q85.webp';
     const n=state.narrative,setting=n.lines[n.index].setting;
     if(state.ending==='five'&&n.after==='five-hit'&&!state.endingReality){
       const from=n.lines.findIndex(line=>line.text.startsWith('你感到一阵头晕目眩'));
-      if(from>=0&&n.index>=from)return 'ending-beast-battle.png';
+      if(from>=0&&n.index>=from)return 'ending-beast-battle-q85.webp';
     }
     if(state.ending==='five'&&n.after==='five-finish'&&['home','home-lookback'].includes(setting)){
       // Derive the range from dialogue too, so existing saves get the corrected CG sequence.
       const from=n.lines.findIndex(line=>line.text.startsWith('你回过头去'));
       const to=n.lines.findIndex((line,i)=>i>=from&&line.text.startsWith('没事妈妈'));
-      return from>=0&&to>=from&&n.index>=from&&n.index<=to?'ending-home.jpg':'ending-home.png';
+      return from>=0&&to>=from&&n.index>=from&&n.index<=to?'ending-home-lookback-q85.webp':'ending-home-q85.webp';
     }
-    return ({ceiling:'ending-ceiling.png',home:'ending-home.png','home-lookback':'ending-home.jpg',peek:'ending-easter.jpg'})[setting]||null;
+    return ({ceiling:'ending-ceiling-q85.webp',home:'ending-home-q85.webp','home-lookback':'ending-home-lookback-q85.webp',peek:'ending-easter-q85.webp'})[setting]||null;
   }
   function chefBackground(){
     const n=state.narrative;
@@ -359,15 +359,37 @@
     const stages={tv:1,cat:2,princess:3,dragon:4,chicken:5};
     let stage=0;
     for(const line of n.lines.slice(0,n.index))if(line.setting==='park')stage=Math.max(stage,stages[line.speaker]||0);
-    return ['chef-park-empty.png','chef-park-tv.png','chef-park-cat.png','chef-park-princess.png','chef-park-dragon.png','chef-park-all.png'][stage];
+    return ['chef-park-empty-q85.webp','chef-park-tv-q85.webp','chef-park-cat-q85.webp','chef-park-princess-q85.webp','chef-park-dragon-q85.webp','chef-park-all-q85.webp'][stage];
   }
 
+  const backgroundLoader=typeof GameBackgroundLoader!=='undefined'?GameBackgroundLoader.create():null;
+  function likelyBackgrounds(){
+    if(['intro','exit','prologue'].includes(state.phase))return [backgrounds.lab,backgrounds.hub];
+    if(state.phase==='ending'){
+      if(state.ending==='two'){
+        const files=['chef-park-empty-q85.webp','chef-park-tv-q85.webp','chef-park-cat-q85.webp','chef-park-princess-q85.webp','chef-park-dragon-q85.webp','chef-park-all-q85.webp'];
+        return files.slice(Math.max(0,files.indexOf(chefBackground())+1),Math.max(0,files.indexOf(chefBackground())+1)+2);
+      }
+      if(state.ending==='five'){
+        const files=['ending-beast-battle-q85.webp','dragon-empty-q85.webp','ending-ceiling-q85.webp','ending-home-q85.webp','ending-home-lookback-q85.webp'];
+        const current=endingBackground();
+        if(current==='ending-home-lookback-q85.webp')return ['ending-home-q85.webp'];
+        return files.slice(Math.max(0,files.indexOf(current)+1),Math.max(0,files.indexOf(current)+1)+2);
+      }
+      if(state.ending==='six')return state.endingReality?['ending-companion-friends-q85.webp','ending-home-q85.webp']:['dragon-boarding-q85.webp','ending-companion-q85.webp'];
+      return ['dragon-empty-q85.webp'];
+    }
+    return ({lab:[backgrounds.hub],hub:['central-park-dialogue-q85.webp',backgrounds.bath,backgrounds.sky,backgrounds.forest,backgrounds.palace,backgrounds.lab],bath:[backgrounds.hub],sky:[backgrounds.ice,backgrounds.hub],ice:state.section==='upper'?[backgrounds.ice]:['ice-upper-q85.webp',backgrounds.sky],forest:[backgrounds.hub],palace:[backgrounds.dragon,backgrounds.hub],dragon:['dragon-empty-q85.webp',backgrounds.palace]})[state.scene]||[];
+  }
   function render(){
+    let visibleBackground=null;
     clearInterval(typingTimer);
     if(['intro','exit'].includes(state.phase)){
-      app.innerHTML=`<div class="stage menu cover-menu" style="background-image:url(assets/cover.png)"><div class="menu-content" ${modal?'inert':''}><h1>一锅小小的魔法</h1><p>${state.phase==='exit'?'游戏已结束':'小精灵的第一次冒险'}</p>${button('开始','start')}${button('继续','continue',library.autosave||library.slots.some(Boolean)?'':'disabled')}${button('设置','settings')}${button('成就','achievements')}</div>${popup()}${achievementView()}</div>`;
+      visibleBackground='cover-q85.webp';
+      app.innerHTML=`<div class="stage menu cover-menu" style="background-image:url(assets/cover-q85.webp)"><div class="menu-content" ${modal?'inert':''}><h1>一锅小小的魔法</h1><p>${state.phase==='exit'?'游戏已结束':'小精灵的第一次冒险'}</p>${button('开始','start')}${button('继续','continue',library.autosave||library.slots.some(Boolean)?'':'disabled')}${button('设置','settings')}${button('成就','achievements')}</div>${popup()}${achievementView()}</div>`;
     }else{
-      const prologue=state.phase==='prologue',ending=state.phase==='ending',tvConversation=state.scene==='hub'&&!ending&&(state.narrative?.lines.some(line=>line.speaker==='tv')||modal?.type.startsWith('tv-')),boardingCG=ending&&state.ending==='six'&&state.endingStage==='companion'&&!state.endingReality,companionCG=ending&&state.ending==='six'&&state.endingReality&&state.narrative?.after==='ending-summary',farewellIndex=companionFarewellIndex(state.narrative),friendsRevealed=companionCG&&farewellIndex>=0&&(state.narrative.friendsRevealed||state.narrative.index>farewellIndex),bg=prologue||state.narrative?.title||state.narrative?.lines[state.narrative.index].setting==='black'?null:endingBackground()?endingBackground():chefBackground()?chefBackground():tvConversation?'central-park-dialogue.png':ending&&state.ending==='five'&&state.endingReality&&state.narrative?.after==='five-finish'?'ending-home.png':companionCG?(friendsRevealed?'ending-companion-friends.jpg':'ending-companion.png'):boardingCG?'dragon-boarding.png':ending&&state.endingStage==='easter'?'ending-easter.jpg':ending?(state.narrative?.lines[state.narrative.index].setting?null:['gate','companion'].includes(state.endingStage)||state.narrative&&!state.endingReality&&!['light-story','easter'].includes(state.endingStage)?'dragon-empty.png':null):state.scene==='ice'&&state.section==='upper'?'ice-upper.png':state.scene==='dragon'&&state.narrative?'dragon-empty.png':backgrounds[state.scene];
+      const prologue=state.phase==='prologue',ending=state.phase==='ending',tvConversation=state.scene==='hub'&&!ending&&(state.narrative?.lines.some(line=>line.speaker==='tv')||modal?.type.startsWith('tv-')),boardingCG=ending&&state.ending==='six'&&state.endingStage==='companion'&&!state.endingReality,companionCG=ending&&state.ending==='six'&&state.endingReality&&state.narrative?.after==='ending-summary',farewellIndex=companionFarewellIndex(state.narrative),friendsRevealed=companionCG&&farewellIndex>=0&&(state.narrative.friendsRevealed||state.narrative.index>farewellIndex),bg=prologue||state.narrative?.title||state.narrative?.lines[state.narrative.index].setting==='black'?null:endingBackground()?endingBackground():chefBackground()?chefBackground():tvConversation?'central-park-dialogue-q85.webp':ending&&state.ending==='five'&&state.endingReality&&state.narrative?.after==='five-finish'?'ending-home-q85.webp':companionCG?(friendsRevealed?'ending-companion-friends-q85.webp':'ending-companion-q85.webp'):boardingCG?'dragon-boarding-q85.webp':ending&&state.endingStage==='easter'?'ending-easter-q85.webp':ending?(state.narrative?.lines[state.narrative.index].setting?null:['gate','companion'].includes(state.endingStage)||state.narrative&&!state.endingReality&&!['light-story','easter'].includes(state.endingStage)?'dragon-empty-q85.webp':null):state.scene==='ice'&&state.section==='upper'?'ice-upper-q85.webp':state.scene==='dragon'&&state.narrative?'dragon-empty-q85.webp':backgrounds[state.scene];
+      visibleBackground=bg;
       let view='';
       if(prologue)view=`<div class="storybook" aria-label="翻开的故事书"><div class="book-left"><span>一锅小小的魔法</span><i>✦</i></div><div class="book-right"><span>第 ${state.narrative.index+1} 页</span><i>✧</i></div><div class="turning-page" style="--page:${state.narrative.index}"></div></div>`;
       else if(ending){
@@ -385,6 +407,7 @@
       else view=(tvConversation?'':scene())+(state.phase==='ready'&&state.scene==='dragon'?button('拿出魔法药','potion-prompt','class="potion-button"'):'');
       app.innerHTML=`<div class="stage ${bg?'illustrated':''} ${state.narrative?.preview?'cg-preview-stage':''} ${state.narrative?.allowNavigation?'npc-navigation':''}" ${bg?`style="background-image:url(assets/${bg})"`:''}><div class="world" ${state.narrative&&!state.narrative.allowNavigation||modal?'inert':''}>${!prologue?`<header>${!ending&&!(state.scene==='lab'&&state.phase==='explore')?button('← 返回','back'):''}<div>${button('设置','settings')}${button('背包','bag',`aria-expanded="${bag}"`)}</div></header>`:''}${view}${bag&&!prologue?inventory():''}</div>${endingFormArt()}${notice?`<div class="notice" role="status">${esc(notice)}</div>`:''}${narrativeView()}${state.narrative&&!state.narrative.preview?button('快进至未读','skip-read','class="skip-read" aria-label="跳过已读对白，停在未读内容"'):''}${popup()}${achievementView()}${state.effects?'<div class="magic-smoke" aria-hidden="true"></div>':''}</div>`;
     }
+    backgroundLoader?.update(visibleBackground,likelyBackgrounds());
     if(state.endingStage==='light-story'&&!endingBackground())app.querySelector?.('.stage')?.classList.add('light-story');
     if(modal?.type==='name')document.getElementById('player-name').focus();
     else if(modal){const controls=app.querySelectorAll('.modal button:not([disabled])');controls[0]?.focus();}

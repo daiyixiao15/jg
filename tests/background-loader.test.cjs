@@ -1,0 +1,20 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const context={};vm.createContext(context);vm.runInContext(fs.readFileSync('src/background-loader.js','utf8'),context);
+const jobs=[],requests=[];
+const loader=context.GameBackgroundLoader.create({schedule:fn=>jobs.push(fn),makeImage:()=>{const image={naturalWidth:100,decode:()=>Promise.resolve()};Object.defineProperty(image,'src',{set(url){image.url=url;requests.push(image);}});return image;}});
+const tick=async()=>{for(let i=0;i<6;i++)await Promise.resolve();};
+const paint=()=>{const list=jobs.splice(0);list.forEach(fn=>fn());};
+(async()=>{
+ loader.update('current.webp',['a.webp','b.webp','c.webp','a.webp']);paint();
+ assert.equal(requests.length,1);assert.equal(requests[0].fetchPriority,'high');
+ requests[0].onload();await tick();assert.equal(requests.length,1,'no speculative load before paint');paint();
+ assert.equal(requests.length,3,'only two speculative loads');assert.equal(requests[1].fetchPriority,'low');
+ requests[1].onload();await tick();assert.equal(requests.length,4,'third starts only after a slot is free');
+ loader.update('next.webp',['d.webp','e.webp']);paint();assert.equal(requests.length,5);
+ requests[2].onload();requests[3].onload();await tick();assert.equal(requests.length,5,'new current still blocks queue');
+ requests[4].onload();await tick();paint();assert.equal(requests.length,7);
+ requests[5].onload();requests[6].onerror();await tick();
+ loader.update('current.webp',['a.webp','b.webp','c.webp','d.webp','e.webp']);paint();await tick();paint();assert.equal(requests.length,7,'ready, failed and in-flight records do not retry on rerender');
+ loader.update('obsolete.webp',['old-neighbor.webp']);loader.update('current.webp',['a.webp']);paint();await tick();paint();assert.equal(requests.length,7,'obsolete scheduled work is dropped');
+ console.log('PASS: current load/decode/paint gate, two-load limit, slot reuse, deduplication, scene changes, failed image handling, stale queue cancellation.');
+})().catch(e=>{console.error(e);process.exitCode=1;});

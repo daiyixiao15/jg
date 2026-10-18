@@ -863,6 +863,330 @@
     ],
     "source": "codex-clipboard-54940469-383b-4dd3-8263-93d02cfc76a4.png",
     "sha256": "e7827f1d7ac1de21d9fb9f018b97ea49231d7d895c3106d66541c25ddd3cd0e9"
+  },
+  "cover-q85.webp": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      0,
+      0,
+      2800,
+      2100
+    ],
+    "source": "cover.png",
+    "sha256": "c76af262f3169624cf1fa935ac4d7276ca4a4d60e0c832584104de86b0a47ea3"
+  },
+  "central-park-q85.webp": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      0,
+      0,
+      2800,
+      2100
+    ],
+    "source": "central-park.png",
+    "sha256": "903bb6eb260965187e9957c1c554717f7d0ce0da1bece582792516610824726d"
+  },
+  "bath-q85.webp": {
+    "width": 1840,
+    "height": 1380,
+    "bounds": [
+      0,
+      0,
+      1840,
+      1380
+    ],
+    "source": "bath.jpg",
+    "sha256": "66ef928f8135efdb813525d9d20b991b86a7d463dddf9d65939ce44ae89f4dae"
+  },
+  "central-park-dialogue-q85.webp": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      0,
+      0,
+      2800,
+      2100
+    ],
+    "source": "central-park-dialogue.png",
+    "sha256": "3392f01e1ef060fde97e776f5086c2cd479b9e9bcf505ad56b2978d1f6831654"
+  },
+  "lab-q85.webp": {
+    "width": 1840,
+    "height": 1380,
+    "bounds": [
+      0,
+      0,
+      1840,
+      1380
+    ],
+    "source": "lab.jpg",
+    "sha256": "61b4574a3c91364360004b56054f97014ffc42924a4971076ee01ca5ef4b2b25"
+  },
+  "sky-q85.webp": {
+    "width": 1840,
+    "height": 1380,
+    "bounds": [
+      0,
+      0,
+      1840,
+      1380
+    ],
+    "source": "sky.jpg",
+    "sha256": "ea8d766b718ab3ed983e81b0ebafcbe922c9a200b2dab532b9579918e8e95c4f"
+  },
+  "ice-q85.webp": {
+    "width": 1440,
+    "height": 1080,
+    "bounds": [
+      0,
+      0,
+      1440,
+      1080
+    ],
+    "source": "ice.jpg",
+    "sha256": "bbf4fe1b3df2b2385d6a0da43dc0cb13c1993772a649a8b92933fed250285eee"
+  },
+  "ice-upper-q85.webp": {
+    "width": 2463,
+    "height": 1840,
+    "bounds": [
+      0,
+      0,
+      2463,
+      1840
+    ],
+    "source": "ice-upper.png",
+    "sha256": "2f3f5a7701e8932a03a4384e31e5519232b5fa90f64290045c2a0ee186bf92fb"
+  },
+  "forest-q85.webp": {
+    "width": 2454,
+    "height": 1840,
+    "bounds": [
+      0,
+      0,
+      2454,
+      1840
+    ],
+    "source": "forest.png",
+    "sha256": "2cd40fb61795b6d4ba04ddb1ea7236341db48b71c797654e8652090f4b6a59fc"
+  },
+  "palace-q85.webp": {
+    "width": 1840,
+    "height": 1380,
+    "bounds": [
+      0,
+      0,
+      1840,
+      1380
+    ],
+    "source": "palace.png",
+    "sha256": "0054828736d85a7fe1c7c71783464f0ec9fb99c9aa295dc9aa56620057128d82"
+  },
+  "dragon-resting-q85.webp": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      0,
+      0,
+      2800,
+      2100
+    ],
+    "source": "dragon-resting.png",
+    "sha256": "d1d905c541ae0d5e4d708a7e830f9690a2f29923869ffc48b1e9a4849b44bc08"
+  },
+  "dragon-empty-q85.webp": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      0,
+      0,
+      2800,
+      2100
+    ],
+    "source": "dragon-empty.png",
+    "sha256": "8daa2e47fce2f52b7411662f8cdc1be6dc7f5c0dfe75ef3e8feeacf0498806eb"
+  },
+  "dragon-boarding-q85.webp": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      0,
+      0,
+      2800,
+      2100
+    ],
+    "source": "dragon-boarding.png",
+    "sha256": "f3e85baf138db0293db5503e73792c53b631223387bde1bef1721e1d141fbf21"
+  },
+  "ending-companion-q85.webp": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      0,
+      0,
+      2800,
+      2100
+    ],
+    "source": "ending-companion.png",
+    "sha256": "924e935a969a13840db7f0a8f9a18d7f793a5b6d09708bd0c4d0f98da029ec03"
+  },
+  "ending-companion-friends-q85.webp": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      0,
+      0,
+      2800,
+      2100
+    ],
+    "source": "ending-companion-friends.jpg",
+    "sha256": "cbbbb764745998bad4f930accd54baac9babf2dc443ec434779a2080395fbf60"
+  },
+  "ending-home-q85.webp": {
+    "width": 2304,
+    "height": 1728,
+    "bounds": [
+      0,
+      0,
+      2304,
+      1728
+    ],
+    "source": "ending-home.png",
+    "sha256": "0d77f81d67ef11ed784d51936595ab02fbecd5cc852964b2fc28257e61d51585"
+  },
+  "ending-home-lookback-q85.webp": {
+    "width": 1840,
+    "height": 1380,
+    "bounds": [
+      0,
+      0,
+      1840,
+      1380
+    ],
+    "source": "ending-home.jpg",
+    "sha256": "ac51a0401b76affba52bf0366b2f5052b9bd4b823d615090064cfd929706b73f"
+  },
+  "ending-ceiling-q85.webp": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      0,
+      0,
+      2800,
+      2100
+    ],
+    "source": "ending-ceiling.png",
+    "sha256": "cb65ed860b5e3ae2321c2065e7a1e00c4946c625a9415673366507611f9c2d84"
+  },
+  "ending-easter-q85.webp": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      0,
+      0,
+      2800,
+      2100
+    ],
+    "source": "ending-easter.jpg",
+    "sha256": "38dd8c3704bd7fc5555eeb1e21f0a6041ebb6765217ca31b336ad7eaad887898"
+  },
+  "ending-bubble-q85.webp": {
+    "width": 1840,
+    "height": 1380,
+    "bounds": [
+      0,
+      0,
+      1840,
+      1380
+    ],
+    "source": "ending-bubble.jpg",
+    "sha256": "3c8f25e86e727717b7f4d80fa57ac44bdb24ba86df7e5d43c24edac0775da85f"
+  },
+  "ending-beast-battle-q85.webp": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      0,
+      0,
+      2800,
+      2100
+    ],
+    "source": "ending-beast-battle.png",
+    "sha256": "ebdea9f7a40463dfedcab131fda805a270debaaa675044968f2f5aebd143ef53"
+  },
+  "chef-park-empty-q85.webp": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      0,
+      0,
+      2800,
+      2100
+    ],
+    "source": "chef-park-empty.png",
+    "sha256": "fc9cae6d37976404d42483bd2a750cd2bf6fa437944c54374ac7f41ad936a50e"
+  },
+  "chef-park-tv-q85.webp": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      0,
+      0,
+      2800,
+      2100
+    ],
+    "source": "chef-park-tv.png",
+    "sha256": "75fce452b655ecdb4eafcada6a674e4945c279aba5ad76ec1ff2a91b64b54da2"
+  },
+  "chef-park-cat-q85.webp": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      0,
+      0,
+      2800,
+      2100
+    ],
+    "source": "chef-park-cat.png",
+    "sha256": "8318987abd3dba40644ef39a1d4fcd8c84488dac6c342e1054aaea7e95b30c97"
+  },
+  "chef-park-princess-q85.webp": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      0,
+      0,
+      2800,
+      2100
+    ],
+    "source": "chef-park-princess.png",
+    "sha256": "572d2a8173caf24545a25a5a935ddc110476b37f59064270205cec40cd6029c2"
+  },
+  "chef-park-dragon-q85.webp": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      0,
+      0,
+      2800,
+      2100
+    ],
+    "source": "chef-park-dragon.png",
+    "sha256": "f1d1fd700b9c9da23d496afdc89a5e9b3b80152f2a60c8f997bf550a6c5a5a2c"
+  },
+  "chef-park-all-q85.webp": {
+    "width": 2800,
+    "height": 2100,
+    "bounds": [
+      0,
+      0,
+      2800,
+      2100
+    ],
+    "source": "chef-park-all.png",
+    "sha256": "c450a0dd157f4cea82eb6372b1030c0ce6f2f39ade124fd9613d1eb3136fe33e"
   }
 };
 })(globalThis);

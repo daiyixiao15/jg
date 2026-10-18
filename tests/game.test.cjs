@@ -9,14 +9,14 @@ function game(storage={}){
 }
 const g=game();assert.match(g.html,/>开始</);g.start();assert.match(g.html,/storybook/);assert.match(g.html,/inert/);assert.equal(g.library.autosave.phase,'prologue');
 // Even a stale background-control event must only turn the story page.
-g.act('scene','sky');assert.equal(g.library.autosave.scene,'lab');assert.equal(g.library.autosave.narrative.index,1);g.finishText();assert.equal(g.library.autosave.phase,'explore');assert.match(g.html,/lab.jpg/);
+g.act('scene','sky');assert.equal(g.library.autosave.scene,'lab');assert.equal(g.library.autosave.narrative.index,1);g.finishText();assert.equal(g.library.autosave.phase,'explore');assert.match(g.html,/lab-q85.webp/);
 g.act('scene','hub');g.finishText();assert.doesNotMatch(g.html,/data-id="dragon"/);assert.equal((g.html.match(/data-action="scene"/g)||[]).length,5);
 g.act('scene','bath');assert.match(g.html,/reading-layer/);assert.match(g.html,/inert/);g.act('inspect','shampoo');assert.equal(g.library.autosave.collected.length,0);g.finishText();assert.doesNotMatch(g.html,/data-action="chair"/);
 g.act('inspect','bleach');g.finishText();assert.equal(g.library.autosave.bleachStage,0);g.act('inspect','shampoo');assert.doesNotMatch(g.html,/能吃|不能吃|无毒|有毒|出泡/);g.act('collect','shampoo');assert.deepEqual(g.library.autosave.collected,['shampoo']);
 g.act('bag');assert.equal((g.html.match(/class="item /g)||[]).length,8);g.act('item','shampoo');g.act('discard','shampoo');g.act('discard-confirm');assert.equal(g.library.autosave.collected.length,0);g.act('bag');
 g.act('scene','hub');g.act('scene','bath');assert.doesNotMatch(g.html,/reading-layer/);
 g.act('settings');g.act('save-list');g.act('save-slot','0');assert.equal(g.library.slots[0].state.scene,'bath');g.act('close');g.act('scene','sky');g.finishText();assert.match(g.html,/class="travel-arrow"/);g.act('scene','ice','lower');g.finishText();assert.equal(g.library.autosave.section,'lower');assert.match(g.html,/data-section="upper"/);g.act('scene','ice','upper');g.finishText();g.act('back');assert.equal(g.library.autosave.section,'lower');g.act('back');assert.equal(g.library.autosave.scene,'sky');
-g.act('settings');g.act('load-list');g.act('restore','0');assert.equal(g.library.slots[0].state.scene,'bath');assert.match(g.html,/bath.jpg/);
+g.act('settings');g.act('load-list');g.act('restore','0');assert.equal(g.library.slots[0].state.scene,'bath');assert.match(g.html,/bath-q85.webp/);
 g.act('menu');g.act('continue');assert.match(g.html,/选择要继续的存档/);g.act('restore','auto');assert.doesNotMatch(g.html,/风险/);
 const ids=['apple','grape','cabbage','ice_cream','dumpling','frost','plants','cat_food'];
 function seed(extra={},completed=[]){return {[KEY]:JSON.stringify({version:2,slots:[null,null,null],completed,autosave:{...g.context.GameRules.createState(),phase:'explore',scene:'lab',playerName:'测试',collected:ids,round:1,adventureId:'test-run',visited:[],narrative:null,...extra}})}}

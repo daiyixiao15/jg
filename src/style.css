@@ -45,7 +45,7 @@ header{position:absolute;inset:2% 2% auto;display:flex;justify-content:space-bet
 @keyframes candy-shake{0%,100%{transform:rotate(0)}25%{transform:rotate(14deg)}75%{transform:rotate(-14deg)}}
 @media(prefers-reduced-motion:reduce){.magic-smoke,.stage.lollipop-shake:after{animation:none;opacity:.2}}
 
-.candy-shaking-bg{position:absolute;left:20%;top:38%;width:28%;height:35%;background-image:url(../assets/ice-upper.png);background-size:357.142857% 285.714286%;background-position:27.777778% 58.461538%;pointer-events:none;animation:candy-shake .55s}
+.candy-shaking-bg{position:absolute;left:20%;top:38%;width:28%;height:35%;background-image:url(../assets/ice-upper-q85.webp);background-size:357.142857% 285.714286%;background-position:27.777778% 58.461538%;pointer-events:none;animation:candy-shake .55s}
 .ending-form-art{position:absolute;left:10%;top:10%;width:48%;height:62%;pointer-events:none}.ending-form-art .sprite-art{width:100%;height:100%}
 .stage:has(.other-npc) .world header{z-index:30}.stage:has(.other-npc) .world .inventory{z-index:30}
 @media(prefers-reduced-motion:reduce){.candy-shaking-bg{animation:none}}
