@@ -1187,6 +1187,54 @@
     ],
     "source": "chef-park-all.png",
     "sha256": "c450a0dd157f4cea82eb6372b1030c0ce6f2f39ade124fd9613d1eb3136fe33e"
+  },
+  "storybook-page-1-q85.webp": {
+    "width": 2800,
+    "height": 1400,
+    "bounds": [
+      0,
+      0,
+      2800,
+      1400
+    ],
+    "source": "codex-clipboard-a57c83e9-43e8-4cb0-a97c-613d7607f1df.png",
+    "sha256": "99bd99da22f26c2862a0b35de68840e5e2451e37c435f0ed88f25027a0671610"
+  },
+  "storybook-page-2-q85.webp": {
+    "width": 2800,
+    "height": 1400,
+    "bounds": [
+      0,
+      0,
+      2800,
+      1400
+    ],
+    "source": "codex-clipboard-8cc98b21-722c-4c75-8741-e72ea13888f0.png",
+    "sha256": "abacc00e4358bd62792d80f9585d64111174ffb8622ae059342d6cd65e972c73"
+  },
+  "storybook-page-3-q85.webp": {
+    "width": 2800,
+    "height": 1400,
+    "bounds": [
+      0,
+      0,
+      2800,
+      1400
+    ],
+    "source": "codex-clipboard-2269b378-a6c8-497b-95b7-8251ef5969cf.png",
+    "sha256": "5908318a425db7215a63632b435997353daa2c7371459f6d949c9d10ca444155"
+  },
+  "storybook-page-4-q85.webp": {
+    "width": 2800,
+    "height": 1400,
+    "bounds": [
+      0,
+      0,
+      2800,
+      1400
+    ],
+    "source": "codex-clipboard-6e3293d1-fd7b-48b4-86f8-316ad9348192.png",
+    "sha256": "357c4664f4b6f56f1b5c156fb9676763c091477933f11281541774e03098364a"
   }
 };
 })(globalThis);

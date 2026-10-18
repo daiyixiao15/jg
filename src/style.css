@@ -98,3 +98,36 @@ header{position:absolute;inset:2% 2% auto;display:flex;justify-content:space-bet
 
 .choices.new-adventure-choices{flex-direction:column;align-items:stretch;gap:.8em}
 .choices.new-adventure-choices button{width:100%;min-width:0;white-space:normal;overflow-wrap:anywhere}
+
+/* Opening illustrations span both book leaves without cropping or stretching. */
+.illustrated-book{left:10%;right:10%;top:13%;height:auto;aspect-ratio:2/1;isolation:isolate}
+.illustrated-book .book-left,.illustrated-book .book-right{padding:0;border:0;background-color:#f3e8ce;background-size:200% 100%;background-repeat:no-repeat;box-shadow:none;overflow:hidden}
+.illustrated-book .book-left{background-position:left center;border-radius:7px 0 0 7px}
+.illustrated-book .book-right{background-position:right center;border-radius:0 7px 7px 0}
+.book-spine{position:absolute;inset:0 auto 0 49.6%;width:.8%;background:linear-gradient(90deg,transparent,#65543a30,transparent);pointer-events:none;z-index:1}
+
+/* Reveal the new left illustration along the moving leaf edge, from spine outward. */
+
+/* A small paper margin surrounds the illustration; only the initial spread fades in. */
+.illustrated-book::before{content:"";position:absolute;inset:-1.1cqw -1.2cqw -1.4cqw;z-index:-1;border-radius:10px;background:#e7dbc0;border:1px solid #a28a61;box-shadow:0 .35cqw 0 #c1ad87,0 .6cqw 0 #806f52,0 1cqw 2cqw #0005}
+.book-art-enter>.book-left>.book-ink,.book-art-enter>.book-right>.book-ink{animation:storybook-art-appear .9s ease-out .5s both}
+@keyframes storybook-art-appear{from{opacity:0;filter:blur(8px)}to{opacity:1;filter:blur(0)}}
+@media(prefers-reduced-motion:reduce){.book-art-enter>.book-left>.book-ink,.book-art-enter>.book-right>.book-ink{animation:storybook-art-appear-reduced .3s ease-out .5s both}@keyframes storybook-art-appear-reduced{from{opacity:0}to{opacity:1}}}
+
+/* Paper remains visible while each new illustration waits, then gently appears. */
+.book-ink{position:absolute;inset:0;background-size:200% 100%;background-position:left center;background-repeat:no-repeat;pointer-events:none;mask-image:linear-gradient(to right,transparent,#000 4%,#000),linear-gradient(to bottom,transparent,#000 5%,#000 95%,transparent);mask-composite:intersect}
+
+.music-settings{display:flex;align-items:center;flex-wrap:wrap;gap:1em;margin:1em 0}.music-settings label{display:flex;align-items:center;gap:.6em}.music-settings input{max-width:35cqw;accent-color:#b9d8bd}
+
+/* Picture changes use a simple fade, with no rotating or unfolding paper. */
+.book-previous{position:absolute;inset:0;display:flex;pointer-events:none;animation:storybook-art-out .3s ease-out both;z-index:1}
+.book-previous .book-left,.book-previous .book-right{flex:0 0 50%}
+.book-right>.book-ink{background-position:right center;mask-image:linear-gradient(to left,transparent,#000 4%,#000),linear-gradient(to bottom,transparent,#000 5%,#000 95%,transparent)}
+@keyframes storybook-art-out{from{opacity:1}to{opacity:0}}
+@media(prefers-reduced-motion:reduce){.book-previous{animation-duration:.15s}}
+
+.audio-settings{display:flex;flex-direction:column;gap:1em}
+.audio-setting-row{display:grid;grid-template-columns:3em minmax(0,1fr) 3.5em;align-items:center;gap:1em;padding:.65em .8em;background:#222633;border:1px solid #7c8297;border-radius:6px}
+.audio-setting-row input{width:100%;min-width:0;accent-color:#b9d8bd;cursor:pointer}
+.audio-setting-row output{text-align:right;font-size:.85em;font-variant-numeric:tabular-nums}
+.reset-game-button{width:100%;margin:0}
