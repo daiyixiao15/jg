@@ -3,7 +3,7 @@
   function create(options={}){
     const storage=options.storage||root.localStorage;
     const audio=options.audio||(typeof Audio==='function'?new Audio():null);
-    const tracks={cover:'assets/cover-bgm-fairytale.mp3',prologue:'assets/prologue-bgm-c13.mp3',collection:'assets/collection-bgm.m4a',dragon:'assets/dragon-bgm-siren.m4a'};
+    const tracks={cover:'assets/cover-bgm-fairytale.mp3',prologue:'assets/prologue-bgm-c13.mp3',collection:'assets/collection-bgm.m4a',dragon:'assets/dragon-bgm-c23.mp3',ice:'assets/ice-tower-bgm-f1.mp3',bubble:'assets/ending-bubble-bgm.m4a',chef:'assets/ending-chef-bgm-n5.mp3',summary:'assets/ending-summary-bgm.m4a',trueOne:'assets/dragon-bgm-siren.m4a',trueTwo:'assets/cover-bgm-universe.m4a'};
     let preferences={muted:false,volume:.45,effectsVolume:.7},track=null,pending=null,revision=0;
     try{const saved=JSON.parse(storage?.getItem('little-magic-audio-v1'));if(saved){preferences.muted=!!saved.muted;for(const key of ['volume','effectsVolume'])if(Number.isFinite(saved[key]))preferences[key]=Math.min(1,Math.max(0,saved[key]));}}catch{}
     if(audio){audio.loop=true;audio.preload='none';audio.volume=preferences.volume;audio.muted=preferences.muted;}

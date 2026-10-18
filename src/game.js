@@ -383,6 +383,17 @@
   }
   const coverAudio=typeof GameCoverAudio!=='undefined'?GameCoverAudio.create():null;
   const backgroundLoader=typeof GameBackgroundLoader!=='undefined'?GameBackgroundLoader.create():null;
+  function backgroundMusic(){
+    if(state.phase==='intro')return 'cover';
+    if(state.phase==='prologue')return 'prologue';
+    if(state.phase==='ending'){
+      if(state.endingStage==='summary'&&!state.narrative&&!state.cinematic)return 'summary';
+      if(['fin','credits','epilogue','easter'].includes(state.endingStage))return null;
+      return ({four:'bubble',two:'chef',five:'trueOne',six:'trueTwo'})[state.ending]||null;
+    }
+    if(['explore','brew','mixing','ready'].includes(state.phase))return state.scene==='dragon'?'dragon':state.scene==='ice'?'ice':'collection';
+    return null;
+  }
   function likelyBackgrounds(){
     if(['intro','exit'].includes(state.phase))return storybookPages.slice(0,2);
     if(state.phase==='prologue')return [...storybookPages.slice(state.narrative.index+1,state.narrative.index+3),backgrounds.lab];
@@ -428,7 +439,7 @@
       else view=(tvConversation?'':scene())+(state.phase==='ready'&&state.scene==='dragon'?button('拿出魔法药','potion-prompt','class="potion-button"'):'');
       app.innerHTML=`<div class="stage ${bg?'illustrated':''} ${state.narrative?.preview?'cg-preview-stage':''} ${state.narrative?.allowNavigation?'npc-navigation':''}" ${bg?`style="background-image:url(assets/${bg})"`:''}><div class="world" ${state.narrative&&!state.narrative.allowNavigation||modal?'inert':''}>${!prologue?`<header>${!ending&&!(state.scene==='lab'&&state.phase==='explore')?button('← 返回','back'):''}<div>${button('设置','settings')}${button('背包','bag',`aria-expanded="${bag}"`)}</div></header>`:''}${view}${bag&&!prologue?inventory():''}</div>${endingFormArt()}${notice?`<div class="notice" role="status">${esc(notice)}</div>`:''}${narrativeView()}${state.narrative&&!state.narrative.preview?button('快进至未读','skip-read','class="skip-read" aria-label="跳过已读对白，停在未读内容"'):''}${popup()}${achievementView()}${state.effects?'<div class="magic-smoke" aria-hidden="true"></div>':''}</div>`;
     }
-    coverAudio?.update(state.phase==='intro'?'cover':state.phase==='prologue'?'prologue':['explore','brew','mixing','ready'].includes(state.phase)?(state.scene==='dragon'?'dragon':'collection'):null);
+    coverAudio?.update(backgroundMusic());
     backgroundLoader?.update(visibleBackground,likelyBackgrounds());
     if(state.endingStage==='light-story'&&!endingBackground())app.querySelector?.('.stage')?.classList.add('light-story');
     if(modal?.type==='name')document.getElementById('player-name').focus();
