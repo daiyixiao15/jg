@@ -10,7 +10,7 @@
   function skipRead(){
     const n=state.narrative;if(!n||n.preview)return;
     if(!readLines.has(readKey(n.lines[n.index]))){notice='已经到达未读内容。';render();return;}
-    while(state.narrative===n&&readLines.has(readKey(n.lines[n.index]))){
+    while(!state.cinematic&&state.narrative===n&&readLines.has(readKey(n.lines[n.index]))){
       n.shown=n.lines[n.index].text.replaceAll('{name}',state.playerName).length;
       const index=n.index;advance();
       if(state.narrative===n&&n.index===index)break;
@@ -206,6 +206,7 @@
     const next=state.cinematic?.next;if(!next)return;state.cinematic=null;cinematicTimer=null;
     if(next==='five-after-hit'){say(X.fiveAfterHit,'ending-story');return;}
     if(next==='five-hospital'){state.endingReality=true;say(X.fiveHospital,'five-finish');return;}
+    if(next==='five-home'){autosave(true);render();return;}
     if(next==='six-reality'){state.endingReality=true;say(X.sixReality,'ending-summary',{preview:true});return;}
     if(next==='credits'){showCredits();return;}
     state.endingStage='summary';autosave(true);render();
@@ -387,7 +388,7 @@
     if(state.endingStage==='light-story'&&!endingBackground())app.querySelector?.('.stage')?.classList.add('light-story');
     if(modal?.type==='name')document.getElementById('player-name').focus();
     else if(modal){const controls=app.querySelectorAll('.modal button:not([disabled])');controls[0]?.focus();}
-    if(state.narrative&&!state.narrative.preview){
+    if(state.narrative&&!state.narrative.preview&&!state.cinematic){
       const n=state.narrative,line=n.lines[n.index],node=document.getElementById('dialog-text'),fullText=line.text.replaceAll('{name}',state.playerName);
       typingTimer=setInterval(()=>{if(state.narrative!==n){clearInterval(typingTimer);return;}n.shown=Math.min(fullText.length,n.shown+1);node.textContent=fullText.slice(0,n.shown);if(n.shown===fullText.length)clearInterval(typingTimer);},50);
     }
@@ -401,7 +402,12 @@
     if(state.phase!=='prologue'&&n.shown<text.length){n.shown=text.length;autosave(true);render();return;}
     if(n.index===companionFarewellIndex(n)&&!n.friendsRevealed){n.friendsRevealed=true;autosave(true);render();return;}
     rememberLine(n.lines[n.index]);
-    if(n.index<n.lines.length-1){n.index++;n.shown=0;syncChickenHat();autosave(true);render();return;}
+    if(n.index<n.lines.length-1){
+      const goingHome=state.ending==='five'&&n.after==='five-finish'&&n.lines[n.index].setting==='ceiling'&&n.lines[n.index+1].setting==='home';
+      n.index++;n.shown=0;syncChickenHat();
+      if(goingHome){clearInterval(typingTimer);timedScene('white',1000,'five-home');return;}
+      autosave(true);render();return;
+    }
     state.narrative=null;clearInterval(typingTimer);
     if(n.after==='lab'){
       state.phase='explore';state.scene='lab';state.visited=state.visited||[];
@@ -435,7 +441,7 @@
     }
     if(n.after==='five-hit'){playImpact();timedScene('impact',500,'five-after-hit');return;}
     if(n.after==='five-center'){state.endingStage='mother-call';}
-    if(n.after==='five-wake'){timedScene('white',1000,'five-hospital');return;}
+    if(n.after==='five-wake'){state.endingReality=true;say(X.fiveHospital,'five-finish');return;}
     if(n.after==='five-finish'){timedScene('black',3000,'summary');return;}
     if(n.after==='six-grip-choice')modal={type:'grip-ready'};
     if(n.after==='six-white'){timedScene('white',1000,'six-reality');return;}

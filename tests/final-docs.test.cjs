@@ -12,7 +12,7 @@ while(bubble.library.autosave.narrative){
 assert.equal(bubble.library.autosave.endingStage,'summary');assert.doesNotMatch(bubble.html,/ending-bubble.jpg/);
 const X=bubble.context.GameExpansion;
 assert.ok(X.fiveHospital.some(l=>l.text.includes('不小心食用了妈妈放在浴室高处的清洁剂')));
-assert.equal(X.fiveHospital.at(-1).text,'你笑了笑没有多想，转回头更紧地环住了妈妈的脖子。');
+assert.equal(X.fiveHospital.at(-1).text,'你笑了笑，转回头更紧地环住了妈妈的脖子。');
 assert.equal(X.easter.at(-1).text,'她会回来的，只要童心未泯。');assert.ok(X.easter.some(l=>l.text==='她也答应过我要回来讲她的冒险故事。'));
 for(const [lines,after,stage] of [[X.fiveWake,'five-wake','light-story'],[X.fiveHospital,'five-finish','story'],[X.easter,'easter-finished','easter']]){
  for(let index=0;index<lines.length;index++){
