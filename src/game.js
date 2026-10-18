@@ -428,7 +428,7 @@
       else view=(tvConversation?'':scene())+(state.phase==='ready'&&state.scene==='dragon'?button('拿出魔法药','potion-prompt','class="potion-button"'):'');
       app.innerHTML=`<div class="stage ${bg?'illustrated':''} ${state.narrative?.preview?'cg-preview-stage':''} ${state.narrative?.allowNavigation?'npc-navigation':''}" ${bg?`style="background-image:url(assets/${bg})"`:''}><div class="world" ${state.narrative&&!state.narrative.allowNavigation||modal?'inert':''}>${!prologue?`<header>${!ending&&!(state.scene==='lab'&&state.phase==='explore')?button('← 返回','back'):''}<div>${button('设置','settings')}${button('背包','bag',`aria-expanded="${bag}"`)}</div></header>`:''}${view}${bag&&!prologue?inventory():''}</div>${endingFormArt()}${notice?`<div class="notice" role="status">${esc(notice)}</div>`:''}${narrativeView()}${state.narrative&&!state.narrative.preview?button('快进至未读','skip-read','class="skip-read" aria-label="跳过已读对白，停在未读内容"'):''}${popup()}${achievementView()}${state.effects?'<div class="magic-smoke" aria-hidden="true"></div>':''}</div>`;
     }
-    coverAudio?.update(state.phase==='intro'?'cover':state.phase==='prologue'?'prologue':['explore','brew','mixing','ready'].includes(state.phase)?'collection':null);
+    coverAudio?.update(state.phase==='intro'?'cover':state.phase==='prologue'?'prologue':['explore','brew','mixing','ready'].includes(state.phase)?(state.scene==='dragon'?'dragon':'collection'):null);
     backgroundLoader?.update(visibleBackground,likelyBackgrounds());
     if(state.endingStage==='light-story'&&!endingBackground())app.querySelector?.('.stage')?.classList.add('light-story');
     if(modal?.type==='name')document.getElementById('player-name').focus();
