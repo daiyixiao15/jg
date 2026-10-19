@@ -1,5 +1,18 @@
 (function(root){
   root.GameAssets={
+  "princess-default.webp": {"width": 1804, "height": 1890, "bounds": [0, 0, 1804, 1890]},
+  "princess-proud.webp": {"width": 1804, "height": 1890, "bounds": [0, 0, 1804, 1890]},
+  "princess-sad.webp": {"width": 1804, "height": 1890, "bounds": [0, 0, 1804, 1890]},
+  "princess-smile.webp": {"width": 1804, "height": 1890, "bounds": [0, 0, 1804, 1890]},
+  "princess-confused.webp": {"width": 1804, "height": 1890, "bounds": [0, 0, 1804, 1890]},
+
+  "princess-proud.png": {"width": 1840, "height": 2453, "bounds": [36, 246, 1840, 2136]},
+  "princess-default.png": {"width": 1840, "height": 2453, "bounds": [36, 246, 1840, 2136]},
+  "princess-smile.png": {"width": 1840, "height": 2453, "bounds": [36, 246, 1840, 2136]},
+  "princess-sad.png": {"width": 1840, "height": 2453, "bounds": [36, 246, 1840, 2136]},
+  "princess-confused.png": {"width": 1840, "height": 2453, "bounds": [36, 246, 1840, 2136]},
+
+  "player-chef.png": {"width":1840,"height":2453,"bounds":[305,220,1716,2223]},
   "dragon.png": {"width":2800,"height":1840,"bounds":[713,3,2059,1765]},
   "cat-food.png": {"width": 2800, "height": 1840, "bounds": [443, 200, 2489, 1748], "source": "用户提供的毛绒绒怪赠送美食贴图", "sha256": "8402871fe8c708a10ccc67e088a4b7dd1c350514fc3111e65404e082e7df0857"},
   "ending-companion.png": {

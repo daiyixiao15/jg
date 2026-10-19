@@ -12,6 +12,7 @@
       records.set(file,record);
       record.promise=new Promise(resolve=>{
         const image=makeImage();
+        record.image=image; // Retain decoded pixels for upcoming portrait swaps.
         image.decoding='async';image.fetchPriority=priority;
         let settled=false;
         function finish(ok){if(settled)return;settled=true;image.onload=null;image.onerror=null;record.status=ok?'ready':'failed';resolve(ok);}

@@ -165,3 +165,6 @@ header{position:absolute;inset:2% 2% auto;display:flex;justify-content:space-bet
 
 .npc-portrait.dragon-full-body{left:34%;top:3%;width:48%;height:87%;object-fit:contain}
 .dragon-full-body .sprite-art{width:100%;height:100%}
+
+.player-portrait.chef-player-portrait{left:1%;bottom:0%;width:31%;height:55%}
+.chef-player-portrait .sprite-art{width:100%;height:100%}
