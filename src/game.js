@@ -414,7 +414,7 @@
     if(state.phase==='prologue')return 'prologue';
     if(state.phase==='ending'){
       if(['summary','fin','credits','epilogue','easter'].includes(state.endingStage))return 'summary';
-      return ({four:'bubble',two:'chef',five:'trueOne',six:'trueTwo'})[state.ending]||null;
+      return ({one:'pig',two:'chef',three:'ugly',four:'bubble',five:'trueOne',six:'trueTwo'})[state.ending]||null;
     }
     if(['explore','brew','mixing','ready'].includes(state.phase))return state.scene==='dragon'?'dragon':state.scene==='ice'?'ice':'collection';
     return null;

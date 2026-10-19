@@ -8,7 +8,7 @@
     const splashAudio=options.splashAudio||(typeof Audio==='function'?new Audio('assets/ingredient-splash.wav'):null);
     let brewing=false;
     if(boilAudio)boilAudio.loop=true;
-    const tracks={cover:'assets/cover-bgm-fairytale.mp3',prologue:'assets/prologue-bgm-c13.mp3',collection:'assets/collection-bgm.m4a',dragon:'assets/dragon-bgm-c23.mp3',ice:'assets/ice-tower-bgm-f1.mp3',bubble:'assets/ending-bubble-bgm.m4a',chef:'assets/ending-chef-bgm-n5.mp3',summary:'assets/ending-summary-bgm.m4a',trueOne:'assets/dragon-bgm-siren.m4a',trueTwo:'assets/cover-bgm-universe.m4a'};
+    const tracks={cover:'assets/cover-bgm-fairytale.mp3',prologue:'assets/prologue-bgm-c13.mp3',collection:'assets/collection-bgm.m4a',dragon:'assets/dragon-bgm-c23.mp3',ice:'assets/ice-tower-bgm-f1.mp3',bubble:'assets/ending-bubble-bgm.m4a',chef:'assets/ending-chef-bgm-n5.mp3',summary:'assets/ending-summary-bgm.m4a',trueOne:'assets/ending-true-one-bgm-0618.m4a',ugly:'assets/ending-ugly-bgm-hidamari.mp3',pig:'assets/ending-pig-bgm-picnic.mp3',trueTwo:'assets/cover-bgm-universe.m4a'};
     let preferences={muted:false,volume:.45,effectsVolume:.7},track=null,pending=null,revision=0;
     try{const saved=JSON.parse(storage?.getItem('little-magic-audio-v1'));if(saved){preferences.muted=!!saved.muted;for(const key of ['volume','effectsVolume'])if(Number.isFinite(saved[key]))preferences[key]=Math.min(1,Math.max(0,saved[key]));}}catch{}
     const loadedTracks=new Map();
