@@ -1,0 +1,14 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const c={};vm.createContext(c);vm.runInContext(fs.readFileSync('src/book-physics.js','utf8'),c);
+const {sheet,step}=c.GameBookPhysics,b=sheet();
+for(let frame=0;frame<70;frame++)step(b,Math.min(frame/126,1),1/120);
+assert.ok(b.angles.some(a=>a>.2&&a<Math.PI-.2));
+assert.ok(Math.max(...b.angles)-Math.min(...b.angles)>.1,'paper bends instead of rotating as a rigid plane');
+assert.ok(b.velocity.some(v=>v>0));
+for(let frame=70;frame<264;frame++)step(b,Math.min(frame/126,1),1/120);
+assert.ok(b.angles.every(a=>Math.abs(a-Math.PI)<.003),'paper settles flat');
+assert.ok(b.velocity.every(v=>Math.abs(v)<.025),'spring energy decays');
+for(const a of b.angles)assert.ok(Number.isFinite(a));
+assert.match(fs.readFileSync('index.html','utf8'),/book-physics\.js/);
+assert.match(fs.readFileSync('src/style.css','utf8'),/\.physics-turn>\.book-left,\.physics-turn>\.book-right\{visibility:hidden\}/);
+console.log('PASS: flexible hinge chain, damped settling, finite constrained angles, physics script and flat-image concealment.');

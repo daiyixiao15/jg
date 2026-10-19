@@ -320,7 +320,7 @@
     if(n.preview)return '<div class="reading-layer cg-preview"><button type="button" class="reading-surface" data-action="advance" aria-label="点击开始对白"></button></div>';
     const line=n.lines[n.index],speaker=line.speaker==='player'?state.playerName:({dragon:'恶龙',cat:'毛绒绒怪',chicken:'傻不拉鸡',princess:'小公主',unknown:'未知的声音',tv:'电视机先生',mother:'妈妈',fur:'毛绒绒'})[line.speaker]||'';
     if(line.centered||n.index===companionFarewellIndex(n))return `<div class="reading-layer centered-reading"><button type="button" class="reading-surface" data-action="advance" aria-label="点击画面推进文字"></button><div class="centered-message"><p id="dialog-text">${esc(line.text.replaceAll('{name}',state.playerName).slice(0,n.shown))}</p></div><small>点击画面继续</small></div>`;
-    const cgOnly=state.phase==='ending'&&(state.ending==='four'||state.endingStage==='easter');
+    const cgOnly=state.phase==='prologue'||state.phase==='ending'&&(state.ending==='four'||state.endingStage==='easter');
     const catThinking=n.after==='cat-choice'&&(line.expression==='thinking'||line.text==='魔法材料？'||line.text.includes('这只黑色毛球的眼睛藏在'));
     const portraitSpeaker=catThinking?'cat':line.speaker;
     const npcFile=cgOnly||line.setting==='black'?null:catThinking?'fluffy-thinking.png':line.speaker==='dragon'?(line.expression==='smile'?'dragon-smile.png':'dragon.png'):line.speaker==='cat'?(state.quests.cat==='rewarded'?'fluffy-delivered.png':state.quests.cat==='accepted'?'fluffy-reward.png':'fluffy-wait.png'):line.speaker==='chicken'?(state.phase==='ending'||state.quests.hatTaken?'chicken-dialogue.png':'chicken-hat-dialogue.png'):line.speaker==='princess'?'princess-dialogue.png':line.speaker==='fur'?'fur-dialogue.png':line.speaker==='tv'?'tv-dialogue.png':null;
@@ -364,22 +364,20 @@
     return ['chef-park-empty-q85.webp','chef-park-tv-q85.webp','chef-park-cat-q85.webp','chef-park-princess-q85.webp','chef-park-dragon-q85.webp','chef-park-all-q85.webp'][stage];
   }
 
-  const storybookPages=['storybook-page-1-q85.webp','storybook-page-2-q85.webp','storybook-page-3-q85.webp','storybook-page-4-q85.webp'];
-  let lastBookPage=-1,bookTransitionPending=false,bookTransitionTimer=null;
+  // The document's three illustrations span dialogue groups, rather than single lines.
+  const storybookPages=['storybook-page-1-q85.webp','storybook-page-2-q85.webp','storybook-page-3-q85.webp','storybook-dragon-resting-lossless.webp','storybook-dragon.jpg','storybook-dragon.jpg','storybook-magic-lossless.webp','storybook-journey-lossless.webp','storybook-journey-lossless.webp'];
+  let lastBookPage=-1,bookTransitionPending=false,bookTransitionTimer=null,stopBookTurn=null;
   function storybookView(){
     const index=state.narrative.index,file=storybookPages[index];
-    const changed=index!==lastBookPage,previous=storybookPages[lastBookPage];
+    const previous=storybookPages[lastBookPage],changed=file!==previous;
     lastBookPage=index;
     if(changed){
       clearTimeout(bookTransitionTimer);bookTransitionPending=false;
-      if(file&&typeof requestAnimationFrame==='function'){
-        bookTransitionPending=true;
-        bookTransitionTimer=setTimeout(()=>{bookTransitionPending=false;},1400);
-      }
+      if(file&&previous&&typeof GameBookPhysics!=='undefined')bookTransitionPending=true;
     }
     if(!file)return `<div class="storybook" aria-label="翻开的故事书"><div class="book-left"><span>一锅小小的魔法</span><i>✦</i></div><div class="book-right"><span>第 ${index+1} 页</span><i>✧</i></div></div>`;
     const ink=image=>`<div class="book-ink" style="background-image:url(assets/${image})"></div>`;
-    return `<div class="storybook illustrated-book${changed?' book-art-enter':''}" aria-label="绘本第 ${index+1} 页" data-page="${index+1}"><div class="book-left">${ink(file)}</div><div class="book-right">${ink(file)}</div>${changed&&previous?`<div class="book-previous" aria-hidden="true"><div class="book-left">${ink(previous)}</div><div class="book-right">${ink(previous)}</div></div>`:''}<div class="book-spine" aria-hidden="true"></div></div>`;
+    return `<div class="storybook illustrated-book${changed&&previous?' physics-turn':''}" aria-label="绘本第 ${index+1} 页" data-page="${index+1}"><div class="book-left">${ink(file)}</div><div class="book-right">${ink(file)}</div>${changed&&previous?`<canvas class="book-physics-canvas" data-from="${previous}" data-to="${file}" aria-hidden="true"></canvas><div class="book-loading-cover" style="background-image:url(assets/${previous})" aria-hidden="true"></div>`:''}<div class="book-spine" aria-hidden="true"></div></div>`;
   }
   const coverAudio=typeof GameCoverAudio!=='undefined'?GameCoverAudio.create():null;
   const backgroundLoader=typeof GameBackgroundLoader!=='undefined'?GameBackgroundLoader.create():null;
@@ -394,8 +392,8 @@
     return null;
   }
   function likelyBackgrounds(){
-    if(['intro','exit'].includes(state.phase))return storybookPages.slice(0,2);
-    if(state.phase==='prologue')return [...storybookPages.slice(state.narrative.index+1,state.narrative.index+3),backgrounds.lab];
+    if(['intro','exit'].includes(state.phase))return [...new Set(storybookPages)];
+    if(state.phase==='prologue')return [...new Set(storybookPages.slice(state.narrative.index+1)),backgrounds.lab];
     if(state.phase==='ending'){
       if(state.ending==='two'){
         const files=['chef-park-empty-q85.webp','chef-park-tv-q85.webp','chef-park-cat-q85.webp','chef-park-princess-q85.webp','chef-park-dragon-q85.webp','chef-park-all-q85.webp'];
@@ -438,6 +436,14 @@
       else view=(tvConversation?'':scene())+(state.phase==='ready'&&state.scene==='dragon'?button('拿出魔法药','potion-prompt','class="potion-button"'):'');
       app.innerHTML=`<div class="stage ${bg?'illustrated':''} ${state.narrative?.preview?'cg-preview-stage':''} ${state.narrative?.allowNavigation?'npc-navigation':''}" ${bg?`style="background-image:url(assets/${bg})"`:''}><div class="world" ${state.narrative&&!state.narrative.allowNavigation||modal?'inert':''}>${!prologue?`<header>${!ending&&!(state.scene==='lab'&&state.phase==='explore')?button('← 返回','back'):''}<div>${button('设置','settings')}${button('背包','bag',`aria-expanded="${bag}"`)}</div></header>`:''}${view}${bag&&!prologue?inventory():''}</div>${endingFormArt()}${notice?`<div class="notice" role="status">${esc(notice)}</div>`:''}${narrativeView()}${state.narrative&&!state.narrative.preview?button('快进至未读','skip-read','class="skip-read" aria-label="跳过已读对白，停在未读内容"'):''}${popup()}${achievementView()}${state.effects?'<div class="magic-smoke" aria-hidden="true"></div>':''}</div>`;
     }
+    stopBookTurn?.();stopBookTurn=null;
+    const bookCanvas=app.querySelector('.book-physics-canvas');
+    if(bookCanvas&&typeof GameBookPhysics!=='undefined'){
+      const book=app.querySelector('.storybook');
+      stopBookTurn=GameBookPhysics.mount(bookCanvas,bookCanvas.dataset.from,bookCanvas.dataset.to,()=>{
+        bookTransitionPending=false;book?.classList.remove('physics-turn');bookCanvas.remove();book?.querySelector('.book-loading-cover')?.remove();
+      });
+    }else if(bookCanvas){bookTransitionPending=false;app.querySelector('.storybook')?.classList.remove('physics-turn');bookCanvas.remove();}
     coverAudio?.update(backgroundMusic());
     coverAudio?.setBrewing?.(state.phase==='mixing'&&state.scene==='lab');
     backgroundLoader?.update(visibleBackground,likelyBackgrounds());
