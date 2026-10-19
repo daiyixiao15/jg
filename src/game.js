@@ -415,6 +415,7 @@
     if(state.phase==='intro')return 'cover';
     if(state.phase==='prologue')return 'prologue';
     if(state.phase==='ending'){
+      if(state.ending==='six')return state.endingStage==='easter'||state.easterSeen?'easter':'trueTwo';
       if(['summary','fin','credits','epilogue','easter'].includes(state.endingStage))return 'summary';
       return ({one:'pig',two:'chef',three:'ugly',four:'bubble',five:'trueOne',six:'trueTwo'})[state.ending]||null;
     }
