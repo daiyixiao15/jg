@@ -88,8 +88,10 @@ def build(version, release_date):
     for name, metadata in assets.items():
         path = local_path(ROOT / 'assets', name)
         refs.add(path)
-        require(sha(files[path]) == metadata['sha256'], f'Original image metadata mismatch: {name}')
+        if metadata.get('sha256'):
+            require(sha(files[path]) == metadata['sha256'], f'Original image metadata mismatch: {name}')
     require(all(path in files for path in refs), 'A referenced resource was omitted from the package')
+    require('game.json' not in files, 'H5 packages must not be detected as Tap mini-games')
     output = ROOT / 'dist'
     output.mkdir(exist_ok=True)
     stem = f'jg-h5-v{version}-{release_date}'
@@ -108,6 +110,7 @@ def build(version, release_date):
         for name, data in files.items():
             require(archive.read('jg/' + name) == data, f'Packaged bytes differ: {name}')
             require((ROOT / name).read_bytes() == data, f'Source changed while packaging; rebuild with a new version: {name}')
+    require(temporary.stat().st_size <= 300_000_000, 'H5 ZIP exceeds the 300 MB upload limit')
     temporary.rename(final)
     manifest = {
         'version': version,

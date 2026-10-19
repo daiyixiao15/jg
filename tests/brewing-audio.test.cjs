@@ -12,9 +12,9 @@ context.document.hidden=false;events.visibilitychange();assert.equal(boil.paused
 audio.setBrewing(false);assert.equal(boil.paused,true);assert.equal(boil.currentTime,0);
 audio.splash();assert.equal(splash.plays,1);assert.equal(splash.volume,.4);
 let drops=0,mixing=false;const g=game(seed(),{update(){},splash(){drops++;},setBrewing(value){mixing=value;}});
-g.act('continue');g.act('restore','auto');g.act('brew');assert.match(g.html,/brewing-cauldron.png/);
+g.act('continue');g.act('restore','auto');g.act('brew');assert.match(g.html,/class="pot-decoration"/);assert.doesNotMatch(g.html,/brewing-cauldron.png/);
 g.drag('apple',200,150);assert.equal(drops,0);g.drag('apple',100,50,true);assert.equal(drops,0);
 for(const id of g.library.autosave.collected)g.drag(id);assert.equal(drops,8);
 g.drag('apple');assert.equal(drops,8);g.act('mix');assert.equal(mixing,true);g.timer();assert.equal(mixing,false);
-for(const file of ['brewing-boil.mp3','ingredient-splash.wav','brewing-cauldron.png'])assert.ok(fs.statSync('assets/'+file).size>0);
-console.log('PASS: boiling lifecycle/volume/visibility, successful-drop-only splash, duplicate/cancelled/missed drops, and cauldron asset.');
+for(const file of ['brewing-boil.mp3','ingredient-splash.wav'])assert.ok(fs.statSync('assets/'+file).size>0);
+console.log('PASS: boiling lifecycle/volume/visibility, successful-drop-only splash, duplicate/cancelled/missed drops, and geometric cauldron markup.');

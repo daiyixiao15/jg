@@ -136,14 +136,13 @@ header{position:absolute;inset:2% 2% auto;display:flex;justify-content:space-bet
 .in-game-settings{margin-bottom:1em}.in-game-settings button{width:100%}
 .brew-panel{gap:2%}
 .brew-panel h2{margin:.5em 0}
-.brew-panel #pot{width:80%;height:auto;min-height:0;aspect-ratio:3/2;flex:0 1 auto;margin-top:0;border:0;border-radius:0;background:transparent;box-shadow:none}
-.cauldron-art{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none}
-.brew-panel #pot-mouth{top:23%;left:17%;width:66%;height:20%;background:transparent;border:0;border-radius:50%;z-index:1;text-shadow:0 1px 4px #163561}
-.mixing #pot{animation:none;box-shadow:none}
-.mixing .cauldron-art{animation:cauldron-glow 1s ease-in-out infinite alternate}
-.mixing #pot::after{display:none}
-@keyframes cauldron-glow{from{filter:drop-shadow(0 0 4px #79e8ff55)}to{filter:drop-shadow(0 0 18px #79e8ffbb)}}
-@media(prefers-reduced-motion:reduce){.mixing .cauldron-art{animation:none}}
+/* The cauldron is assembled from a rounded body, an oval rim and a star. */
+.brew-panel #pot{width:70%;height:auto;min-height:0;aspect-ratio:3.6/1;flex:none;margin:7% 0 2%;border:3px solid #b899d5;border-radius:0 0 5.5cqw 5.5cqw;background:#63419be6;box-shadow:none;isolation:isolate}
+.brew-panel #pot-mouth{top:-23%;left:-3%;width:106%;height:46%;background:#442c69;border:3px solid #b899d5;border-radius:50%;z-index:1;text-shadow:none;pointer-events:none}
+.pot-decoration{position:absolute;left:50%;top:53%;transform:translate(-50%,-50%);font-size:2em;line-height:1;color:#f5d677;pointer-events:none}
+.mixing #pot{animation:stir 1s ease-in-out infinite alternate;box-shadow:0 0 28px #b899d555}
+.mixing #pot::after{position:absolute;left:25%;top:-30%;width:50%;z-index:2;pointer-events:none;color:#f5d677}
+@media(prefers-reduced-motion:reduce){.mixing #pot,.mixing #pot::after{animation:none}}
 .book-turn-leaf{position:absolute;left:50%;top:0;width:50%;height:100%;transform-origin:left center;transform-style:preserve-3d;background:#f3e8ce;z-index:4;pointer-events:none;animation:illustrated-leaf-turn .7s ease-in-out both;box-shadow:-8px 0 20px #47351a44}
 .book-turn-leaf>.book-ink{background-position:right center;mask-image:none}
 .book-turn-leaf::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#6c512d44,transparent 30%,#fff4);backface-visibility:hidden}
