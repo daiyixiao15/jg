@@ -1,0 +1,9 @@
+const {game,seed}=require('./game.test.cjs'),assert=require('node:assert/strict');
+function load(storage=seed({scene:'forest',visited:['forest'],collected:[]})){const g=game(storage);g.act('continue');g.act('restore','auto');return g;}
+const first=load();first.act('inspect','snack_small');assert.equal(first.library.autosave.narrative.lines[0].text,'草丛里躺着一个尖尖的小东西。');first.finishText();assert.equal(first.library.autosave.quests.snacks.length,0);assert.doesNotMatch(first.html,/data-action="snack-pickup"/);
+first.act('inspect','snack_large');assert.equal(first.library.autosave.narrative.lines[0].text,'石头旁边也有一个一模一样的东西。');first.finishText();
+const resumed=load(first.storage);resumed.act('cat-talk');resumed.finishText();resumed.act('cat-accept');resumed.finishText();
+for(const id of ['snack_small','snack_large']){resumed.act('inspect',id);assert.ok(resumed.library.autosave.narrative.lines.some(l=>l.text==='原来一路掉东西的是你啊！！'));resumed.finishText();assert.match(resumed.html,/捡起来/);resumed.act('snack-pickup',id);assert.match(resumed.html,/获得：妙脆角 ×1/);resumed.act('close');}
+assert.equal(resumed.library.autosave.quests.snacks.length,2);resumed.act('cat-talk');resumed.finishText();resumed.act('cat-far');resumed.finishText();resumed.act('close');resumed.act('bag');assert.match(resumed.html,/assets\/cat-food.png/);
+const fresh=load();fresh.act('cat-talk');fresh.finishText();fresh.act('cat-refuse');fresh.finishText();fresh.act('inspect','snack_small');assert.ok(fresh.library.autosave.narrative.lines.some(l=>l.text.includes('大王说的妙脆角')));assert.ok(!fresh.library.autosave.narrative.lines.some(l=>l.text.includes('一路掉东西')));fresh.finishText();fresh.act('snack-pickup','snack_small');fresh.act('close');fresh.act('bag');assert.match(fresh.html,/妙脆角角一/);
+console.log('PASS: before-meeting previews prevent pickup, per-item recognition survives reload, named pickups and reward artwork, first-seen-after-meeting branch.');

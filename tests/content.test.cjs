@@ -4,7 +4,7 @@ const AK='little-magic-achievements-v1';
 const acquired=g=>JSON.parse(g.storage[AK]||'{"unlocked":[]}').unlocked;
 const load=(extra={},storage)=>{const g=game(storage||seed({scene:'forest',collected:[],visited:['forest'],...extra}));g.act('continue');g.act('restore','auto');return g;};
 const cat=load();cat.act('cat-talk');cat.finishText();assert.match(cat.html,/是否帮助/);cat.act('cat-refuse');cat.finishText();assert.ok(acquired(cat).includes('refuse_cat'));assert.equal(cat.library.autosave.quests.cat,'refused');cat.act('cat-talk');cat.finishText();cat.act('cat-accept');cat.finishText();
-for(const id of ['snack_small','snack_large']){cat.act('inspect',id);assert.match(cat.html,/待补充/);cat.act('collect',id);}
+for(const id of ['snack_small','snack_large']){cat.act('inspect',id);cat.finishText();assert.match(cat.html,/捡起来/);cat.act('snack-pickup',id);cat.act('close');}
 assert.deepEqual(cat.library.autosave.collected,[]);assert.deepEqual(cat.library.autosave.quests.snacks,['snack_small','snack_large']);const old=cat.library.autosave;assert.equal(cat.context.GameRules.putInPot({...old,phase:'brew',collected:['snack_small','snack_large','apple','grape','cabbage','frost','plants','cat_fur']},'snack_small'),false);
 cat.act('cat-talk');cat.finishText();cat.act('cat-far');cat.finishText();assert.deepEqual(cat.library.autosave.collected,['cat_food']);assert.equal(cat.library.autosave.quests.cat,'rewarded');assert.ok(acquired(cat).includes('snacks'));cat.act('close');cat.act('cat-talk');cat.finishText();assert.equal(cat.library.autosave.collected.length,1);
 const restored=load({},cat.storage);assert.equal(restored.library.autosave.quests.cat,'rewarded');assert.deepEqual(restored.library.autosave.collected,['cat_food']);

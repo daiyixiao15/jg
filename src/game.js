@@ -9,7 +9,7 @@
   function rememberLine(line){readLines.add(readKey(line));try{localStorage.setItem(READ_KEY,JSON.stringify([...readLines].slice(-5000)));}catch{}}
   function skipRead(){
     const n=state.narrative;if(!n||n.preview)return;
-    if(!readLines.has(readKey(n.lines[n.index]))){notice='已经到达未读内容。';render();return;}
+    if(!readLines.has(readKey(n.lines[n.index]))){notice='';render();return;}
     while(!state.cinematic&&state.narrative===n&&readLines.has(readKey(n.lines[n.index]))){
       n.shown=n.lines[n.index].text.replaceAll('{name}',state.playerName).length;
       const index=n.index;advance();
@@ -19,7 +19,7 @@
   let saveDestination=null,saveSource=null;
   const names={lab:'制药所',hub:'中央公园',bath:'泡泡王国',sky:'天空之城',ice:'冰雪塔楼',forest:'梦幻森林',palace:'宫殿长廊',dragon:'恶龙盘踞之地'};
   const backgrounds={hub:'central-park-q85.webp',lab:'lab-q85.webp',bath:'bath-q85.webp',sky:'sky-q85.webp',ice:'ice-q85.webp',forest:'forest-q85.webp',palace:'palace-q85.webp',dragon:'dragon-resting-q85.webp'};
-  const itemImages={body_wash:'bath-yellow.png',shampoo:'bath-pink.png',detergent:'bath-powder.png',toothpaste:'bath-berry.png',bleach:'bath-poison.png',soy_sauce:'material-soy-sauce.png',vinegar:'material-vinegar.png',salt:'material-salt.png',sugar:'material-sugar.png',cooking_wine:'material-cooking-wine.png',ice_cream:'sweet-snow.png',dumpling:'dumplings.png',frost:'frost.png',apple:'ice-fruit.png',grape:'grape.png',cabbage:'ice-grass.png',plants:'flowers.png',fallen_leaves:'chicken-leaf.png',cat_fur:'fur.png',skincare:'skincare.png',perfume:'perfume.png',lipstick:'sunset.png',snack_small:'snack-small.png',snack_large:'snack-large.png'};
+  const itemImages={body_wash:'bath-yellow.png',shampoo:'bath-pink.png',detergent:'bath-powder.png',toothpaste:'bath-berry.png',bleach:'bath-poison.png',soy_sauce:'material-soy-sauce.png',vinegar:'material-vinegar.png',salt:'material-salt.png',sugar:'material-sugar.png',cooking_wine:'material-cooking-wine.png',ice_cream:'sweet-snow.png',dumpling:'dumplings.png',frost:'frost.png',apple:'ice-fruit.png',grape:'grape.png',cabbage:'ice-grass.png',plants:'flowers.png',fallen_leaves:'chicken-leaf.png',cat_fur:'fur.png',skincare:'skincare.png',perfume:'perfume.png',lipstick:'sunset.png',cat_food:'cat-food.png',snack_small:'snack-small.png',snack_large:'snack-large.png'};
   const spots={shampoo:[10,29,14,22],body_wash:[22,32,10,23],detergent:[68,37,14,23],toothpaste:[86,37,10,28],bleach:[79,1,15,19],soy_sauce:[88,46,10,25],vinegar:[30,4,10,21],salt:[64,33,9,15],sugar:[13,53,10,17],cooking_wine:[17,14,10,12],ice_cream:[54,53,39,22],dumpling:[60,73,38,15],frost:[0,30,12,22]};
   Object.assign(spots,{apple:[28,76,24,24],grape:[58,0,25,30],cabbage:[67,41,32,50],plants:[68,0,20,30],cat_fur:[54,79,11,18],fallen_leaves:[0,49,25,50],skincare:[13,45,23,27],perfume:[34,29,17,28],lipstick:[55,37,33,45]});
   let state=Q.normalize(R.createState()),bag=false,modal=null,notice='',typingTimer=null,mixingTimer=null,drag=null,suppressClickUntil=0,autosavePaused=false;
@@ -137,6 +137,7 @@
   }
   function catTalk(){
     const q=state.quests;
+    q.catMet=true;
     if(q.cat==='new'){say(X.catFirst,'cat-choice');return;}
     if(q.cat==='refused'){say(X.catRetry,'cat-retry');return;}
     if(Q.deliver(state)){unlock('snacks');say(X.catRewardIntro,'cat-farewell');return;}
@@ -218,9 +219,18 @@
   }
   function startEaster(){
     if(state.phase!=='ending'||state.ending!=='six'||state.endingStage!=='credits')return;
-    clearTimeout(cinematicTimer);state.endingStage='easter';state.endingReality=false;say(X.easter,'easter-finished',{preview:true,title:'彩蛋'});
+    clearTimeout(cinematicTimer);state.endingStage='easter';state.endingReality=false;say(X.easter,'easter-finished',{preview:true,title:'故事已经翻到了最后一页。\n不过，还有几个家伙，迟迟不肯散场。'});
   }
   function inspectMaterial(id){
+    if(state.scene==='forest'&&Q.questItems.some(m=>m.id===id)&&!ownsItem(id)){
+      const q=state.quests;
+      if(q.cat==='rewarded')return;
+      if(!q.catMet){
+        if(!q.snacksSeenBefore.includes(id))q.snacksSeenBefore.push(id);
+        say(id==='snack_small'?[S.narration('草丛里躺着一个尖尖的小东西。'),S.narration('小精灵伸出手，又停住了。'),S.player('看起来像是谁弄丢的……还是先别乱拿啦。')]:[S.narration('石头旁边也有一个一模一样的东西。'),S.player('怎么又有一个？'),S.player('到底是谁一路掉东西呀……')]);return;
+      }
+      say([S.player('等等……这个不会就是大王说的妙脆角吧？'),...(q.snacksSeenBefore.includes(id)?[S.player('原来一路掉东西的是你啊！！')]:[])],'snack-pickup:'+id);return;
+    }
     if(id==='bleach'){if(state.collected.includes(id)){modal={type:'material',id};render();return;}if(state.quests.ladder){say(X.bleachReach,'bleach-window');return;}say([S.player('呜呜呜太高了够不着，有什么办法可以拿到它呢。可惜我的翅膀是装饰，不然就可以飞起来了！')]);return;}
     if(state.scene==='palace'&&gifts.includes(id)&&!state.collected.includes(id)){
       if(!state.quests.princessMet||!state.quests.princessOffered||state.quests.princessLocked||state.quests.princessReturned.includes(id)){princessTalk();return;}
@@ -229,6 +239,9 @@
     if(state.scene==='forest'&&id==='cat_fur'){state.quests.groundFurSeen=true;if(!state.collected.includes(id)){say(X.groundFur,'ground-fur-window');return;}}
     if(id==='cat_food'&&!state.collected.includes(id)&&!state.quests.catRewardGround){catTalk();return;}
     modal={type:'material',id};render();
+  }
+  function poisonReturns(){
+    say([S.narration('你刚松开手，瓶身两侧的黑色翅膀便“扑棱”一声张开了。'),S.narration('女巫毒药绕着你晃了一圈，一溜烟飞回泡泡王国，稳稳落回了原先的高处。')]);
   }
   function collectItem(id){
     const result=Q.questItems.some(m=>m.id===id)?Q.collectSnack(state,id):R.collect(state,id);
@@ -247,11 +260,11 @@
 
       view+=[[85.8,59,6.5,8.7],[94.1,68,5.9,8],[73.6,80.4,6.5,8.7]].map((rect,i)=>`<button type="button" class="body-fur-icon" data-action="body-fur" data-id="${i+1}" aria-label="身上的小毛绒绒 ${i+1}" style="left:${rect[0]}%;top:${rect[1]}%;width:${rect[2]}%;height:${rect[3]}%">${sprite('fur-icon.png','身上的小毛绒绒')}</button>`).join('');
       if(q.cat!=='rewarded')for(const [id,rect] of [['snack_small',[29,36,20,19]],['snack_large',[44,14,22,21]]])if(!state.quests.snacks.includes(id))view+=hot(material(id).name,'inspect',id,rect);
-      if(q.catRewardGround)view+=spriteObject('fluffy-reward.png','毛绒绒怪的美食',[67,76,9,14],'inspect','cat_food');
+      if(q.catRewardGround)view+=spriteObject('cat-food.png','毛绒绒怪的美食',[67,76,9,14],'inspect','cat_food');
       return view;
     }
     if(state.scene==='ice'&&state.section==='upper')return hot('冰果','inspect','apple',spots.apple)+hot('串串冰','inspect','grape',spots.grape)+hot('冰草草','inspect','cabbage',spots.cabbage)+hot('树上的冰果','tree-fruit','',[0,0,22,33])+hot('冰冰糖','lollipop','',[20,38,28,35]);
-    const rows=D.materials.filter(m=>m.scene===state.scene&&(!m.section||m.section===state.section));
+    const rows=D.materials.filter(m=>m.scene===state.scene&&(!m.section||m.section===state.section)&&!(m.id==='bleach'&&state.collected.includes('bleach')));
     let view=rows.map(m=>hot(m.name+(state.collected.includes(m.id)?' · 已收集':''),'inspect',m.id,spots[m.id])).join('');
     if(state.scene==='bath')view+=hot('泡泡','bath-bubbles','',[42,32,13,25]);
     if(state.scene==='sky')view+=arrow('前往冰雪塔楼下层','ice','lower');
@@ -267,6 +280,7 @@
     const row=(label,id,exists,action)=>`<div class="save-row">${button(label,action,`data-id="${id}" class="save-slot" ${!saveMode&&!exists?'disabled':''}`)}${exists?button('重命名','rename-save',`data-id="${id}" class="rename-save"`)+button('删除','delete-save',`data-id="${id}" class="delete-save" aria-label="删除${id==='auto'?'自动存档':'存档 '+(Number(id)+1)}"`):''}</div>`;
     return `<h2>${saveMode?'选择存档位置':'选择要继续的存档'}</h2>${!saveMode&&library.autosave?row((library.autosaveName||'自动存档')+' · '+library.autosave.playerName,'auto',true,'restore'):''}${library.slots.map((slot,i)=>row((slot?.name||'存档 '+(i+1))+(slot?' · '+slot.state.playerName+' · '+slot.date:' · 空'),i,!!slot,saveMode?'save-slot':'restore')).join('')}`;
   }
+  const choiceModalTypes=new Set(['name','reuse-name','rename-save','reset-game-confirm','new-confirm','delete-confirm','discard-confirm','saved-menu','park-jam-choice','tv-entry','tv-menu','tv-routes','tv-applause','cat-farewell','chicken-laugh','chicken-method','chicken-return','grip-ready','cat-choice','cat-retry','cat-reward','reward-discard','princess-choice','princess-reclaim','gifts','gate-ready','companion-ready','next-round','snack-pickup','travel','drink']);
   function popup(){
     if(!modal)return '';
     let body='';
@@ -293,7 +307,8 @@
     else if(modal.type==='grip-ready')body=`<h2>抓稳了吗？</h2>${button('抓稳啦！','grip-ready')}`;
     else if(modal.type==='cat-choice')body=`<h2>是否帮助这只傲娇的毛绒绒怪？</h2><div class="choices">${button('是','cat-accept')}${button('否','cat-refuse')}</div>`;
     else if(modal.type==='cat-retry')body=`<h2>绒绒大王又给了你一次机会</h2>${button('谢谢大王！','cat-accept')}`;
-    else if(modal.type==='cat-reward')body=`<h2>获得奖励：毛绒绒怪的美食！</h2><p>${state.collected.length>=8?'你的背包已经放不下啦！':'绒绒大王把美食递给你。'}</p><div class="choices">${button(state.collected.length>=8?'从背包里丢一个东西':'收下美食',state.collected.length>=8?'reward-discard':'reward-take')}${button('丢掉毛绒绒怪的美食','reward-leave')}</div>`;
+    else if(modal.type==='cat-received')body=`<div class="item-art">${art(material('cat_food'))}</div><h2>获得奖励：毛绒绒怪的美食！</h2>`;
+    else if(modal.type==='cat-reward')body=`<div class="item-art">${art(material('cat_food'))}</div><h2>获得奖励：毛绒绒怪的美食！</h2><p>${state.collected.length>=8?'你的背包已经放不下啦！':'绒绒大王把美食递给你。'}</p><div class="choices">${button(state.collected.length>=8?'从背包里丢一个东西':'收下美食',state.collected.length>=8?'reward-discard':'reward-take')}${button('丢掉毛绒绒怪的美食','reward-leave')}</div>`;
     else if(modal.type==='reward-discard')body=`<h2>从背包里丢一个东西</h2><div class="gift-list">${state.collected.map(id=>button(material(id).name,'reward-discard-item',`data-id="${id}"`)).join('')}</div>`;
     else if(modal.type==='hat')body=`<h2>你确定要抢走傻不拉鸡的帽子吗？</h2><div class="choices">${button('确定','hat-take')}${button('算了','hat-leave')}</div>`;
     else if(modal.type==='princess-choice')body=`<h2>你是公主吗？</h2><div class="setting-buttons">${['我不是公主','我是精灵公主！','我只是一般路过的小精灵'].map((label,i)=>button(label,'princess-answer',`data-id="${i}"`)).join('')}</div>`;
@@ -303,13 +318,14 @@
     else if(modal.type==='companion-ready')body=`<h2>和你的大龙一起前往光明世界吧！</h2>${button('我这次是真的准备好啦！','companion-ready')}`;
     else if(modal.type==='next-round'&&state.ending==='six')body=`<h2>故事暂时告一段落。</h2><p>你已经抵达最终结局，可以保存这段冒险，也可以再去看看熟悉的朋友们。</p><div class="choices">${button('保存并返回标题','ending-save-menu')}${button('继续下一周目','next-round')}${button('返回标题','menu')}</div>`;
     else if(modal.type==='next-round')body=`<h2>这次冒险结束了，故事还没有。</h2><p>还有一些话，你和大龙没有说完。保存这次冒险，下次点击标题页的‘继续’，就能带着当前的故事进度开启下一周目。自动存档会随游玩更新，建议另存一份手动存档。</p><div class="choices">${button('保存并返回标题','ending-save-menu')}${button('继续下一周目','next-round')}${button('暂不手动保存，返回标题','menu')}</div>`;
+    else if(modal.type==='snack-pickup')body=`<div class="item-art">${art(material(modal.id))}</div><h2>${esc(material(modal.id).name)}</h2><div class="choices">${button('捡起来','snack-pickup',`data-id="${modal.id}"`)}${button('暂时不拿','close')}</div>`;
     else if(modal.type==='material'){
-      const m=material(modal.id),owned=ownsItem(m.id);
-      body=`<div class="item-art">${art(m)}</div><h2>${esc(m.name)}</h2><p>${esc(m.description)}</p><div class="choices">${button(owned?'已收集':'收集','collect',`data-id="${m.id}" ${owned?'disabled':''}`)}${button('丢弃','discard',`data-id="${m.id}" ${owned?'':'disabled'}`)}</div>`;
+      const m=material(modal.id),owned=ownsItem(m.id),reading=!!state.narrative;
+      body=`<div class="item-art">${art(m)}</div><h2>${esc(m.name)}</h2><p>${esc(m.description)}</p>${reading?'<p class="storage-note">对话期间可以查看物品，结束对话后可整理背包。</p>':''}<div class="choices">${button(owned?'已收集':'收集','collect',`data-id="${m.id}" ${owned||reading?'disabled':''}`)}${button('丢弃','discard',`data-id="${m.id}" ${owned&&!reading?'':'disabled'}`)}</div>`;
     }else if(modal.type==='travel')body=`<h2>魔法药做好了</h2><p>是否前往恶龙盘踞之地？</p><div class="choices">${button('确认','potion-travel')}${button('稍后再去','close')}</div>`;
     else if(modal.type==='drink')body=`<h2>恶龙就在眼前</h2><p>你握着已经调制好的魔法药。</p><div class="choices">${button('喝下药水','drink')}${button('暂时收好','close')}</div>`;
     else body=`<h2>提示</h2><p>${esc(modal.text)}</p>`;
-    return `<div class="shade"><section class="modal" role="dialog" aria-modal="true" aria-label="${modal.type==='material'?esc(material(modal.id).name):'游戏提示'}">${button('×','close','class="close" aria-label="关闭窗口"')}${body}</section></div>`;
+    return `<div class="shade"><section class="modal" role="dialog" aria-modal="true" aria-label="${modal.type==='material'?esc(material(modal.id).name):'游戏提示'}">${choiceModalTypes.has(modal.type)?'':button('×','close','class="close" aria-label="关闭窗口"')}${body}</section></div>`;
   }
   function companionFarewellIndex(n){
     return state.ending==='six'&&n?.after==='ending-summary'?n.lines.findIndex(line=>line.moment==='farewell'||line.text==='你是不是还没和他们好好道别呢'):-1;
@@ -320,12 +336,17 @@
     if(n.preview)return '<div class="reading-layer cg-preview"><button type="button" class="reading-surface" data-action="advance" aria-label="点击开始对白"></button></div>';
     const line=n.lines[n.index],speaker=line.speaker==='player'?state.playerName:({dragon:'恶龙',cat:'毛绒绒怪',chicken:'傻不拉鸡',princess:'小公主',unknown:'未知的声音',tv:'电视机先生',mother:'妈妈',fur:'毛绒绒'})[line.speaker]||'';
     if(line.centered||n.index===companionFarewellIndex(n))return `<div class="reading-layer centered-reading"><button type="button" class="reading-surface" data-action="advance" aria-label="点击画面推进文字"></button><div class="centered-message"><p id="dialog-text">${esc(line.text.replaceAll('{name}',state.playerName).slice(0,n.shown))}</p></div><small>点击画面继续</small></div>`;
-    const cgOnly=state.phase==='prologue'||state.phase==='ending'&&(state.ending==='four'||state.endingStage==='easter');
+    const cgOnly=state.phase==='prologue'||!!chefOpeningCG()||state.phase==='ending'&&(state.ending==='four'||state.endingStage==='easter');
     const catThinking=n.after==='cat-choice'&&(line.expression==='thinking'||line.text==='魔法材料？'||line.text.includes('这只黑色毛球的眼睛藏在'));
-    const portraitSpeaker=catThinking?'cat':line.speaker;
-    const npcFile=cgOnly||line.setting==='black'?null:catThinking?'fluffy-thinking.png':line.speaker==='dragon'?(line.expression==='smile'?'dragon-smile.png':'dragon.png'):line.speaker==='cat'?(state.quests.cat==='rewarded'?'fluffy-delivered.png':state.quests.cat==='accepted'?'fluffy-reward.png':'fluffy-wait.png'):line.speaker==='chicken'?(state.phase==='ending'||state.quests.hatTaken?'chicken-dialogue.png':'chicken-hat-dialogue.png'):line.speaker==='princess'?'princess-dialogue.png':line.speaker==='fur'?'fur-dialogue.png':line.speaker==='tv'?'tv-dialogue.png':null;
+    const npcNames={dragon:'恶龙',cat:'毛绒绒怪',chicken:'傻不拉鸡',princess:'小公主',fur:'毛绒绒',tv:'电视机先生'};
+    // Keep the conversation partner visible while the player or narrator speaks.
+    const sceneLines=n.lines.filter((entry,index)=>index<=n.index&&entry.setting===line.setting);
+    const npcLine=npcNames[line.speaker]?line:[...sceneLines].reverse().find(entry=>npcNames[entry.speaker])||n.lines.slice(n.index+1).find(entry=>entry.setting===line.setting&&npcNames[entry.speaker]);
+    const portraitSpeaker=catThinking?'cat':npcLine?.speaker||(n.after==='round'?'dragon':null);
+    const endingCG=state.phase==='ending'&&(!!endingBackground()||!!chefBackground()||state.ending==='six');
+    const npcFile=cgOnly||endingCG||state.endingReality||line.setting==='black'?null:catThinking?'fluffy-thinking.png':portraitSpeaker==='dragon'?(npcLine?.expression==='smile'?'dragon-smile.png':'dragon.png'):portraitSpeaker==='cat'?(state.quests.cat==='rewarded'?'fluffy-delivered.png':state.quests.cat==='accepted'?'fluffy-reward.png':'fluffy-wait.png'):portraitSpeaker==='chicken'?(state.phase==='ending'||state.quests.hatTaken?'chicken-dialogue.png':'chicken-hat-dialogue.png'):portraitSpeaker==='princess'?'princess-dialogue.png':portraitSpeaker==='fur'?'fur-dialogue.png':portraitSpeaker==='tv'?'tv-dialogue.png':null;
     const playerFile=line.form==='beast'?'red-dragon.png':line.form==='pig'?'ending-pig.png':line.form==='ugly'?'ending-ugly.png':'player.png';
-    return `<div class="reading-layer"><button type="button" class="reading-surface" data-action="advance" aria-label="点击画面推进文字"></button>${npcFile?(line.speaker==='dragon'?`<img class="npc-portrait" src="assets/${npcFile}" alt="恶龙立绘">`:`<div class="npc-portrait other-npc" data-npc="${portraitSpeaker}">${sprite(npcFile,speaker+'立绘')}</div>`):''}${!line.hidePortrait&&!cgOnly&&speaker&&line.speaker!=='unknown'&&!state.endingReality&&n.after!=='easter-finished'&&!['chef','bubble'].includes(line.form)&&line.setting!=='black'?`<img class="player-portrait" src="assets/${playerFile}" alt="玩家立绘">`:''}<div class="dialogue ${speaker?'':'narration'}" role="button" tabindex="0" data-action="advance" aria-label="点击推进对话">${speaker?`<div class="speaker">${esc(speaker)}</div>`:''}<p id="dialog-text">${esc(line.text.replaceAll('{name}',state.playerName).slice(0,n.shown))}</p><small>${state.phase==='prologue'?'点击画面翻页':'点击画面继续'}</small></div></div>`;
+    return `<div class="reading-layer"><button type="button" class="reading-surface" data-action="advance" aria-label="点击画面推进文字"></button>${npcFile?(portraitSpeaker==='dragon'?`<div class="npc-portrait dragon-full-body" data-npc="dragon">${sprite(npcFile,"恶龙立绘")}</div>`:`<div class="npc-portrait other-npc" data-npc="${portraitSpeaker}">${sprite(npcFile,npcNames[portraitSpeaker]+'立绘')}</div>`):''}${!line.hidePortrait&&!cgOnly&&speaker&&line.speaker!=='unknown'&&!state.endingReality&&n.after!=='easter-finished'&&!['chef','bubble'].includes(line.form)&&line.setting!=='black'?`${["pig","ugly"].includes(line.form)?`<div class="player-portrait ending-dialogue-portrait">${sprite(playerFile,"玩家立绘").replace("xMidYMid meet","xMinYMax meet")}</div>`:`<img class="player-portrait" src="assets/${playerFile}" alt="玩家立绘">`}`:''}<div class="dialogue ${speaker?'':'narration'}" role="button" tabindex="0" data-action="advance" aria-label="点击推进对话">${speaker?`<div class="speaker">${esc(speaker)}</div>`:''}<p id="dialog-text">${esc(line.text.replaceAll('{name}',state.playerName).slice(0,n.shown))}</p><small>${state.phase==='prologue'?'点击画面翻页':'点击画面继续'}</small></div></div>`;
   }
 
   function endingFormArt(){
@@ -335,12 +356,14 @@
     const file=({pig:'ending-pig.png',ugly:'ending-ugly.png'})[line.form];
     if(!file)return '';
     const reveal=['one','three'].includes(state.ending)&&!n.lines.slice(0,n.index).some(previous=>previous.form===line.form);
+    if(!reveal)return '';
     return `<div class="ending-form-art${reveal?' transformation-reveal':''}" aria-label="${reveal?'变身立绘展示':'变身形态'}">${sprite(file,'变身形态')}</div>`;
   }
 
   function endingBackground(){
     if(state.phase!=='ending'||!state.narrative)return null;
     if(state.ending==='four')return 'ending-bubble-q85.webp';
+    if(chefOpeningCG())return chefOpeningCG();
     const n=state.narrative,setting=n.lines[n.index].setting;
     if(state.ending==='five'&&n.after==='five-hit'&&!state.endingReality){
       const from=n.lines.findIndex(line=>line.text.startsWith('你感到一阵头晕目眩'));
@@ -353,6 +376,11 @@
       return from>=0&&to>=from&&n.index>=from&&n.index<=to?'ending-home-lookback-q85.webp':'ending-home-q85.webp';
     }
     return ({ceiling:'ending-ceiling-q85.webp',home:'ending-home-q85.webp','home-lookback':'ending-home-lookback-q85.webp',peek:'ending-easter-q85.webp'})[setting]||null;
+  }
+  function chefOpeningCG(){
+    const n=state.narrative;if(state.phase!=='ending'||state.ending!=='two'||!n||n.title||n.preview)return null;
+    const park=n.lines.findIndex(line=>line.setting==='park');
+    return park>=0&&n.index<park?'ending-chef-spoon.jpg':null;
   }
   function chefBackground(){
     const n=state.narrative;
@@ -392,6 +420,7 @@
     return null;
   }
   function likelyBackgrounds(){
+    if(state.scene==='bath'&&state.phase!=='ending')return [backgrounds.hub,backgrounds.bath,'bath-no-poison.webp'];
     if(['intro','exit'].includes(state.phase))return [...new Set(storybookPages)];
     if(state.phase==='prologue')return [...new Set(storybookPages.slice(state.narrative.index+1)),backgrounds.lab];
     if(state.phase==='ending'){
@@ -417,7 +446,7 @@
       lastBookPage=-1;bookTransitionPending=false;clearTimeout(bookTransitionTimer);visibleBackground='cover-q85.webp';
       app.innerHTML=`<div class="stage menu cover-menu" style="background-image:url(assets/cover-q85.webp)"><div class="menu-content" ${modal?'inert':''}><h1>一锅小小的魔法</h1><p>${state.phase==='exit'?'游戏已结束':'小精灵的第一次冒险'}</p>${button('开始','start')}${button('继续','continue',library.autosave||library.slots.some(Boolean)?'':'disabled')}${button('设置','settings')}${button('成就','achievements')}</div>${popup()}${achievementView()}</div>`;
     }else{
-      const prologue=state.phase==='prologue',ending=state.phase==='ending',tvConversation=state.scene==='hub'&&!ending&&(state.narrative?.lines.some(line=>line.speaker==='tv')||modal?.type.startsWith('tv-')),boardingCG=ending&&state.ending==='six'&&state.endingStage==='companion'&&!state.endingReality,companionCG=ending&&state.ending==='six'&&state.endingReality&&state.narrative?.after==='ending-summary',farewellIndex=companionFarewellIndex(state.narrative),friendsRevealed=companionCG&&farewellIndex>=0&&(state.narrative.friendsRevealed||state.narrative.index>farewellIndex),bg=prologue||state.narrative?.title||state.narrative?.lines[state.narrative.index].setting==='black'?null:endingBackground()?endingBackground():chefBackground()?chefBackground():tvConversation?'central-park-dialogue-q85.webp':ending&&state.ending==='five'&&state.endingReality&&state.narrative?.after==='five-finish'?'ending-home-q85.webp':companionCG?(friendsRevealed?'ending-companion-friends-q85.webp':'ending-companion-q85.webp'):boardingCG?'dragon-boarding-q85.webp':ending&&state.endingStage==='easter'?'ending-easter-q85.webp':ending?(state.narrative?.lines[state.narrative.index].setting?null:['gate','companion'].includes(state.endingStage)||state.narrative&&!state.endingReality&&!['light-story','easter'].includes(state.endingStage)?'dragon-empty-q85.webp':null):state.scene==='ice'&&state.section==='upper'?'ice-upper-q85.webp':state.scene==='dragon'&&state.narrative?'dragon-empty-q85.webp':backgrounds[state.scene];
+      const prologue=state.phase==='prologue',ending=state.phase==='ending',tvConversation=state.scene==='hub'&&!ending&&(state.narrative?.lines.some(line=>line.speaker==='tv')||modal?.type.startsWith('tv-')),boardingCG=ending&&state.ending==='six'&&state.endingStage==='companion'&&!state.endingReality,companionCG=ending&&state.ending==='six'&&state.endingReality&&state.narrative?.after==='ending-summary',farewellIndex=companionFarewellIndex(state.narrative),friendsRevealed=companionCG&&farewellIndex>=0&&(state.narrative.friendsRevealed||state.narrative.index>farewellIndex),bg=prologue||state.narrative?.title||state.narrative?.lines[state.narrative.index].setting==='black'?null:endingBackground()?endingBackground():chefBackground()?chefBackground():tvConversation?'central-park-dialogue-q85.webp':ending&&state.ending==='five'&&state.endingReality&&state.narrative?.after==='five-finish'?'ending-home-q85.webp':companionCG?(friendsRevealed?'ending-companion-friends-q85.webp':'ending-companion-q85.webp'):boardingCG?'dragon-boarding-q85.webp':ending&&state.endingStage==='easter'?'ending-easter-q85.webp':ending?(state.narrative?.lines[state.narrative.index].setting?null:['gate','companion'].includes(state.endingStage)||state.narrative&&!state.endingReality&&!['light-story','easter'].includes(state.endingStage)?'dragon-empty-q85.webp':null):state.scene==='ice'&&state.section==='upper'?'ice-upper-q85.webp':state.scene==='dragon'&&state.narrative?.after==='round'?'dragon-empty-q85.webp':state.scene==='bath'&&state.collected.includes('bleach')?'bath-no-poison.webp':backgrounds[state.scene];
       visibleBackground=bg;
       let view='';
       if(prologue){view=storybookView();visibleBackground=storybookPages[state.narrative.index]||null;}
@@ -433,8 +462,8 @@
         else if(!state.narrative)view=`<button class="ending-screen" data-action="ending-next"><span>${state.endingStage==='fin'?'完':`${state.ending==='six'?'达成真结局二':`达成结局${({one:'一',two:'二',three:'三',four:'四'})[state.ending]||''}`}<br>${esc(state.ending==='five'?'光明世界的尽头是一双手':state.ending==='six'?'和我一起去光明世界吧！':D.endings[state.ending].title)}${E.captions[state.ending]?`<br><span class="ending-caption">${esc(E.captions[state.ending])}</span>`:''}`}</span><small>点击任意空白处继续</small></button>`;
       }
       else if(['brew','mixing','ready'].includes(state.phase)&&state.scene==='lab')view=`<div class="brew-panel ${state.phase==='mixing'?'mixing':''}"><h2>${state.phase==='mixing'?'魔法正在涌现……':state.phase==='ready'?'魔法药做好了':'把背包材料直接拖到锅口'}</h2><p>${state.pot.length}/8 已入锅</p><div id="pot" role="img" aria-label="制药大锅"><img class="cauldron-art" src="assets/brewing-cauldron.png" alt="" draggable="false"><div id="pot-mouth" aria-label="锅口">${state.phase==='brew'?'拖到锅口松开':'✦'}</div></div>${state.phase==='brew'?button('开始制药','mix',R.canBrew(state)?'':'disabled'):state.phase==='ready'?button('前往恶龙盘踞之地','potion-prompt'):''}</div>`;
-      else view=(tvConversation?'':scene())+(state.phase==='ready'&&state.scene==='dragon'?button('拿出魔法药','potion-prompt','class="potion-button"'):'');
-      app.innerHTML=`<div class="stage ${bg?'illustrated':''} ${state.narrative?.preview?'cg-preview-stage':''} ${state.narrative?.allowNavigation?'npc-navigation':''}" ${bg?`style="background-image:url(assets/${bg})"`:''}><div class="world" ${state.narrative&&!state.narrative.allowNavigation||modal?'inert':''}>${!prologue?`<header>${!ending&&!(state.scene==='lab'&&state.phase==='explore')?button('← 返回','back'):''}<div>${button('设置','settings')}${button('背包','bag',`aria-expanded="${bag}"`)}</div></header>`:''}${view}${bag&&!prologue?inventory():''}</div>${endingFormArt()}${notice?`<div class="notice" role="status">${esc(notice)}</div>`:''}${narrativeView()}${state.narrative&&!state.narrative.preview?button('快进至未读','skip-read','class="skip-read" aria-label="跳过已读对白，停在未读内容"'):''}${popup()}${achievementView()}${state.effects?'<div class="magic-smoke" aria-hidden="true"></div>':''}</div>`;
+      else view=tvConversation?'':scene();
+      app.innerHTML=`<div class="stage ${bg?'illustrated':''} ${state.narrative?.preview?'cg-preview-stage':''} ${state.narrative?'dialogue-active':''} ${state.narrative?.allowNavigation?'npc-navigation':''}" ${bg?`style="background-image:url(assets/${bg})"`:''}><div class="world" ${modal?'inert':''}><header>${!prologue&&!ending&&!(state.scene==='lab'&&state.phase==='explore')?button('← 返回','back'):''}<div>${button('设置','settings')}${button('背包','bag',`aria-expanded="${bag}"`)}</div></header>${view}${bag?inventory():''}</div>${endingFormArt()}${notice?`<div class="notice" role="status">${esc(notice)}</div>`:''}${narrativeView()}${state.narrative&&!state.narrative.preview?button('快进至未读','skip-read','class="skip-read" aria-label="跳过已读对白，停在未读内容"'):''}${popup()}${achievementView()}${state.effects?'<div class="magic-smoke" aria-hidden="true"></div>':''}</div>`;
     }
     stopBookTurn?.();stopBookTurn=null;
     const bookCanvas=app.querySelector('.book-physics-canvas');
@@ -450,7 +479,7 @@
     if(state.endingStage==='light-story'&&!endingBackground())app.querySelector?.('.stage')?.classList.add('light-story');
     if(modal?.type==='name')document.getElementById('player-name').focus();
     else if(modal){const controls=app.querySelectorAll('.modal button:not([disabled])');controls[0]?.focus();}
-    if(state.narrative&&!state.narrative.preview&&!state.cinematic){
+    if(state.narrative&&!state.narrative.preview&&!state.cinematic&&!modal&&!bag){
       const n=state.narrative,line=n.lines[n.index],node=document.getElementById('dialog-text'),fullText=line.text.replaceAll('{name}',state.playerName);
       typingTimer=setInterval(()=>{if(state.narrative!==n){clearInterval(typingTimer);return;}n.shown=Math.min(fullText.length,n.shown+1);node.textContent=fullText.slice(0,n.shown);if(n.shown===fullText.length)clearInterval(typingTimer);},50);
     }
@@ -472,6 +501,7 @@
       autosave(true);render();return;
     }
     state.narrative=null;clearInterval(typingTimer);
+    if(n.after.startsWith('snack-pickup:')){modal={type:'snack-pickup',id:n.after.split(':')[1]};autosave(true);render();return;}
     if(n.after==='lab'){
       state.phase='explore';state.scene='lab';state.visited=state.visited||[];
       if(!state.visited.includes('lab')){state.visited.push('lab');say([S.narration(S.intros.lab)]);return;}
@@ -482,7 +512,7 @@
     if(n.after==='princess-choice'||n.after==='cat-choice'||n.after==='cat-retry'||n.after==='princess-reclaim'){modal={type:n.after};autosave(true);render();return;}
     if(n.after==='princess-gifts'){giftMenu();return;}
     if(n.after==='princess-gift-menu'){giftMenu(true);return;}
-    if(n.after==='cat-reward'){if(state.collected.length<8){collectItem('cat_food');modal={type:'text',text:'获得奖励：毛绒绒怪的美食！'};}else modal={type:'cat-reward'};autosave(true);render();return;}
+    if(n.after==='cat-reward'){if(state.collected.length<8){collectItem('cat_food');modal={type:'cat-received'};}else modal={type:'cat-reward'};autosave(true);render();return;}
     if(n.after==='tv-first-menu'){state.quests.tvIntroDone=true;state.quests.tvNeedApplause=true;state.quests.tvReturnPending=false;library.televisionSeen=true;modal={type:'tv-menu'};}
     if(n.after==='park-jam-choice')modal={type:'park-jam-choice'};
     if(n.after==='park-jam-tasted')unlock('park_jam');
@@ -591,13 +621,13 @@
     if(event.isTrusted&&Date.now()<suppressClickUntil)return;
     const el=event.target.closest('[data-action]');
     if(el?.dataset.action==='skip-read'&&!el.disabled&&state.narrative&&!modal){coverAudio?.click?.();skipRead();return;}
-    if(state.narrative&&!modal&&!(state.narrative.allowNavigation&&['back','settings','bag'].includes(el?.dataset.action))){advance();return;}
+    if(state.narrative&&!modal&&!['settings','bag','item','ladder-info'].includes(el?.dataset.action)&&!(state.narrative.allowNavigation&&el?.dataset.action==='back')){advance();return;}
     if(!el||el.disabled)return;
     let action=el.dataset.action,id=el.dataset.id;
     if(action==='delete-confirm'&&modal?.type==='delete-confirm')id=modal.id;
     if(action==='discard-confirm'&&modal?.type==='discard-confirm'){id=modal.id;action=modal.reward?'reward-discard-item':'discard';const previous=modal.previous;modal=previous;el.confirmedDiscard=true;}
     // A popup blocks all underlying world controls, including keyboard activation.
-    const popupActions=['reset-game','reset-game-confirm','music-toggle','rename-save','rename-confirm','rename-cancel','park-jam-taste','park-jam-refuse','begin-adventure','new-confirm','confirm-cancel','delete-confirm','discard-confirm','ending-save-menu','saved-menu','start-backup','achievements','cat-accept','cat-refuse','reward-take','reward-leave','reward-discard','reward-discard-item','hat-take','hat-leave','princess-answer','princess-reclaim-yes','princess-reclaim-no','gift-inspect','gifts-all','gifts-select','gifts-later','next-round','next-save','gate-ready','companion-ready','tv-wander','tv-chat','tv-topic','tv-route','tv-routes-done','tv-clap','tv-thumb','tv-hurry','cat-far','cat-dragon','chicken-laugh','chicken-hold','chicken-grab','chicken-plead','chicken-return','chicken-keep','grip-ready','close','reuse-name','change-name','save-list','load-list','menu','restore','save-slot','delete-save','collect','discard','potion-travel','drink'];
+    const popupActions=['snack-pickup','reset-game','reset-game-confirm','music-toggle','rename-save','rename-confirm','rename-cancel','park-jam-taste','park-jam-refuse','begin-adventure','new-confirm','confirm-cancel','delete-confirm','discard-confirm','ending-save-menu','saved-menu','start-backup','achievements','cat-accept','cat-refuse','reward-take','reward-leave','reward-discard','reward-discard-item','hat-take','hat-leave','princess-answer','princess-reclaim-yes','princess-reclaim-no','gift-inspect','gifts-all','gifts-select','gifts-later','next-round','next-save','gate-ready','companion-ready','tv-wander','tv-chat','tv-topic','tv-route','tv-routes-done','tv-clap','tv-thumb','tv-hurry','cat-far','cat-dragon','chicken-laugh','chicken-hold','chicken-grab','chicken-plead','chicken-return','chicken-keep','grip-ready','close','reuse-name','change-name','save-list','load-list','menu','restore','save-slot','delete-save','collect','discard','potion-travel','drink'];
     if(modal&&!popupActions.includes(action))return;
     if(!['advance','ending-next','ending-white','ending-wake','credits-skip','inspect','item','gift-inspect','close'].includes(action))coverAudio?.click?.();
     notice='';
@@ -666,6 +696,7 @@
     }else if(action==='stone'){state.quests.clicks.stone=(state.quests.clicks.lastAction==='stone'?state.quests.clicks.stone||0:0)+1;state.quests.clicks.lastAction='stone';if(state.quests.clicks.stone>=3)unlock('stone');say([S.player('诶呀，完全敲不下来！'),S.narration('这里面好像冰冻着可以吃的东西，但是你不管怎么样都无法挪动它。')]);return;}
     else if(action==='inspect'){inspectMaterial(id);autosave(true);return;
     }else if(action==='item')modal={type:'material',id};
+    else if(action==='snack-pickup'&&modal?.type==='snack-pickup'&&modal.id===id){const result=collectItem(id);modal={type:'text',text:result.ok?'获得：妙脆角 ×1。':result.message};}
     else if(action==='collect'){
       if(modal?.type!=='material'||modal.id!==id)return;
       if(!material(id)?.questOnly&&state.collected.length>=8&&!state.collected.includes(id)){modal={type:'text',text:'背包已满，不可继续收集。请先丢弃物品，腾出空格。'};render();return;}
@@ -675,6 +706,7 @@
       if(!el.confirmedDiscard){modal={type:'discard-confirm',id,previous:modal};render();return;}
       if(material(id)?.questOnly?Q.discardSnack(state,id):R.discard(state,id)){
         achievements.discarded++;persistAchievements();if(achievements.discarded>=20)unlock('discard20');
+        if(id==='bleach'){poisonReturns();return;}
         if(state.scene==='palace'&&gifts.includes(id)&&state.quests.princessClaimed.includes(id)){
           const q=state.quests;q.princessDiscards++;if(!q.princessReturned.includes(id))q.princessReturned.push(id);
           if(q.princessDiscards>=3){q.princessLocked=true;say(N.thirdDiscard);return;}
@@ -693,7 +725,7 @@
     else if(action==='reward-discard')modal={type:'reward-discard'};
     else if(action==='reward-discard-item'){
       if(!el.confirmedDiscard){if(!state.collected.includes(id))return;modal={type:'discard-confirm',id,reward:true,previous:modal};render();return;}
-      if(state.collected.includes(id)){R.discard(state,id);achievements.discarded++;persistAchievements();if(achievements.discarded>=20)unlock('discard20');collectItem('cat_food');}modal=null;
+      if(state.collected.includes(id)){R.discard(state,id);achievements.discarded++;persistAchievements();if(achievements.discarded>=20)unlock('discard20');collectItem('cat_food');if(id==='bleach'){poisonReturns();return;}}modal=null;
     }else if(action==='reward-take'){if(state.quests.catRewardGround){collectItem('cat_food');modal=null;}}
     else if(action==='body-fur'){countClick('body_fur','body_fur');say(state.quests.groundFurSeen?X.bodyFur.concat(X.bodyFurExtra):X.bodyFur);return;}
     else if(action==='cat-far'||action==='cat-dragon'){state.quests.catFarewellDone=true;say(action==='cat-far'?X.catFar:X.catDragon,'cat-reward');return;}
@@ -796,11 +828,11 @@
     if(event.key==='Enter'&&event.target.id==='save-name'&&modal?.type==='rename-save'){event.preventDefault();renameSave();return;}
     if(event.key==='Enter'&&event.target.id==='player-name'&&modal?.type==='name'){event.preventDefault();const input=event.target;if(!input.reportValidity||input.reportValidity())startAdventure(input.value);return;}
     if(['INPUT','TEXTAREA'].includes(event.target.tagName))return;
-    if(state.narrative&&!modal){if(['Enter',' '].includes(event.key)){event.preventDefault();advance();}else if(event.key==='Tab'){event.preventDefault();}return;}
+    if(state.narrative&&!modal&&!['settings','bag','item','ladder-info'].includes(event.target.closest?.('[data-action]')?.dataset.action)){if(['Enter',' '].includes(event.key)){event.preventDefault();advance();}return;}
     if(event.key==='Escape'&&drag){cancelDrag();return;}
     const item=event.target.closest?.('[data-draggable]');
     if(event.key==='Enter'&&state.phase==='brew'&&!modal&&item){event.preventDefault();if(R.putInPot(state,item.dataset.id)){coverAudio?.splash?.();notice='宝物放入大锅了。';autosave(true);render();}return;}
-    if(event.key==='Escape'){if(modal)modal=null;else bag=false;render();}
+    if(event.key==='Escape'){if(modal&&choiceModalTypes.has(modal.type)){event.preventDefault();return;}if(modal)modal=null;else bag=false;render();}
     if(event.key==='Tab'&&modal){const nodes=Array.from(app.querySelectorAll('.modal button:not([disabled]),.modal input'));if(!nodes.length)return;const first=nodes[0],last=nodes[nodes.length-1];if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
   });
   render();

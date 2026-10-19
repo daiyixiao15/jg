@@ -1,8 +1,8 @@
 (function(root){
   'use strict';
   const questItems=[
-    {id:'snack_small',scene:'forest',name:'妙脆角小一',description:'待补充',questOnly:true,tags:[]},
-    {id:'snack_large',scene:'forest',name:'妙脆角大二',description:'待补充',questOnly:true,tags:[]}
+    {id:'snack_small',scene:'forest',name:'妙脆角角一',description:'在草丛里找到的妙脆角。',questOnly:true,tags:[]},
+    {id:'snack_large',scene:'forest',name:'妙脆角角二',description:'在石头旁找到的妙脆角。',questOnly:true,tags:[]}
   ];
   function normalize(state){
     if(['five','six'].includes(state.ending)&&Array.isArray(state.narrative?.lines)){
@@ -29,6 +29,8 @@
     state.quests.clicks=state.quests.clicks||{};
     state.quests.princessClaimed=state.quests.princessClaimed||[];
     state.quests.princessReturned=state.quests.princessReturned||[];
+    state.quests.catMet=!!q.catMet||state.quests.cat!=='new';
+    state.quests.snacksSeenBefore=Array.isArray(q.snacksSeenBefore)?q.snacksSeenBefore.filter(id=>questItems.some(m=>m.id===id)):[];
     const isSnack=id=>questItems.some(m=>m.id===id);
     const legacy=Array.isArray(state.collected)?state.collected.filter(isSnack):[];
     state.quests.snacks=state.quests.cat==='rewarded'?[]:[...new Set([...(Array.isArray(q.snacks)?q.snacks:[]),...legacy])].filter(isSnack);
@@ -39,6 +41,7 @@
   function collectSnack(s,id){
     normalize(s);
     if(s.scene!=='forest'||s.phase!=='explore'||!questItems.some(m=>m.id===id))return {ok:false,message:'现在不能拾取这份妙脆角。'};
+    if(!s.quests.catMet)return {ok:false,message:'看起来像是谁弄丢的……还是先别乱拿啦。'};
     if(s.quests.cat==='rewarded')return {ok:false,message:'妙脆角已经交给绒绒大王了。'};
     if(s.quests.snacks.includes(id))return {ok:false,message:'这份妙脆角已经随身携带了。'};
     s.quests.snacks.push(id);return {ok:true,message:'拾取了'+questItems.find(m=>m.id===id).name+'。'};
