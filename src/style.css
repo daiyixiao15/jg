@@ -169,3 +169,6 @@ header{position:absolute;inset:2% 2% auto;display:flex;justify-content:space-bet
 
 .player-portrait.chef-player-portrait{left:1%;bottom:0%;width:31%;height:55%}
 .chef-player-portrait .sprite-art{width:100%;height:100%}
+
+.stage.forest-conversation .other-npc[data-npc="cat"]{transform:scale(1.08);transform-origin:center bottom}
+.stage.forest-conversation .body-fur-icon{visibility:hidden;pointer-events:none}

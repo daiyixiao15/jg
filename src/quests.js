@@ -5,6 +5,11 @@
     {id:'snack_large',scene:'forest',name:'妙脆角角二',description:'在石头旁找到的妙脆角。',questOnly:true,tags:[]}
   ];
   function normalize(state){
+    if(state.ending==='one'&&Array.isArray(state.narrative?.lines)){
+      for(const line of state.narrative.lines){
+        if(typeof line.text==='string'&&line.text.startsWith('你跺了跺小蹄子。'))line.text=line.text.replace('坐进草里','坐进泥巴里');
+      }
+    }
     if(['five','six'].includes(state.ending)&&Array.isArray(state.narrative?.lines)){
       for(const line of state.narrative.lines){
         if(typeof line.text!=='string')continue;
