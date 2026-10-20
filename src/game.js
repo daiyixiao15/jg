@@ -263,7 +263,7 @@
       if(q.catRewardGround)view+=spriteObject('cat-food.png','毛绒绒怪的美食',[67,76,9,14],'inspect','cat_food');
       return view;
     }
-    if(state.scene==='ice'&&state.section==='upper')return hot('冰果','inspect','apple',spots.apple)+hot('串串冰','inspect','grape',spots.grape)+hot('冰草草','inspect','cabbage',spots.cabbage)+hot('树上的冰果','tree-fruit','',[0,0,22,33])+hot('冰冰糖','lollipop','',[20,38,28,35]);
+    if(state.scene==='ice'&&state.section==='upper')return '<svg class="ice-lollipop" viewBox="440 688 778 859" aria-hidden="true"><image href="assets/ice-lollipop.png" width="2800" height="1840" /></svg>'+hot('冰果','inspect','apple',spots.apple)+hot('串串冰','inspect','grape',spots.grape)+hot('冰草草','inspect','cabbage',spots.cabbage)+hot('树上的冰果','tree-fruit','',[0,0,22,33])+hot('冰冰糖','lollipop','',[20,38,28,35]);
     const rows=D.materials.filter(m=>m.scene===state.scene&&(!m.section||m.section===state.section)&&!(m.id==='bleach'&&state.collected.includes('bleach')));
     let view=rows.map(m=>hot(m.name+(state.collected.includes(m.id)?' · 已收集':''),'inspect',m.id,spots[m.id])).join('');
     if(state.scene==='bath')view+=hot('泡泡','bath-bubbles','',[42,32,13,25]);
@@ -307,8 +307,8 @@
     else if(modal.type==='grip-ready')body=`<h2>抓稳了吗？</h2>${button('抓稳啦！','grip-ready')}`;
     else if(modal.type==='cat-choice')body=`<h2>是否帮助这只傲娇的毛绒绒怪？</h2><div class="choices">${button('是','cat-accept')}${button('否','cat-refuse')}</div>`;
     else if(modal.type==='cat-retry')body=`<h2>绒绒大王又给了你一次机会</h2>${button('谢谢大王！','cat-accept')}`;
-    else if(modal.type==='cat-received')body=`<div class="item-art">${art(material('cat_food'))}</div><h2>获得奖励：毛绒绒怪的美食！</h2>`;
-    else if(modal.type==='cat-reward')body=`<div class="item-art">${art(material('cat_food'))}</div><h2>获得奖励：毛绒绒怪的美食！</h2><p>${state.collected.length>=8?'你的背包已经放不下啦！':'绒绒大王把美食递给你。'}</p><div class="choices">${button(state.collected.length>=8?'从背包里丢一个东西':'收下美食',state.collected.length>=8?'reward-discard':'reward-take')}${button('丢掉毛绒绒怪的美食','reward-leave')}</div>`;
+    else if(modal.type==='cat-received')body=`<div class="item-art">${art(material('cat_food'))}</div><h2>获得奖励：毛绒绒怪的美食！</h2><p>${esc(material('cat_food').description)}</p>`;
+    else if(modal.type==='cat-reward')body=`<div class="item-art">${art(material('cat_food'))}</div><h2>获得奖励：毛绒绒怪的美食！</h2><p>${esc(material('cat_food').description)}</p><p>${state.collected.length>=8?'你的背包已经放不下啦！':'绒绒大王把美食递给你。'}</p><div class="choices">${button(state.collected.length>=8?'从背包里丢一个东西':'收下美食',state.collected.length>=8?'reward-discard':'reward-take')}${button('丢掉毛绒绒怪的美食','reward-leave')}</div>`;
     else if(modal.type==='reward-discard')body=`<h2>从背包里丢一个东西</h2><div class="gift-list">${state.collected.map(id=>button(material(id).name,'reward-discard-item',`data-id="${id}"`)).join('')}</div>`;
     else if(modal.type==='hat')body=`<h2>你确定要抢走傻不拉鸡的帽子吗？</h2><div class="choices">${button('确定','hat-take')}${button('算了','hat-leave')}</div>`;
     else if(modal.type==='princess-choice')body=`<h2>你是公主吗？</h2><div class="setting-buttons">${['我不是公主','我是精灵公主！','我只是一般路过的小精灵'].map((label,i)=>button(label,'princess-answer',`data-id="${i}"`)).join('')}</div>`;
@@ -336,14 +336,15 @@
     if(n.preview)return '<div class="reading-layer cg-preview"><button type="button" class="reading-surface" data-action="advance" aria-label="点击开始对白"></button></div>';
     const line=n.lines[n.index],speaker=line.speaker==='player'?state.playerName:({dragon:'恶龙',cat:'毛绒绒怪',chicken:'傻不拉鸡',princess:'小公主',unknown:'未知的声音',tv:'电视机先生',mother:'妈妈',fur:'毛绒绒'})[line.speaker]||'';
     if(line.centered||n.index===companionFarewellIndex(n))return `<div class="reading-layer centered-reading"><button type="button" class="reading-surface" data-action="advance" aria-label="点击画面推进文字"></button><div class="centered-message"><p id="dialog-text">${esc(line.text.replaceAll('{name}',state.playerName).slice(0,n.shown))}</p></div><small>点击画面继续</small></div>`;
-    const cgOnly=state.phase==='prologue'||!!chefOpeningCG()||state.phase==='ending'&&(state.ending==='four'||state.endingStage==='easter');
+    const cgOnly=state.phase==='prologue'||!!pigMudCG()||!!uglyReflectionCG()||!!chefOpeningCG()||state.phase==='ending'&&(state.ending==='four'||state.endingStage==='easter');
     const catThinking=n.after==='cat-choice'&&(line.expression==='thinking'||line.text==='魔法材料？'||line.text.includes('这只黑色毛球的眼睛藏在'));
     const npcNames={dragon:'恶龙',cat:'毛绒绒怪',chicken:'傻不拉鸡',princess:'小公主',fur:'毛绒绒',tv:'电视机先生'};
     // Keep the conversation partner visible while the player or narrator speaks.
     const sceneLines=n.lines.filter((entry,index)=>index<=n.index&&entry.setting===line.setting);
     const npcLine=npcNames[line.speaker]?line:[...sceneLines].reverse().find(entry=>npcNames[entry.speaker])||n.lines.slice(n.index+1).find(entry=>entry.setting===line.setting&&npcNames[entry.speaker]);
     const portraitSpeaker=catThinking?'cat':npcLine?.speaker||(n.after==='round'?'dragon':null);
-    const endingCG=state.phase==='ending'&&(!!endingBackground()||!!chefBackground()||state.ending==='six');
+    // Chef park scenes use ordinary dialogue portraits over the arrival backgrounds.
+    const endingCG=state.phase==='ending'&&(!!endingBackground()||state.ending==='six');
     const pigRevealIndex=n.lines.findIndex(entry=>entry.form==='pig'&&!entry.speaker);
     const hidePigOpeningDragon=state.phase==='ending'&&state.ending==='one'&&pigRevealIndex>=0&&n.index<=pigRevealIndex&&portraitSpeaker==='dragon';
     const npcFile=cgOnly||endingCG||hidePigOpeningDragon||state.endingReality||line.setting==='black'?null:catThinking?'fluffy-thinking.png':portraitSpeaker==='dragon'?(npcLine?.expression==='smile'?'dragon-smile.png':'dragon.png'):portraitSpeaker==='cat'?(state.quests.cat==='rewarded'?'fluffy-delivered.png':state.quests.cat==='accepted'?'fluffy-reward.png':'fluffy-wait.png'):portraitSpeaker==='chicken'?(state.phase==='ending'||state.quests.hatTaken?'chicken-dialogue.png':'chicken-hat-dialogue.png'):portraitSpeaker==='princess'?N.princessPortrait(npcLine?.text):portraitSpeaker==='fur'?'fur-dialogue.png':portraitSpeaker==='tv'?'tv-dialogue.png':null;
@@ -354,7 +355,7 @@
   function endingFormArt(){
     const n=state.narrative,line=n?.lines[n.index];
     if(state.phase!=='ending'||!n||n.preview||n.title||!line||line.hidePortrait||line.setting||line.speaker)return '';
-    if(line.form==='beast')return '';
+    if(line.form==='beast'||pigMudCG()||uglyReflectionCG())return '';
     const file=({pig:'ending-pig.png',ugly:'ending-ugly.png'})[line.form];
     if(!file)return '';
     const reveal=['one','three'].includes(state.ending)&&!n.lines.slice(0,n.index).some(previous=>previous.form===line.form);
@@ -365,6 +366,8 @@
   function endingBackground(){
     if(state.phase!=='ending'||!state.narrative)return null;
     if(state.ending==='four')return 'ending-bubble-q85.webp';
+    if(pigMudCG())return pigMudCG();
+    if(uglyReflectionCG())return uglyReflectionCG();
     if(chefOpeningCG())return chefOpeningCG();
     const n=state.narrative,setting=n.lines[n.index].setting;
     if(state.ending==='five'&&n.after==='five-hit'&&!state.endingReality){
@@ -378,6 +381,20 @@
       return from>=0&&to>=from&&n.index>=from&&n.index<=to?'ending-home-lookback-q85.webp':'ending-home-q85.webp';
     }
     return ({ceiling:'ending-ceiling-q85.webp',home:'ending-home-q85.webp','home-lookback':'ending-home-lookback-q85.webp',peek:'ending-easter-q85.webp'})[setting]||null;
+  }
+  function pigMudCG(){
+    const n=state.narrative;
+    if(state.phase!=='ending'||state.ending!=='one'||!n||n.title||n.preview)return null;
+    const start=n.lines.findIndex(line=>line.text==='哼唧！哼唧哼唧！');
+    const end=n.lines.findIndex((line,index)=>index>=start&&line.text.startsWith('大龙没有喷火，也没有赶你走。'));
+    return start>=0&&end>=start&&n.index>=start&&n.index<=end?'ending-pig-mud.png':null;
+  }
+  function uglyReflectionCG(){
+    const n=state.narrative;
+    if(state.phase!=='ending'||state.ending!=='three'||!n||n.title||n.preview)return null;
+    const start=n.lines.findIndex(line=>line.text.startsWith('你还没来得及放下瓶子'));
+    const end=n.lines.findIndex((line,index)=>index>=start&&line.text==='好吧，是我。');
+    return start>=0&&end>=start&&n.index>=start&&n.index<=end?'ending-ugly-reflection.png':null;
   }
   function chefOpeningCG(){
     const n=state.narrative;if(state.phase!=='ending'||state.ending!=='two'||!n||n.title||n.preview)return null;
@@ -450,7 +467,7 @@
       lastBookPage=-1;bookTransitionPending=false;clearTimeout(bookTransitionTimer);visibleBackground='cover-q85.webp';
       app.innerHTML=`<div class="stage menu cover-menu" style="background-image:url(assets/cover-q85.webp)"><div class="menu-content" ${modal?'inert':''}><h1>一锅小小的魔法</h1><p>${state.phase==='exit'?'游戏已结束':'小精灵的第一次冒险'}</p>${button('开始','start')}${button('继续','continue',library.autosave||library.slots.some(Boolean)?'':'disabled')}${button('设置','settings')}${button('成就','achievements')}</div>${popup()}${achievementView()}</div>`;
     }else{
-      const prologue=state.phase==='prologue',ending=state.phase==='ending',tvConversation=state.scene==='hub'&&!ending&&(state.narrative?.lines.some(line=>line.speaker==='tv')||modal?.type.startsWith('tv-')),boardingCG=ending&&state.ending==='six'&&state.endingStage==='companion'&&!state.endingReality,companionCG=ending&&state.ending==='six'&&state.endingReality&&state.narrative?.after==='ending-summary',farewellIndex=companionFarewellIndex(state.narrative),friendsRevealed=companionCG&&farewellIndex>=0&&(state.narrative.friendsRevealed||state.narrative.index>farewellIndex),bg=prologue||state.narrative?.title||state.narrative?.lines[state.narrative.index].setting==='black'?null:endingBackground()?endingBackground():chefBackground()?chefBackground():tvConversation?'central-park-dialogue-q85.webp':ending&&state.ending==='five'&&state.endingReality&&state.narrative?.after==='five-finish'?'ending-home-q85.webp':companionCG?(friendsRevealed?'ending-companion-friends-q85.webp':'ending-companion-q85.webp'):boardingCG?'dragon-boarding-q85.webp':ending&&state.endingStage==='easter'?'ending-easter-q85.webp':ending?(state.narrative?.lines[state.narrative.index].setting?null:['gate','companion'].includes(state.endingStage)||state.narrative&&!state.endingReality&&!['light-story','easter'].includes(state.endingStage)?'dragon-empty-q85.webp':null):state.scene==='ice'&&state.section==='upper'?'ice-upper-q85.webp':state.scene==='dragon'&&state.narrative?.after==='round'?'dragon-empty-q85.webp':state.scene==='bath'&&state.collected.includes('bleach')?'bath-no-poison.webp':backgrounds[state.scene];
+      const prologue=state.phase==='prologue',ending=state.phase==='ending',tvConversation=state.scene==='hub'&&!ending&&(state.narrative?.lines.some(line=>line.speaker==='tv')||modal?.type.startsWith('tv-')),boardingCG=ending&&state.ending==='six'&&state.endingStage==='companion'&&!state.endingReality,companionCG=ending&&state.ending==='six'&&state.endingReality&&state.narrative?.after==='ending-summary',farewellIndex=companionFarewellIndex(state.narrative),friendsRevealed=companionCG&&farewellIndex>=0&&(state.narrative.friendsRevealed||state.narrative.index>farewellIndex),bg=prologue||state.narrative?.title||state.narrative?.lines[state.narrative.index].setting==='black'?null:endingBackground()?endingBackground():chefBackground()?chefBackground():tvConversation?'central-park-dialogue-q85.webp':ending&&state.ending==='five'&&state.endingReality&&state.narrative?.after==='five-finish'?'ending-home-q85.webp':companionCG?(friendsRevealed?'ending-companion-friends-q85.webp':'ending-companion-q85.webp'):boardingCG?'dragon-boarding-q85.webp':ending&&state.endingStage==='easter'?'ending-easter-q85.webp':ending?(state.narrative?.lines[state.narrative.index].setting?null:['gate','companion'].includes(state.endingStage)||state.narrative&&!state.endingReality&&!['light-story','easter'].includes(state.endingStage)?'dragon-empty-q85.webp':null):state.scene==='ice'&&state.section==='upper'?'ice-upper-no-lollipop.webp':state.scene==='dragon'&&state.narrative?.after==='round'?'dragon-empty-q85.webp':state.scene==='bath'&&state.collected.includes('bleach')?'bath-no-poison.webp':backgrounds[state.scene];
       visibleBackground=bg;
       let view='';
       if(prologue){view=storybookView();visibleBackground=storybookPages[state.narrative.index]||null;}
@@ -691,7 +708,7 @@
     else if(action==='tv-routes-done'){say([{speaker:'tv',text:'很好！很有方向感的小精灵！那么你想去哪里呢？'}],'tv-answer');return;}
     else if(action==='tv-clap'){say(X.tvClap,'tv-finish');return;}
     else if(action==='tv-thumb'){say(X.tvThumb,'tv-finish');return;}
-    else if(action==='tv-hurry'){say([{speaker:'tv',text:'待补充。'}]);return;}
+    else if(action==='tv-hurry'){say([{speaker:'tv',text:'赶时间？明白，掌声可以下次补！看好脚下，别把自己赶丢啦！'}]);return;}
     else if(action==='scene'){enter(id,el.dataset.section);return;}
     else if(action==='back'){
       const target=returnTarget();
@@ -750,7 +767,7 @@
     else if(action==='gifts-all'){
       const available=princessAvailable();if(available.length<=8-state.collected.length){for(const gift of available){collectItem(gift);if(state.phase==='ending')return;}if(giftAftercare('all'))return;}
     }else if(action==='tree-fruit'){say([S.player('好多漂亮的蓝色果子呀！可是好高呀够不着……会不会有掉在地上的呢？')]);return;}
-    else if(action==='lollipop'){countClick('lollipop','lollipop');state.effects=false;notice='巨大的冰棒棒糖诶！小草精好像很爱吃的样子？';autosave(true);render();const stage=app.querySelector('.stage');if(stage){const candy=document.createElement('div');candy.className='candy-shaking-bg';candy.setAttribute('aria-hidden','true');stage.appendChild(candy);setTimeout(()=>candy.remove(),550);}return;}
+    else if(action==='lollipop'){countClick('lollipop','lollipop');state.effects=false;notice='巨大的冰棒棒糖诶！小草精好像很爱吃的样子？';autosave(true);render();const candy=app.querySelector('.ice-lollipop');if(candy)candy.classList.add('is-swaying');return;}
     else if(action==='cabbage-secret'){unlock('cabbage');say([S.narration('冰草草探出小脑袋：糖糖，糖糖……原来小菜精也来到了这里！')]);return;}
     else if(action==='gate'){countClick('gate','gate');say([S.player('可恶，被恶龙死死地挡住了诶！')]);return;}
     else if(action==='dragon-flowers'){countClick('dragon_flowers','dragon_flowers');notice='花花在风里晃动，挡住你的去路。';}
