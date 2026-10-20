@@ -172,3 +172,5 @@ header{position:absolute;inset:2% 2% auto;display:flex;justify-content:space-bet
 
 .stage.forest-conversation .other-npc[data-npc="cat"]{transform:scale(1.08);transform-origin:center bottom}
 .stage.forest-conversation .body-fur-icon{visibility:hidden;pointer-events:none}
+
+.setting-buttons .tv-leave-button{margin-top:.6em}

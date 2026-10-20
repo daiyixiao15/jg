@@ -14,15 +14,22 @@ for(const ids of [
  ['apple','grape','cabbage','ice_cream','dumpling','frost','plants','cat_food'],
  ['apple','grape','cabbage','ice_cream','sugar','dumpling','frost','plants']
 ])assert.equal(R.resolveEnding(make(ids)),'two');
-assert.equal(R.resolveEnding(make(['apple','grape','cabbage','dumpling','frost','plants','cat_food','cat_fur'])),'three');
+assert.equal(R.resolveEnding(make(['apple','grape','cabbage','dumpling','frost','plants','cat_food','cat_fur'])),'one');
 assert.equal(R.resolveEnding(make(['apple','grape','dumpling','frost','plants','cat_food','salt','vinegar'])),'one');
-assert.equal(R.resolveEnding(make(['apple','grape','cabbage','ice_cream','dumpling','frost','plants','cat_fur'])),'three');
+assert.equal(R.resolveEnding(make(['apple','grape','cabbage','ice_cream','dumpling','frost','plants','cat_fur'])),'one');
 assert.equal(R.resolveEnding(make(['apple','grape','cabbage','ice_cream','dumpling','frost','shampoo','body_wash'])),'three');
 assert.equal(R.resolveEnding(make(['apple','grape','cabbage','ice_cream','dumpling','shampoo','body_wash','detergent'])),'four');
-assert.equal(R.resolveEnding(make(['apple','grape','cabbage','ice_cream','dumpling','frost','plants','skincare'])),'three');
+assert.equal(R.resolveEnding(make(['apple','grape','cabbage','ice_cream','dumpling','frost','plants','skincare'])),'one');
 assert.equal(R.resolveEnding(make(['apple','grape','cabbage','ice_cream','shampoo','body_wash','detergent','bleach'])),'five');
 assert.equal(R.resolveEnding(make(['apple','grape','cabbage','ice_cream','shampoo','body_wash','detergent','bleach'],3,0,true)),'six');
 assert.equal(R.resolveEnding(make(base,3,6)),'two');
+// Seven edible ingredients permit a pig ending; poison and true-ending gates still win.
+const sevenEdible=['apple','grape','cabbage','dumpling','frost','plants','cat_food'];
+for(const id of ['cat_fur','fallen_leaves','lipstick','skincare','perfume','shampoo','body_wash','detergent']){
+ assert.equal(R.resolveEnding(make([...sevenEdible,id])),'one',id);
+}
+assert.equal(R.resolveEnding(make([...sevenEdible,'bleach'])),'five');
+assert.equal(R.resolveEnding(make([...sevenEdible,'cat_fur'],3,0,true)),'six');
 assert.throws(()=>R.resolveEnding(make(base.slice(0,7))));
 assert.throws(()=>R.resolveEnding(make([...base.slice(0,7),'apple'])));
 const s=R.createState();s.phase='explore';

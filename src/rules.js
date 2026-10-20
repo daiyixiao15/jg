@@ -22,9 +22,10 @@
     if(state.dialogueCount>=3 && state.dragonProgress?.poisonSeen) return 'six';
     if(rows.some(m=>m.id==='bleach')) return 'five';
     if(rows.filter(m=>m.tags.includes('foaming')).length>=3) return 'four';
-    const allEdible=rows.every(m=>m.tags.includes('edible'));
+    const edibleCount=rows.filter(m=>m.tags.includes('edible')).length;
+    const allEdible=edibleCount===8;
     if(allEdible && rows.filter(m=>m.tags.includes('tasty')).length>=3) return 'two';
-    if(allEdible) return 'one';
+    if(edibleCount>=7) return 'one';
     return 'three';
   }
   function discard(state,id) {

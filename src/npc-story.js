@@ -74,5 +74,17 @@
     const expression=Object.keys(princessExpressions).find(key=>princessExpressions[key].includes(text))||'default';
     return `princess-${expression}.webp`;
   }
-  root.GameNpcStory={princessPortrait,princessExpressions,cat,chicken,princess,first,branches,offer,discards,thirdDiscard,random};
+  const playerExpressions={
+    smile:['谢谢你送我的宝物呀。','知道啦~你放心吧，我一定会回来的！','好啦，还是还给你吧，看你刚刚都快哭了。','等我下次回来，给你带一顶新的，比这个还漂亮。','嗯，专门给你的。','你困了吗？那……我先不吵你了。','嗯……恶龙也没有吃掉小精灵嘛。','梯子……谢谢了。','原来大龙也能讲道理。'],
+    scared:['呀！','果然是一条很凶、很凶的恶龙！','哎哟，好痛！完蛋了……要被吃掉了！'],
+    angry:['好凶好凶……我一定要调出厉害的魔法药，打败你！','哼！你不过就是一条……大一点的龙！','哼！你可不要小瞧了我！','你这只愚蠢的黑色煤球！','可是讲了这么久，它还是不让我过去嘛。'],
+    confused:['诶？检查什么？','警察先生，可是我一辆车也没有看见呀。','可是我才刚从那里出来……','……现在就要鼓掌吗？','重要工作？','研究……？','妙脆角？','？','你不是最喜欢它吗？','……帽子还能两个人一起戴啊？','……它怎么不过来呀？','诶？你刚才是在说话？'],
+    excited:['听起来很漂亮！','冰果、冰草草，还有好大的冰冰糖！','比我的脑袋还大！','嗯，妙脆角已经找回来了！','（有了这个，那些放在高处的东西就能拿到了……）','真的吗？真的吗！']
+  };
+  const playerExpressionByText=new Map(Object.entries(playerExpressions).flatMap(([expression,texts])=>texts.map(text=>[text,expression])));
+  function playerPortrait(line){
+    const expression=line.speaker==='player'?playerExpressionByText.get(line.text):null;
+    return `player-${expression||'default'}.webp`;
+  }
+  root.GameNpcStory={playerPortrait,playerExpressions,princessPortrait,princessExpressions,cat,chicken,princess,first,branches,offer,discards,thirdDiscard,random};
 })(globalThis);

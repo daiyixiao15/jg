@@ -1,5 +1,6 @@
 (function(root){
   root.GameAssets={
+  "dragon-surprised.webp": {"width":900,"height":1190,"bounds":[0,0,900,1190]},
   "princess-default.webp": {"width": 1804, "height": 1890, "bounds": [0, 0, 1804, 1890]},
   "princess-proud.webp": {"width": 1804, "height": 1890, "bounds": [0, 0, 1804, 1890]},
   "princess-sad.webp": {"width": 1804, "height": 1890, "bounds": [0, 0, 1804, 1890]},
