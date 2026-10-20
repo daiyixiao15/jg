@@ -650,7 +650,8 @@
     // A popup blocks all underlying world controls, including keyboard activation.
     const popupActions=['snack-pickup','reset-game','reset-game-confirm','music-toggle','rename-save','rename-confirm','rename-cancel','park-jam-taste','park-jam-refuse','begin-adventure','new-confirm','confirm-cancel','delete-confirm','discard-confirm','ending-save-menu','saved-menu','start-backup','achievements','cat-accept','cat-refuse','reward-take','reward-leave','reward-discard','reward-discard-item','hat-take','hat-leave','princess-answer','princess-reclaim-yes','princess-reclaim-no','gift-inspect','gifts-all','gifts-select','gifts-later','next-round','next-save','gate-ready','companion-ready','tv-wander','tv-chat','tv-topic','tv-route','tv-routes-done','tv-clap','tv-thumb','tv-hurry','cat-far','cat-dragon','chicken-laugh','chicken-hold','chicken-grab','chicken-plead','chicken-return','chicken-keep','grip-ready','close','reuse-name','change-name','save-list','load-list','menu','restore','save-slot','delete-save','collect','discard','potion-travel','drink'];
     if(modal&&!popupActions.includes(action))return;
-    if(!['advance','ending-next','ending-white','ending-wake','credits-skip','inspect','item','gift-inspect','close'].includes(action))coverAudio?.click?.();
+    if(action==='lollipop')coverAudio?.lollipop?.();
+    else if(!['advance','ending-next','ending-white','ending-wake','credits-skip','inspect','item','gift-inspect','close'].includes(action))coverAudio?.click?.();
     notice='';
     if(!['advance','stone','close'].includes(action)&&!modal)state.quests.clicks.lastAction=action;
     if(action==='start'){saveDestination=null;saveSource=null;modal=(library.autosave&&library.autosave.ending!=='six')||library.slots.some(slot=>slot&&slot.state.ending!=='six')?{type:'new-confirm'}:{type:lastName?'reuse-name':'name'};}

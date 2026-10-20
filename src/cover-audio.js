@@ -6,6 +6,25 @@
     const clickAudio=options.effectsAudio||(typeof Audio==='function'?new Audio('assets/button-click.mp3'):null);
     const boilAudio=options.boilAudio||(typeof Audio==='function'?new Audio('assets/brewing-boil.mp3'):null);
     const splashAudio=options.splashAudio||(typeof Audio==='function'?new Audio('assets/ingredient-splash.wav'):null);
+    const lollipopAudio=options.lollipopAudio||(typeof Audio==='function'?new Audio('assets/lollipop-click.mp3'):null);
+    const buffers=new Map(),voices=new Set();
+    let effectsContext=null,effectsGain=null;
+    // Decode short effects once; each trigger starts a fresh in-memory voice.
+    // Keep media playback available for file:// and browsers without Web Audio.
+    try{
+      const Context=root.AudioContext||root.webkitAudioContext;
+      if(Context&&root.fetch){
+        effectsContext=new Context({latencyHint:'interactive'});
+        effectsGain=effectsContext.createGain();effectsGain.connect(effectsContext.destination);
+        for(const clip of [clickAudio,splashAudio,lollipopAudio]){
+          if(!clip?.src)continue;
+          root.fetch(clip.src).then(response=>{if(!response.ok)throw new Error('Audio load failed');return response.arrayBuffer();})
+            .then(bytes=>effectsContext.decodeAudioData(bytes)).then(buffer=>buffers.set(clip,buffer)).catch(()=>{});
+        }
+      }
+    }catch{effectsContext=null;}
+    function unlockEffects(){try{if(effectsContext?.state==='suspended')Promise.resolve(effectsContext.resume()).catch(()=>{});}catch{}}
+    function stopEffects(){for(const voice of voices)try{voice.stop();}catch{}voices.clear();for(const clip of [clickAudio,splashAudio,lollipopAudio])clip?.pause?.();}
     let brewing=false;
     if(boilAudio)boilAudio.loop=true;
     const tracks={cover:'assets/cover-bgm-fairytale.mp3',prologue:'assets/prologue-bgm-c13.mp3',collection:'assets/collection-bgm.m4a',dragon:'assets/dragon-bgm-c23.mp3',ice:'assets/ice-tower-bgm-f1.mp3',bubble:'assets/ending-bubble-bgm.m4a',chef:'assets/ending-chef-bgm-n5.mp3',summary:'assets/ending-summary-bgm.m4a',trueOne:'assets/ending-true-one-bgm-0618.m4a',ugly:'assets/ending-ugly-bgm-hidamari.mp3',pig:'assets/ending-pig-bgm-picnic.mp3',trueTwo:'assets/ending-true-two-bgm-from52.m4a',easter:'assets/easter-bgm-strawberry.m4a'};
@@ -25,7 +44,7 @@
     const loadedTracks=new Map();
     function prepare(clip){if(!clip)return;clip.preload='auto';try{clip.load?.();}catch{}}
     if(audio){audio.loop=true;audio.autoplay=true;audio.src=tracks.cover;audio.volume=preferences.volume;audio.muted=preferences.muted;prepare(audio);if(!options.audio)loadedTracks.set('cover',audio);}
-    [clickAudio,boilAudio,splashAudio].forEach(prepare);
+    [clickAudio,boilAudio,splashAudio,lollipopAudio].forEach(prepare);
     // Warm the remaining music after the initial page has had a chance to render.
     function preloadMusic(){
       if(options.audio||typeof Audio!=='function')return;
@@ -59,9 +78,17 @@
     }
     function toggle(){preferences.muted=!preferences.muted;if(audio)audio.muted=preferences.muted;save();if(preferences.muted)stop();else play();}
     function setVolume(value){preferences.volume=Math.min(1,Math.max(0,Number(value)||0));preferences.muted=preferences.volume===0;if(audio){applyMusicVolume();audio.muted=preferences.muted;}save();if(preferences.muted)stop();else play();}
-    function setEffectsVolume(value){preferences.effectsVolume=Math.min(1,Math.max(0,Number(value)||0));save();syncBrewing();}
+    function setEffectsVolume(value){preferences.effectsVolume=Math.min(1,Math.max(0,Number(value)||0));if(effectsGain)effectsGain.gain.value=preferences.effectsVolume;if(!preferences.effectsVolume)stopEffects();save();syncBrewing();}
     function effect(clip){
       if(!clip||!visible()||preferences.effectsVolume===0)return;
+      unlockEffects();
+      if(effectsContext?.state==='running'&&buffers.has(clip)){
+        try{
+          const voice=effectsContext.createBufferSource();voice.buffer=buffers.get(clip);
+          effectsGain.gain.value=preferences.effectsVolume;voice.connect(effectsGain);
+          voices.add(voice);voice.onended=()=>{voices.delete(voice);voice.disconnect();};voice.start();return;
+        }catch{}
+      }
       try{clip.volume=preferences.effectsVolume;clip.currentTime=0;Promise.resolve(clip.play()).catch(()=>{});}catch{}
     }
     function syncBrewing(){
@@ -73,16 +100,17 @@
     function setBrewing(active){brewing=!!active;syncBrewing();}
     function splash(){effect(splashAudio);}
     function click(){
-      if(!clickAudio||!visible()||preferences.effectsVolume===0)return;
-      try{clickAudio.volume=preferences.effectsVolume;clickAudio.currentTime=0;Promise.resolve(clickAudio.play()).catch(()=>{});}catch{}
+      effect(clickAudio);
     }
+    function lollipop(){effect(lollipopAudio);}
+    for(const event of ['pointerdown','touchend','keydown'])root.document?.addEventListener(event,unlockEffects,{capture:true,passive:true});
     root.document?.addEventListener('pointerdown',play);
     root.document?.addEventListener('click',play);
     root.document?.addEventListener('touchend',play);
     root.document?.addEventListener('keydown',play);
-    root.document?.addEventListener('visibilitychange',()=>{if(visible())play();else stop();syncBrewing();if(!visible())splashAudio?.pause();});
-    root.addEventListener?.('pagehide',()=>{stop();boilAudio?.pause();splashAudio?.pause();});root.addEventListener?.('pageshow',()=>{play();syncBrewing();});
-    return {update,toggle,setVolume,setEffectsVolume,click,setBrewing,splash,get effectsVolume(){return preferences.effectsVolume;},get muted(){return preferences.muted;},get volume(){return preferences.volume;}};
+    root.document?.addEventListener('visibilitychange',()=>{if(visible())play();else{stop();stopEffects();}syncBrewing();});
+    root.addEventListener?.('pagehide',()=>{stop();boilAudio?.pause();stopEffects();});root.addEventListener?.('pageshow',()=>{play();syncBrewing();});
+    return {update,toggle,setVolume,setEffectsVolume,click,lollipop,setBrewing,splash,get effectsVolume(){return preferences.effectsVolume;},get muted(){return preferences.muted;},get volume(){return preferences.volume;}};
   }
   root.GameCoverAudio={create};
 })(globalThis);
