@@ -15,7 +15,7 @@ const again=load({...saved,phase:'ready',scene:'dragon',pot:food});finishRound(a
 const poison=['apple','grape','cabbage','ice_cream','dumpling','frost','plants','bleach'];
 const poisoned=load({phase:'ready',pot:poison,collected:poison,dragonProgress:{stage:4,poisonSeen:false,talked:true}});poisoned.act('drink');assert.equal(poisoned.library.autosave.ending,'five');assert.equal(poisoned.library.autosave.dragonProgress.poisonSeen,true);
 // Continue from the completed poison ending; the next conversation can be the final one.
-const next=load({...poisoned.library.autosave,endingStage:'fin',narrative:null,cinematic:null});next.act('ending-next');next.act('next-round');next.finishText();assert.equal(next.library.autosave.dragonProgress.stage,5);next.act('scene','dragon');next.finishText();next.act('talk');next.finishText();assert.equal(next.library.autosave.ending,'six');
+const next=load({...poisoned.library.autosave,endingStage:'fin',narrative:null,cinematic:null});next.act('ending-next');next.act('next-round');next.finishText();assert.equal(next.library.autosave.dragonProgress.stage,5);next.act('scene','dragon');next.finishText();next.act('talk');next.finishText();next.act('departure-now');assert.equal(next.library.autosave.ending,'six');
 const lab=load({scene:'lab',phase:'explore'});assert.doesNotMatch(lab.html,/data-action="back"/);lab.act('scene','bath');lab.finishText();assert.match(lab.html,/data-action="back"/);
 // Names are editable independently of player ID, survive overwrites and reloads.
 lab.act('settings');lab.act('save-list');lab.act('save-slot','0');lab.act('save-list');lab.act('rename-save','0');

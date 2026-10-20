@@ -5,3 +5,11 @@
 .stage.khaki-ui .dialogue{background-color:rgba(91,81,64,.68)!important}
 .stage.khaki-ui .dialogue p{color:#fff7e8;text-shadow:0 1px 2px rgba(29,23,17,.65)}
 .stage.dialogue-active .travel-arrow,.stage.dialogue-active .notice{visibility:hidden;pointer-events:none}
+
+/* Core colors must work even when a host skips the optional JS theme pass. */
+.stage:not(.cover-menu) .dialogue{background-color:rgba(91,81,64,.68)!important}
+.stage:not(.cover-menu) .dialogue p{font-family:"Microsoft YaHei","PingFang SC","Noto Sans CJK SC",sans-serif;line-height:1.8;letter-spacing:.015em;color:#fff7e8;text-shadow:0 1px 2px rgba(29,23,17,.65)}
+.stage:not(.cover-menu) button:not(.hotspot):not(.reading-surface):not(.ending-screen):not(.white-screen):not(.travel-arrow):not(.body-fur-icon):not(.television),.stage:not(.cover-menu) .speaker{font-family:GameUiRound,"YouYuan","PingFang SC",sans-serif;font-weight:400;background-color:rgba(147,129,96,.9);border-color:#d2c19d}
+.stage:not(.cover-menu) .modal{background-color:rgba(91,81,64,.94);border-color:#d2c19d}
+.stage:not(.cover-menu) .speaker{background-color:rgba(147,129,96,.68)}
+.stage:not(.cover-menu) .item.empty{background-color:transparent}

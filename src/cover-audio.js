@@ -9,7 +9,7 @@
     const lollipopAudio=options.lollipopAudio||(typeof Audio==='function'?new Audio('assets/lollipop-click.mp3'):null);
     const pageTurnAudio=options.pageTurnAudio||(typeof Audio==='function'?new Audio('assets/book-page-turn.mp3'):null);
     const buffers=new Map(),voices=new Set();
-    let effectsContext=null,effectsGain=null;
+    let effectsContext=null,effectsGain=null,effectsPrimed=false;
     // Decode short effects once; each trigger starts a fresh in-memory voice.
     // Keep media playback available for file:// and browsers without Web Audio.
     try{
@@ -24,7 +24,17 @@
         }
       }
     }catch{effectsContext=null;}
-    function unlockEffects(){try{if(effectsContext?.state==='suspended')Promise.resolve(effectsContext.resume()).catch(()=>{});}catch{}}
+    function unlockEffects(){
+      if(!effectsContext||!visible())return;
+      try{
+        if(effectsContext.state==='suspended'||effectsContext.state==='interrupted')Promise.resolve(effectsContext.resume()).catch(()=>{});
+        // Prime the mobile output during the actual gesture, before the first effect.
+        if(!effectsPrimed&&effectsContext.createBuffer){
+          const source=effectsContext.createBufferSource();source.buffer=effectsContext.createBuffer(1,1,effectsContext.sampleRate);
+          source.connect(effectsContext.destination);source.onended=()=>source.disconnect();source.start();effectsPrimed=true;
+        }
+      }catch{}
+    }
     function stopEffects(){for(const voice of voices)try{voice.stop();}catch{}voices.clear();for(const clip of [clickAudio,splashAudio,lollipopAudio,pageTurnAudio])clip?.pause?.();}
     let brewing=false;
     if(boilAudio)boilAudio.loop=true;
@@ -51,7 +61,8 @@
       if(options.audio||typeof Audio!=='function')return;
       for(const [name,src] of Object.entries(tracks)){
         if(loadedTracks.has(name))continue;
-        const clip=new Audio(src);clip.loop=true;prepare(clip);loadedTracks.set(name,clip);
+        // Do not download every full music track alongside the short effect buffers.
+        const clip=new Audio(src);clip.loop=true;clip.preload='metadata';try{clip.load?.();}catch{}loadedTracks.set(name,clip);
       }
     }
     if(root.requestIdleCallback)root.requestIdleCallback(preloadMusic,{timeout:2000});
@@ -72,7 +83,7 @@
       if(track===next)return;
       revision++;pending=null;root.clearInterval?.(musicFadeTimer);musicFadeTimer=null;stop(true);track=next;
       if(audio&&track){
-        if(loadedTracks.has(track))audio=loadedTracks.get(track);
+        if(loadedTracks.has(track)){audio=loadedTracks.get(track);if(audio.preload!=='auto')prepare(audio);}
         else{audio.src=tracks[track];prepare(audio);}
         beginMusicFade();audio.muted=preferences.muted;play();
       }
@@ -83,7 +94,9 @@
     function effect(clip){
       if(!clip||!visible()||preferences.effectsVolume===0)return;
       unlockEffects();
-      if(effectsContext?.state==='running'&&buffers.has(clip)){
+      if(effectsContext&&effectsContext.state!=='closed'&&buffers.has(clip)){
+        // resume() is asynchronous on phones. Queue the source in the context now
+        // instead of falling back to a slower media seek while it is resuming.
         try{
           const voice=effectsContext.createBufferSource();voice.buffer=buffers.get(clip);
           effectsGain.gain.value=preferences.effectsVolume;voice.connect(effectsGain);
@@ -105,12 +118,12 @@
     }
     function lollipop(){effect(lollipopAudio);}
     function pageTurn(){effect(pageTurnAudio);}
-    for(const event of ['pointerdown','touchend','keydown'])root.document?.addEventListener(event,unlockEffects,{capture:true,passive:true});
+    for(const event of ['pointerdown','touchstart','touchend','click','keydown'])root.document?.addEventListener(event,unlockEffects,{capture:true,passive:true});
     root.document?.addEventListener('pointerdown',play);
     root.document?.addEventListener('click',play);
     root.document?.addEventListener('touchend',play);
     root.document?.addEventListener('keydown',play);
-    root.document?.addEventListener('visibilitychange',()=>{if(visible())play();else{stop();stopEffects();}syncBrewing();});
+    root.document?.addEventListener('visibilitychange',()=>{if(visible()){unlockEffects();play();}else{stop();stopEffects();effectsPrimed=false;}syncBrewing();});
     root.addEventListener?.('pagehide',()=>{stop();boilAudio?.pause();stopEffects();});root.addEventListener?.('pageshow',()=>{play();syncBrewing();});
     return {update,toggle,setVolume,setEffectsVolume,click,lollipop,pageTurn,setBrewing,splash,get effectsVolume(){return preferences.effectsVolume;},get muted(){return preferences.muted;},get volume(){return preferences.volume;}};
   }

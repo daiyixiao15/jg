@@ -26,7 +26,7 @@
       for(const key of ['endingStage','endingReality','cinematic','effects','creditsUntil','whiteReadyAt'])delete state[key];
     }
     if(state.phase==='ending'&&state.ending==='two'&&Array.isArray(state.narrative?.lines)){
-      for(const line of state.narrative.lines)if(typeof line.text==='string')line.text=line.text.replace('傻不拉鸡不知什么时候已经站在桌边，帽子戴得端端正正，','傻不拉鸡不知什么时候已经站在桌边，光着小脑袋，');
+      for(const line of state.narrative.lines)if(typeof line.text==='string')line.text=line.text.replace(/傻不拉鸡不知什么时候已经站在桌边，(?:帽子戴得端端正正，|光着小脑袋，)/,'傻不拉鸡不知什么时候已经站在桌边，'+(state.quests?.hatTaken?'光着小脑袋，':'帽子戴得端端正正，'));
     }
     const q=state.quests||{};
     state.quests={ladder:false,tvIntroDone:false,tvTripOrigin:null,tvReturnOrigin:null,tvReturnPending:false,tvLastReturn:{},tvLadderReaction:false,chickenStage:'new',hatOutcome:null,hatRewardPending:false,catFarewellDone:false,groundFurSeen:false,princessGiftBatch:0,princessGiftReminderDone:false,cat:'new',catRewardGround:false,hatTaken:false,princessMet:false,princessOffered:false,princessClaimed:[],princessReturned:[],princessDiscards:0,princessLocked:false,clicks:{},...q};

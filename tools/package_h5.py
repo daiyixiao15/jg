@@ -76,12 +76,22 @@ def build(version, release_date):
             if path:
                 refs.add(path)
     game = files['src/game.js'].decode('utf-8-sig')
+    item_images = re.search(r'const itemImages=\{([^}]+)\}', game)
+    if item_images:
+        for item in re.findall(r"(\w+):'[^']+'", item_images.group(1)):
+            refs.add(local_path(ROOT, f'assets/item-icons/{item}.webp'))
     for value in re.findall(r'[\'"]([\w./-]+\.(?:png|jpg|jpeg|gif|svg|webp|mp3|ogg|wav|woff2?))[\'"]', game):
-        refs.add(local_path(ROOT / 'assets', value))
+        refs.add(local_path(ROOT if value.startswith('assets/') else ROOT / 'assets', value))
     for name, data in files.items():
         if name.startswith('src/') and name.endswith('.js'):
             text = data.decode('utf-8-sig')
-            require(not re.search(r'\b(?:fetch|WebSocket|XMLHttpRequest|EventSource)\s*\(', text), f'Unexpected network API in {name}')
+            network_text = text
+            if name == 'src/cover-audio.js':
+                # Web Audio decodes bundled sound effects using their local media URLs.
+                for value in re.findall(r"new Audio\(['\"](assets/[^'\"]+)['\"]\)", text):
+                    refs.add(local_path(ROOT, value))
+                network_text = network_text.replace('root.fetch(clip.src)', 'localAudioLoad(clip.src)')
+            require(not re.search(r'\b(?:fetch|WebSocket|XMLHttpRequest|EventSource)\s*\(', network_text), f'Unexpected network API in {name}')
             require(not re.search(r'[\'"][A-Za-z]:[\\/]', text), f'Absolute machine path in {name}')
     assets = files['src/assets.js'].decode('utf-8-sig')
     assets = json.JSONDecoder().raw_decode(assets.split('root.GameAssets=', 1)[1].lstrip())[0]
