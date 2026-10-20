@@ -37,7 +37,7 @@
       body.angles[k]=Math.max(0,Math.min(Math.PI+.004,old[k]+body.velocity[k]*dt));
     }
   }
-  function mountCanvas(canvas,from,to,done){
+  function mountCanvas(canvas,from,to,done,onStart){
     const ctx=canvas.getContext('2d');if(!ctx){done();return ()=>{};}
     const rect=canvas.getBoundingClientRect(),w=rect.width,h=rect.height,H=h/1.4,margin=H*.2,half=w/2,depth=w*3.5;
     const ratio=Math.min(root.devicePixelRatio||1,1.5);canvas.width=Math.round(w*ratio);canvas.height=Math.round(h*ratio);ctx.scale(ratio,ratio);ctx.translate(0,margin);
@@ -66,13 +66,13 @@
       const crease=ctx.createLinearGradient(half-8,0,half+8,0);crease.addColorStop(0,'#35261400');crease.addColorStop(.5,'#35261422');crease.addColorStop(1,'#35261400');ctx.fillStyle=crease;ctx.fillRect(half-8,0,16,H);
     }
     const load=file=>new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>{try{resolve(paperTexture(im,file));}catch(error){reject(error);}};im.onerror=reject;im.src='assets/'+file;});
-    Promise.all([load(from),load(to)]).then(([a,b])=>{if(cancelled)return;if(root.matchMedia?.('(prefers-reduced-motion: reduce)').matches){done();return;}paint(a,b);canvas.parentElement?.querySelector('.book-loading-cover')?.remove();function tick(time){if(cancelled)return;if(start===null)start=time;const elapsed=(time-start)/1000,dt=Math.min((time-(last??time))/1000,.035);last=time;for(let t=0;t<dt;t+=1/120)step(body,Math.min(elapsed/1.15,1),Math.min(1/120,dt-t));paint(a,b);if(elapsed>1.15&&body.angles.every((v,i)=>Math.abs(Math.PI-v)<.003&&Math.abs(body.velocity[i])<.025)||elapsed>2.6){done();return;}frame=requestAnimationFrame(tick);}frame=requestAnimationFrame(tick);}).catch(()=>{if(!cancelled)done();});
+    Promise.all([load(from),load(to)]).then(([a,b])=>{if(cancelled)return;onStart?.();if(root.matchMedia?.('(prefers-reduced-motion: reduce)').matches){done();return;}paint(a,b);canvas.parentElement?.querySelector('.book-loading-cover')?.remove();function tick(time){if(cancelled)return;if(start===null)start=time;const elapsed=(time-start)/1000,dt=Math.min((time-(last??time))/1000,.035);last=time;for(let t=0;t<dt;t+=1/120)step(body,Math.min(elapsed/1.15,1),Math.min(1/120,dt-t));paint(a,b);if(elapsed>1.15&&body.angles.every((v,i)=>Math.abs(Math.PI-v)<.003&&Math.abs(body.velocity[i])<.025)||elapsed>2.6){done();return;}frame=requestAnimationFrame(tick);}frame=requestAnimationFrame(tick);}).catch(()=>{if(!cancelled)done();});
     return ()=>{cancelled=true;cancelAnimationFrame(frame);};
   }
-  function mount(canvas,from,to,done){
-    if(root.location?.protocol==='file:')return mountCanvas(canvas,from,to,done);
+  function mount(canvas,from,to,done,onStart){
+    if(root.location?.protocol==='file:')return mountCanvas(canvas,from,to,done,onStart);
     const gl=canvas.getContext('webgl',{alpha:true,antialias:true,premultipliedAlpha:false});
-    if(!gl)return mountCanvas(canvas,from,to,done);
+    if(!gl)return mountCanvas(canvas,from,to,done,onStart);
     const rect=canvas.getBoundingClientRect(),w=Math.max(2,Math.round(rect.width)),h=Math.max(2,Math.round(rect.height));
     const bookHeight=h/1.4,margin=bookHeight*.2,ratio=Math.min(root.devicePixelRatio||1,1.5);
     canvas.width=Math.round(w*ratio);canvas.height=Math.round(h*ratio);gl.viewport(0,0,canvas.width,canvas.height);
@@ -118,6 +118,7 @@
     const load=file=>new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>{const decoded=img.decode?.();Promise.resolve(decoded).catch(()=>{}).then(()=>paperTexture(img,file)).then(resolve,reject);};img.onerror=reject;img.src='assets/'+file;});
     Promise.all([load(from),load(to)]).then(([oldImage,newImage])=>{
       if(cancelled)return;
+      onStart?.();
       if(root.matchMedia?.('(prefers-reduced-motion: reduce)').matches){done();return;}
       texture(oldImage,0);texture(newImage,1);paint();
       canvas.parentElement?.querySelector('.book-loading-cover')?.remove();

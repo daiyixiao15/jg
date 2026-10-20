@@ -434,6 +434,12 @@
     if(state.phase==='ending'){
       if(state.ending==='six')return state.endingStage==='easter'||state.easterSeen?'easter':'trueTwo';
       if(['summary','fin','credits','epilogue','easter'].includes(state.endingStage))return 'summary';
+      if(state.ending==='five'){
+        const setting=state.narrative?.lines[state.narrative.index]?.setting;
+        const homeScene=state.narrative?.after==='five-finish'&&['home','home-lookback'].includes(setting);
+        // Start the homecoming music when the white transition clears; keep it through the final fade.
+        if((homeScene&&state.cinematic?.next!=='five-home')||(state.endingReality&&state.cinematic?.next==='summary'))return 'easter';
+      }
       return ({one:'pig',two:'chef',three:'ugly',four:'bubble',five:'trueOne',six:'trueTwo'})[state.ending]||null;
     }
     if(['explore','brew','mixing','ready'].includes(state.phase))return state.scene==='dragon'?'dragon':state.scene==='ice'?'ice':'collection';
@@ -492,12 +498,13 @@
       const book=app.querySelector('.storybook');
       stopBookTurn=GameBookPhysics.mount(bookCanvas,bookCanvas.dataset.from,bookCanvas.dataset.to,()=>{
         bookTransitionPending=false;book?.classList.remove('physics-turn');bookCanvas.remove();book?.querySelector('.book-loading-cover')?.remove();
-      });
+      },()=>coverAudio?.pageTurn?.());
     }else if(bookCanvas){bookTransitionPending=false;app.querySelector('.storybook')?.classList.remove('physics-turn');bookCanvas.remove();}
     coverAudio?.update(backgroundMusic());
     coverAudio?.setBrewing?.(state.phase==='mixing'&&state.scene==='lab');
     backgroundLoader?.update(visibleBackground,likelyBackgrounds());
     if(state.endingStage==='light-story'&&!endingBackground())app.querySelector?.('.stage')?.classList.add('light-story');
+    if(typeof GameUiTheme!=='undefined')GameUiTheme.apply(app.querySelector?.('.stage'));
     if(modal?.type==='name')document.getElementById('player-name').focus();
     else if(modal){const controls=app.querySelectorAll('.modal button:not([disabled])');controls[0]?.focus();}
     if(state.narrative&&!state.narrative.preview&&!state.cinematic&&!modal&&!bag){

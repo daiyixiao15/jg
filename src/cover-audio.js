@@ -7,6 +7,7 @@
     const boilAudio=options.boilAudio||(typeof Audio==='function'?new Audio('assets/brewing-boil.mp3'):null);
     const splashAudio=options.splashAudio||(typeof Audio==='function'?new Audio('assets/ingredient-splash.wav'):null);
     const lollipopAudio=options.lollipopAudio||(typeof Audio==='function'?new Audio('assets/lollipop-click.mp3'):null);
+    const pageTurnAudio=options.pageTurnAudio||(typeof Audio==='function'?new Audio('assets/book-page-turn.mp3'):null);
     const buffers=new Map(),voices=new Set();
     let effectsContext=null,effectsGain=null;
     // Decode short effects once; each trigger starts a fresh in-memory voice.
@@ -16,7 +17,7 @@
       if(Context&&root.fetch){
         effectsContext=new Context({latencyHint:'interactive'});
         effectsGain=effectsContext.createGain();effectsGain.connect(effectsContext.destination);
-        for(const clip of [clickAudio,splashAudio,lollipopAudio]){
+        for(const clip of [clickAudio,splashAudio,lollipopAudio,pageTurnAudio]){
           if(!clip?.src)continue;
           root.fetch(clip.src).then(response=>{if(!response.ok)throw new Error('Audio load failed');return response.arrayBuffer();})
             .then(bytes=>effectsContext.decodeAudioData(bytes)).then(buffer=>buffers.set(clip,buffer)).catch(()=>{});
@@ -24,7 +25,7 @@
       }
     }catch{effectsContext=null;}
     function unlockEffects(){try{if(effectsContext?.state==='suspended')Promise.resolve(effectsContext.resume()).catch(()=>{});}catch{}}
-    function stopEffects(){for(const voice of voices)try{voice.stop();}catch{}voices.clear();for(const clip of [clickAudio,splashAudio,lollipopAudio])clip?.pause?.();}
+    function stopEffects(){for(const voice of voices)try{voice.stop();}catch{}voices.clear();for(const clip of [clickAudio,splashAudio,lollipopAudio,pageTurnAudio])clip?.pause?.();}
     let brewing=false;
     if(boilAudio)boilAudio.loop=true;
     const tracks={cover:'assets/cover-bgm-fairytale.mp3',prologue:'assets/prologue-bgm-c13.mp3',collection:'assets/collection-bgm.m4a',dragon:'assets/dragon-bgm-c23.mp3',ice:'assets/ice-tower-bgm-f1.mp3',bubble:'assets/ending-bubble-bgm.m4a',chef:'assets/ending-chef-bgm-n5.mp3',summary:'assets/ending-summary-bgm.m4a',trueOne:'assets/ending-true-one-bgm-0618.m4a',ugly:'assets/ending-ugly-bgm-hidamari.mp3',pig:'assets/ending-pig-bgm-picnic.mp3',trueTwo:'assets/ending-true-two-bgm-from52.m4a',easter:'assets/easter-bgm-strawberry.m4a'};
@@ -44,7 +45,7 @@
     const loadedTracks=new Map();
     function prepare(clip){if(!clip)return;clip.preload='auto';try{clip.load?.();}catch{}}
     if(audio){audio.loop=true;audio.autoplay=true;audio.src=tracks.cover;audio.volume=preferences.volume;audio.muted=preferences.muted;prepare(audio);if(!options.audio)loadedTracks.set('cover',audio);}
-    [clickAudio,boilAudio,splashAudio,lollipopAudio].forEach(prepare);
+    [clickAudio,boilAudio,splashAudio,lollipopAudio,pageTurnAudio].forEach(prepare);
     // Warm the remaining music after the initial page has had a chance to render.
     function preloadMusic(){
       if(options.audio||typeof Audio!=='function')return;
@@ -103,6 +104,7 @@
       effect(clickAudio);
     }
     function lollipop(){effect(lollipopAudio);}
+    function pageTurn(){effect(pageTurnAudio);}
     for(const event of ['pointerdown','touchend','keydown'])root.document?.addEventListener(event,unlockEffects,{capture:true,passive:true});
     root.document?.addEventListener('pointerdown',play);
     root.document?.addEventListener('click',play);
@@ -110,7 +112,7 @@
     root.document?.addEventListener('keydown',play);
     root.document?.addEventListener('visibilitychange',()=>{if(visible())play();else{stop();stopEffects();}syncBrewing();});
     root.addEventListener?.('pagehide',()=>{stop();boilAudio?.pause();stopEffects();});root.addEventListener?.('pageshow',()=>{play();syncBrewing();});
-    return {update,toggle,setVolume,setEffectsVolume,click,lollipop,setBrewing,splash,get effectsVolume(){return preferences.effectsVolume;},get muted(){return preferences.muted;},get volume(){return preferences.volume;}};
+    return {update,toggle,setVolume,setEffectsVolume,click,lollipop,pageTurn,setBrewing,splash,get effectsVolume(){return preferences.effectsVolume;},get muted(){return preferences.muted;},get volume(){return preferences.volume;}};
   }
   root.GameCoverAudio={create};
 })(globalThis);
