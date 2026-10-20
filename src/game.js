@@ -343,6 +343,13 @@
     const secondCatBut=firstCatBut>=0?n.lines.findIndex((entry,index)=>index>firstCatBut&&entry.speaker==='cat'&&entry.text==='不过……'):-1;
     const catGrinning=firstCatBut>=0&&n.index>firstCatBut&&n.index<secondCatBut;
     const catThinking=n.after==='cat-choice'&&(catGrinning||line.expression==='thinking'||line.text==='魔法材料？'||line.text.includes('这只黑色毛球的眼睛藏在'));
+    const catAngry=state.scene==='forest'&&state.phase!=='ending'&&line.speaker==='cat'&&[
+      '你叫谁小煤球呢！','喂！这句不准学！',
+      '小气精灵！不帮就不帮！本大王绝不是差你一只精……',
+      '不许偷吃！尤其是尖尖的那一口！',
+      '怎么只有一个！你这让本王怎么出去见人！','你管得着吗！','还有，我是毛绒绒大王！',
+      '你们闭嘴！','笑什么，赶紧走！'
+    ].includes(line.text);
     const npcNames={dragon:'恶龙',cat:'毛绒绒怪',chicken:'傻不拉鸡',princess:'小公主',fur:'毛绒绒',tv:'电视机先生'};
     // Keep the conversation partner visible while the player or narrator speaks.
     const sceneLines=n.lines.filter((entry,index)=>index<=n.index&&entry.setting===line.setting);
@@ -353,7 +360,7 @@
     const pigRevealIndex=n.lines.findIndex(entry=>entry.form==='pig'&&!entry.speaker);
     const hidePigOpeningDragon=state.phase==='ending'&&state.ending==='one'&&pigRevealIndex>=0&&n.index<=pigRevealIndex&&portraitSpeaker==='dragon';
     const dragonSurprised=state.phase==='ending'&&line.speaker==='dragon'&&({one:['……小精灵？','你跑到我面前，就是为了变成一只小猪？'],three:['你的魔法，还会打雷？'],two:['搬锅？找材料？']}[state.ending]||[]).includes(line.text);
-    const npcFile=(cgOnly||endingCG)&&!dragonSurprised||hidePigOpeningDragon||state.endingReality||line.setting==='black'?null:catSleeping?'fluffy-sleep.png':catThinking?'fluffy-thinking.png':portraitSpeaker==='dragon'?(dragonSurprised?'dragon-surprised.webp':npcLine?.expression==='smile'?'dragon-smile.png':'dragon.png'):portraitSpeaker==='cat'?(state.quests.cat==='rewarded'?'fluffy-delivered.png':state.quests.cat==='accepted'?'fluffy-reward.png':'fluffy-wait.png'):portraitSpeaker==='chicken'?(state.phase==='ending'||state.quests.hatTaken?'chicken-dialogue.png':'chicken-hat-dialogue.png'):portraitSpeaker==='princess'?N.princessPortrait(npcLine?.text):portraitSpeaker==='fur'?'fur-dialogue.png':portraitSpeaker==='tv'?'tv-dialogue.png':null;
+    const npcFile=(cgOnly||endingCG)&&!dragonSurprised||hidePigOpeningDragon||state.endingReality||line.setting==='black'?null:catSleeping?'fluffy-sleep.png':catAngry?'fluffy-angry.png':catThinking?'fluffy-thinking.png':portraitSpeaker==='dragon'?(dragonSurprised?'dragon-surprised.webp':npcLine?.expression==='smile'?'dragon-smile.png':'dragon.png'):portraitSpeaker==='cat'?(state.quests.cat==='rewarded'?'fluffy-delivered.png':state.quests.cat==='accepted'?'fluffy-reward.png':'fluffy-wait.png'):portraitSpeaker==='chicken'?(state.phase==='ending'||state.quests.hatTaken?'chicken-dialogue.png':'chicken-hat-dialogue.png'):portraitSpeaker==='princess'?N.princessPortrait(npcLine?.text):portraitSpeaker==='fur'?'fur-dialogue.png':portraitSpeaker==='tv'?'tv-dialogue.png':null;
     const playerFile=line.form==='chef'?'player-chef.png':line.form==='beast'?'red-dragon.png':line.form==='pig'?'ending-pig.png':line.form==='ugly'?'ending-ugly.png':N.playerPortrait(line);
     return `<div class="reading-layer"><button type="button" class="reading-surface" data-action="advance" aria-label="点击画面推进文字"></button>${npcFile?(portraitSpeaker==='dragon'?`<div class="npc-portrait dragon-full-body" data-npc="dragon">${sprite(npcFile,"恶龙立绘")}</div>`:`<div class="npc-portrait other-npc" data-npc="${portraitSpeaker}">${sprite(npcFile,npcNames[portraitSpeaker]+'立绘')}</div>`):''}${!line.hidePortrait&&!cgOnly&&speaker&&line.speaker!=='unknown'&&!state.endingReality&&n.after!=='easter-finished'&&line.form!=='bubble'&&line.setting!=='black'?`${line.form==='chef'?`<div class="player-portrait chef-player-portrait">${sprite(playerFile,"玩家立绘").replace("xMidYMid meet","xMidYMax meet")}</div>`:["pig","ugly"].includes(line.form)?`<div class="player-portrait ending-dialogue-portrait">${sprite(playerFile,"玩家立绘").replace("xMidYMid meet","xMinYMax meet")}</div>`:`<img class="player-portrait" src="assets/${playerFile}" alt="玩家立绘">`}`:''}<div class="dialogue ${speaker?'':'narration'}" role="button" tabindex="0" data-action="advance" aria-label="点击推进对话">${speaker?`<div class="speaker">${esc(speaker)}</div>`:''}<p id="dialog-text">${esc(line.text.replaceAll('{name}',state.playerName).slice(0,n.shown))}</p><small>${state.phase==='prologue'?'点击画面翻页':'点击画面继续'}</small></div></div>`;
   }
